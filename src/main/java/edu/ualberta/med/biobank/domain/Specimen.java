@@ -120,7 +120,7 @@ public class Specimen extends DomainEntity implements HasStatus, HasComments, Ha
     @Column(name = "SAMPLE_ERRORS", columnDefinition = "TEXT")
     private String sampleErrors;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "specimen")
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "specimen")
     private Dna dna;
 
     public String getInventoryId() {
