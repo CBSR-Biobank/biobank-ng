@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.repositories;
 
 import edu.ualberta.med.biobank.dtos.PatientDTO;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import java.util.Optional;
@@ -41,20 +42,24 @@ public class PatientCustomRepository {
     }
 
     public Optional<PatientDTO> findByPnumber(String pnumber) {
-        var query = entityManager.createQuery(PATIENT_INFO_HQL, Tuple.class).setParameter(1, pnumber);
-        var result = query.getSingleResult();
+        try {
+            var query = entityManager.createQuery(PATIENT_INFO_HQL, Tuple.class).setParameter(1, pnumber);
+            var result = query.getSingleResult();
 
-        var patientId = result.get("id", Number.class).intValue();
-        return Optional.of(
-            new PatientDTO(
-                patientId,
-                result.get("pnumber", String.class),
-                result.get("spcCount", Number.class).intValue(),
-                result.get("alqCount", Number.class).intValue(),
-                result.get("studyId", Number.class).intValue(),
-                result.get("studyNameShort", String.class),
-                collectionEventCustomRepository.findByPatientId(patientId)
-            )
-        );
+            var patientId = result.get("id", Number.class).intValue();
+            return Optional.of(
+                new PatientDTO(
+                    patientId,
+                    result.get("pnumber", String.class),
+                    result.get("spcCount", Number.class).intValue(),
+                    result.get("alqCount", Number.class).intValue(),
+                    result.get("studyId", Number.class).intValue(),
+                    result.get("studyNameShort", String.class),
+                    collectionEventCustomRepository.findByPatientId(patientId)
+                )
+            );
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
     }
 }

@@ -36,13 +36,12 @@ public class CollectionEventCustomRepository {
         """
         SELECT cevent.id as id,
                COUNT(DISTINCT sourcesSpecs) as numSourceSpecimens,
-               COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourcesSpecs) as numAliquots,
+               COUNT(DISTINCT allSpecs) - COUNT(DpISTINCT sourcesSpecs) as numAliquots,
                MIN(sourcesSpecs.createdAt) as createdAt
         FROM CollectionEvent as cevent
         LEFT JOIN cevent.originalSpecimens as sourcesSpecs
         LEFT JOIN cevent.allSpecimens as allSpecs
         WHERE cevent.patient.id=?1
-        GROUP BY cevent.id
         """;
 
     @PersistenceContext
