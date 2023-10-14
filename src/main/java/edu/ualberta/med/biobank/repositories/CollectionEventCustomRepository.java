@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.repositories;
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.dtos.CollectionEventSummaryDTO;
 import edu.ualberta.med.biobank.dtos.CommentDTO;
-import edu.ualberta.med.biobank.dtos.EventAttributeDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class CollectionEventCustomRepository {
 
-    Logger logger = LoggerFactory.getLogger(CollectionEventCustomRepository.class);
+    final Logger logger = LoggerFactory.getLogger(CollectionEventCustomRepository.class);
 
     // LEFT JOIN FETCH cevent.eventAttrs eventAttrs
     // LEFT JOIN FETCH eventAttrs.studyEventAttr studyEventAttr
@@ -35,13 +34,14 @@ public class CollectionEventCustomRepository {
     private static final String CEVENT_COUNT_INFO_QRY =
         """
         SELECT cevent.id as id,
-               COUNT(DISTINCT sourcesSpecs) as numSourceSpecimens,
-               COUNT(DISTINCT allSpecs) - COUNT(DpISTINCT sourcesSpecs) as numAliquots,
-               MIN(sourcesSpecs.createdAt) as createdAt
+               COUNT(DISTINCT sourcesSpecimens) as numSourceSpecimens,
+               COUNT(DISTINCT allSpecimens) - COUNT(DISTINCT sourcesSpecimens) as numAliquots,
+               MIN(sourcesSpecimens.createdAt) as createdAt
         FROM CollectionEvent as cevent
-        LEFT JOIN cevent.originalSpecimens as sourcesSpecs
-        LEFT JOIN cevent.allSpecimens as allSpecs
+        LEFT JOIN cevent.originalSpecimens as sourcesSpecimens
+        LEFT JOIN cevent.allSpecimens as allSpecimens
         WHERE cevent.patient.id=?1
+        GROUP BY cevent.id
         """;
 
     @PersistenceContext
@@ -50,6 +50,7 @@ public class CollectionEventCustomRepository {
     public List<CollectionEventSummaryDTO> findByPatientId(Integer patientId) {
         var counts = collectionEventSpecimenCounts(patientId);
         var query = entityManager.createQuery(CEVENT_INFO_QRY).setParameter(1, patientId);
+
         return query
             .getResultStream()
             .map(obj -> {
@@ -90,10 +91,10 @@ public class CollectionEventCustomRepository {
             result.computeIfAbsent(
                 row.get("id", Integer.class),
                 id ->
-                List.of(
-                    row.get("numSourceSpecimens", Number.class).intValue(),
-                    row.get("numAliquots", Number.class).intValue()
-                )
+                    List.of(
+                        row.get("numSourceSpecimens", Number.class).intValue(),
+                        row.get("numAliquots", Number.class).intValue()
+                    )
             );
         }
         return result;

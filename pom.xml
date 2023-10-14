@@ -43,6 +43,12 @@
     -->
 
     <dependency>
+      <groupId>io.github.jbock-java</groupId>
+      <artifactId>either</artifactId>
+      <version>1.4</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.mariadb.jdbc</groupId>
       <artifactId>mariadb-java-client</artifactId>
       <scope>runtime</scope>

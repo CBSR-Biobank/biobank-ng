@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.dtos.PatientSummaryDTO;
 import edu.ualberta.med.biobank.repositories.PatientCustomRepository;
 import edu.ualberta.med.biobank.repositories.PatientRepository;
+import io.jbock.util.Either;
 
 @Service
 public class PatientService {
@@ -32,7 +33,7 @@ public class PatientService {
         patientRepository.save(patient);
     }
 
-    public Optional<PatientDTO> findByPnumber(String pnumber) {
+    public Either<String, PatientDTO> findByPnumber(String pnumber) {
         return patientCustomRepository.findByPnumber(pnumber);
     }
 

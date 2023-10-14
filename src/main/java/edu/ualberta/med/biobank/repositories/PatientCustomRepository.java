@@ -5,10 +5,10 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import io.jbock.util.Either;
 
 @Repository
 public class PatientCustomRepository {
@@ -41,13 +41,13 @@ public class PatientCustomRepository {
         this.collectionEventCustomRepository = collectionEventCustomRepository;
     }
 
-    public Optional<PatientDTO> findByPnumber(String pnumber) {
+    public Either<String, PatientDTO> findByPnumber(String pnumber) {
         try {
             var query = entityManager.createQuery(PATIENT_INFO_HQL, Tuple.class).setParameter(1, pnumber);
             var result = query.getSingleResult();
 
             var patientId = result.get("id", Number.class).intValue();
-            return Optional.of(
+            return Either.right(
                 new PatientDTO(
                     patientId,
                     result.get("pnumber", String.class),
@@ -59,7 +59,7 @@ public class PatientCustomRepository {
                 )
             );
         } catch (NoResultException e) {
-            return Optional.empty();
+            return Either.left("patient not found");
         }
     }
 }

@@ -25,11 +25,9 @@ public class PatientController {
 
     @GetMapping("/{pnumber}")
     public PatientDTO get(@PathVariable String pnumber) {
-        Optional<PatientDTO> maybe = patientService.findByPnumber(pnumber);
-        if (!maybe.isPresent()) {
-            throw new NotFoundException("patient not found");
-        }
-        return maybe.get();
+        return patientService.findByPnumber(pnumber).orElseThrow(err -> {
+                return new NotFoundException(err);
+        });
     }
 
     @GetMapping("")
