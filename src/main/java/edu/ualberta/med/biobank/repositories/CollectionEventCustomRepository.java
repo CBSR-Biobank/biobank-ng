@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.repositories;
 
 import edu.ualberta.med.biobank.domain.CollectionEvent;
-import edu.ualberta.med.biobank.dtos.CommentDTO;
 import edu.ualberta.med.biobank.dtos.CollectionEventSummaryDTO;
+import edu.ualberta.med.biobank.dtos.CommentDTO;
 import edu.ualberta.med.biobank.dtos.EventAttributeDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -34,10 +34,10 @@ public class CollectionEventCustomRepository {
 
     private static final String CEVENT_COUNT_INFO_QRY =
         """
-        SELECT cevent.id,
-               COUNT(DISTINCT sourcesSpecs),
-               COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourcesSpecs),
-               MIN(sourcesSpecs.createdAt)
+        SELECT cevent.id as id,
+               COUNT(DISTINCT sourcesSpecs) as numSourceSpecimens,
+               COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourcesSpecs) as numAliquots,
+               MIN(sourcesSpecs.createdAt) as createdAt
         FROM CollectionEvent as cevent
         LEFT JOIN cevent.originalSpecimens as sourcesSpecs
         LEFT JOIN cevent.allSpecimens as allSpecs
@@ -83,15 +83,19 @@ public class CollectionEventCustomRepository {
     }
 
     private Map<Integer, List<Integer>> collectionEventSpecimenCounts(Integer patientId) {
-        var query = entityManager.createQuery(CEVENT_COUNT_INFO_QRY, Tuple.class).setParameter(1, patientId);
         var result = new HashMap<Integer, List<Integer>>();
+        var query = entityManager.createQuery(CEVENT_COUNT_INFO_QRY, Tuple.class).setParameter(1, patientId);
 
         var rows = query.getResultList();
         for (var row : rows) {
-            var ceventId = ((Number) row.get(0)).intValue();
-            var specimenCount = ((Number) row.get(1)).intValue();
-            var aliquotCount = ((Number) row.get(2)).intValue();
-            result.put(ceventId, List.of(specimenCount, aliquotCount));
+            result.computeIfAbsent(
+                row.get("id", Integer.class),
+                id ->
+                List.of(
+                    row.get("numSourceSpecimens", Number.class).intValue(),
+                    row.get("numAliquots", Number.class).intValue()
+                )
+            );
         }
         return result;
     }
