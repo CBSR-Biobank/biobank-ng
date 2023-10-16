@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.controllers;
+package edu.ualberta.med.biobank.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

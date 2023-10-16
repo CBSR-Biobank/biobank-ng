@@ -17,13 +17,14 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 
 import org.hibernate.annotations.Type;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import edu.ualberta.med.biobank.util.NullUtil;
 
 @Entity
 @Table(name = "ROLE")
 // TODO: check that no Membership uses this role before deleting
-public class Role extends Domain {
+public class Role extends DomainEntity {
     public static final NameComparator NAME_COMPARATOR = new NameComparator();
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.domain.Role.name.NotEmpty}")

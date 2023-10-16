@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -24,9 +25,10 @@ public class User extends Principal implements HasComments {
     @Column(name = "LOGIN", unique = true)
     private String login;
 
-    @NotNull(message = "{edu.ualberta.med.biobank.domain.User.csmUserId.NotNull}")
-    @Column(name = "CSM_USER_ID", unique = true)
-    private Long csmUserId;
+    @NotNull(message = "{edu.ualberta.med.biobank.domain.User.csmUser.NotNull}")
+    @OneToOne
+    @JoinColumn(name = "CSM_USER_ID")
+    private CSMUser csmUser;
 
     @Column(name = "RECV_BULK_EMAILS")
     private boolean recvBulkEmails = true;
@@ -52,14 +54,6 @@ public class User extends Principal implements HasComments {
 
     public void setLogin(String login) {
         this.login = login;
-    }
-
-    public Long getCsmUserId() {
-        return this.csmUserId;
-    }
-
-    public void setCsmUserId(Long csmUserId) {
-        this.csmUserId = csmUserId;
     }
 
     // TODO: rename to isRecvBulkEmails
@@ -110,6 +104,14 @@ public class User extends Principal implements HasComments {
 
     public Set<Group> getGroups() {
         return this.groups;
+    }
+
+    public CSMUser getCsmUser() {
+        return csmUser;
+    }
+
+    public void setCsmUser(CSMUser csmUser) {
+        this.csmUser = csmUser;
     }
 
     public void setGroups(Set<Group> groups) {

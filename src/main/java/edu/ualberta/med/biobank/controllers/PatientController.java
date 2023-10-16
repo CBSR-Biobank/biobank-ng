@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.dtos.PatientSummaryDTO;
+import edu.ualberta.med.biobank.exception.NotFoundException;
 import edu.ualberta.med.biobank.services.PatientService;
 
 @RestController

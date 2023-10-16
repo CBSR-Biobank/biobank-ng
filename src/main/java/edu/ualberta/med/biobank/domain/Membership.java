@@ -56,8 +56,7 @@ public class Membership extends DomainEntity {
     private Domain domain = new Domain();
 
     @ElementCollection(targetClass = PermissionEnum.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "MEMBERSHIP_PERMISSION",
-        joinColumns = @JoinColumn(name = "ID"))
+    @CollectionTable(name = "MEMBERSHIP_PERMISSION",joinColumns = @JoinColumn(name = "ID"))
     @Column(name = "PERMISSION_ID", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private Set<PermissionEnum> permissions = new HashSet<PermissionEnum>(0);

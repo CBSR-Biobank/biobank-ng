@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.controllers;
+package edu.ualberta.med.biobank.exception;
 
 import java.time.LocalDateTime;
 

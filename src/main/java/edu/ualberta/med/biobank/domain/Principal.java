@@ -18,8 +18,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Type;
-
 @Entity
 @Table(name = "PRINCIPAL")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
