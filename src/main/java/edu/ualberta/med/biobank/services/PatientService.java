@@ -11,12 +11,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import edu.ualberta.med.biobank.errors.AppError;
+import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.domain.Patient;
 import edu.ualberta.med.biobank.dtos.CollectionEventSummaryDTO;
 import edu.ualberta.med.biobank.dtos.CommentDTO;
 import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.dtos.PatientSummaryDTO;
+import edu.ualberta.med.biobank.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.repositories.CollectionEventCustomRepository;
 import edu.ualberta.med.biobank.repositories.CollectionEventRepository;
 import edu.ualberta.med.biobank.repositories.PatientCustomRepository;
@@ -44,9 +47,20 @@ public class PatientService {
         patientRepository.save(patient);
     }
 
-    public Either<String, PatientDTO> findByPnumber(String pnumber) {
+    public Either<AppError, Patient> getByPatientId(Integer id) {
+        return patientRepository.findById(id)
+            .map(Either::<AppError, Patient>right)
+            .orElseGet(() -> Either.left(new EntityNotFound("patient")));
+    }
+
+    public Either<AppError, PatientDTO> findByPnumber(String pnumber) {
         return patientCustomRepository.findByPnumber(pnumber)
-                .map(p -> {
+            .flatMap(patient -> {
+                    var permission = new PatientReadPermission(patient.getStudyId());
+                    var allowed = permission.isAllowed();
+                    return allowed.map(a -> patient);
+                })
+            .map(p -> {
                     final var counts = collectionEventCustomRepository.collectionEventSpecimenCounts(p.getId());
                     var collectionEvents = collectionEventRepository.findByPatientId(p.getId()).stream()
                         .map(ce -> toCollectionEventDTO(ce, counts.get(ce.getId())))

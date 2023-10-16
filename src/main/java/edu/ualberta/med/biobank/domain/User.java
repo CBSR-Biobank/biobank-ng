@@ -1,21 +1,51 @@
 package edu.ualberta.med.biobank.domain;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedEntityGraphs;
+import jakarta.persistence.NamedSubgraph;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 
+@NamedEntityGraphs(
+    {
+        @NamedEntityGraph(
+            name = "user-with-groups",
+            attributeNodes = { @NamedAttributeNode("groups"), @NamedAttributeNode("csmUser") }
+        ),
+        @NamedEntityGraph(
+            name = "user-with-groups-and-memberships",
+            attributeNodes = {
+                @NamedAttributeNode(value = "groups", subgraph = "groups-memberships-subgraph"),
+                @NamedAttributeNode(value = "memberships", subgraph = "memberships-subgraph")
+            },
+            subgraphs = {
+                @NamedSubgraph(
+                    name = "groups-memberships-subgraph",
+                    attributeNodes = { @NamedAttributeNode(value = "memberships", subgraph = "memberships-subgraph") }
+                ),
+                @NamedSubgraph(
+                    name = "memberships-subgraph",
+                    attributeNodes = {
+                        @NamedAttributeNode("domain"), @NamedAttributeNode("permissions"), @NamedAttributeNode("roles")
+                    }
+                )
+            }
+        )
+    }
+)
 @Entity
 @DiscriminatorValue("User")
 public class User extends Principal implements HasComments {

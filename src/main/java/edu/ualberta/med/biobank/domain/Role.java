@@ -16,9 +16,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 
-import org.hibernate.annotations.Type;
-import org.hibernate.validator.constraints.UniqueElements;
-
 import edu.ualberta.med.biobank.util.NullUtil;
 
 @Entity

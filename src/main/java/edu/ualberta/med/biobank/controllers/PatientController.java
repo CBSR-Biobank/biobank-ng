@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.dtos.PatientSummaryDTO;
-import edu.ualberta.med.biobank.exception.NotFoundException;
+import edu.ualberta.med.biobank.exception.AppErrorException;
 import edu.ualberta.med.biobank.services.PatientService;
 
 @RestController
@@ -27,7 +27,7 @@ public class PatientController {
     @GetMapping("/{pnumber}")
     public PatientDTO get(@PathVariable String pnumber) {
         return patientService.findByPnumber(pnumber).orElseThrow(err -> {
-                return new NotFoundException(err);
+                return new AppErrorException(err);
         });
     }
 

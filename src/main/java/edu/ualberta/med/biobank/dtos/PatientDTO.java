@@ -15,6 +15,10 @@ public record PatientDTO(
         return id;
     }
 
+    public Integer getStudyId() {
+        return studyId;
+    }
+
     public PatientDTO withCollectionEvents(List<CollectionEventSummaryDTO> collectionEvents) {
         return new PatientDTO(
             id,

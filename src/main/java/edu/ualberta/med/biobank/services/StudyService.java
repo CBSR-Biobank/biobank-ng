@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 
 import edu.ualberta.med.biobank.domain.Study;
 import edu.ualberta.med.biobank.dtos.StudyDTO;
+import edu.ualberta.med.biobank.errors.AppError;
+import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.repositories.StudyRepository;
+import io.jbock.util.Either;
 
 @Service
 public class StudyService {
@@ -18,6 +21,12 @@ public class StudyService {
 
     public void save(Study study) {
         studyRepository.save(study);
+    }
+
+    public Either<AppError, Study> getByStudyId(Integer id) {
+        return studyRepository.findById(id)
+            .map(Either::<AppError, Study>right)
+            .orElseGet(() -> Either.left(new EntityNotFound("not found")));
     }
 
     public Page<StudyDTO> studyPagination(Integer pageNumber, Integer pageSize, String sort) {

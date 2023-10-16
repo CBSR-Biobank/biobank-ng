@@ -8,4 +8,6 @@ import edu.ualberta.med.biobank.domain.Study;
 
 @Repository
 public interface StudyRepository extends JpaRepository<Study, Long>{
+    Optional<Study> findById(Integer id);
+
 }

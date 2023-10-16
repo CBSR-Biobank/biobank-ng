@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.repositories;
 
 import java.util.List;
 import edu.ualberta.med.biobank.dtos.PatientDTO;
+import edu.ualberta.med.biobank.errors.AppError;
+import edu.ualberta.med.biobank.errors.EntityNotFound;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
@@ -36,14 +38,8 @@ public class PatientCustomRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private CollectionEventCustomRepository collectionEventCustomRepository;
-
-    PatientCustomRepository(CollectionEventCustomRepository collectionEventCustomRepository) {
-        this.collectionEventCustomRepository = collectionEventCustomRepository;
-    }
-
     // returns an empty list for collection events, the caller can populate these after
-    public Either<String, PatientDTO> findByPnumber(String pnumber) {
+    public Either<AppError, PatientDTO> findByPnumber(String pnumber) {
         try {
             var query = entityManager.createQuery(PATIENT_INFO_HQL, Tuple.class).setParameter(1, pnumber);
             var result = query.getSingleResult();
@@ -61,7 +57,7 @@ public class PatientCustomRepository {
                 )
             );
         } catch (NoResultException e) {
-            return Either.left("patient not found");
+            return Either.left(new EntityNotFound("patient"));
         }
     }
 }

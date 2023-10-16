@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.exception;
 
 import java.time.LocalDateTime;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -8,8 +11,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import edu.ualberta.med.biobank.errors.EntityNotFound;
+import edu.ualberta.med.biobank.errors.Unauthorized;
+import edu.ualberta.med.biobank.errors.ValidationError;
+
 @RestControllerAdvice
 public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
+
+    private final Logger logger = LoggerFactory.getLogger(CustomizedResponseEntityExceptionHandler.class);
+
 
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<ExceptionResponse> handleAllExceptions(Exception exception, WebRequest request) {
@@ -19,20 +29,35 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
             request.getDescription(false)
         );
 
+        logger.error("an exception occurred", exception);
         return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(NotFoundException.class)
-    public final ResponseEntity<ExceptionResponse> handleUserNotFoundException(
-        NotFoundException notFoundException,
+    @ExceptionHandler(AppErrorException.class)
+    public final ResponseEntity<ExceptionResponse> handleAppErrorException(
+        AppErrorException appErrorException,
         WebRequest request
     ) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        if (appErrorException.appError instanceof EntityNotFound) {
+            status = HttpStatus.NOT_FOUND;
+        }
+
+        if (appErrorException.appError instanceof Unauthorized) {
+            status = HttpStatus.UNAUTHORIZED;
+        }
+
+        if (appErrorException.appError instanceof ValidationError) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+
         ExceptionResponse exceptionResponse = new ExceptionResponse(
             LocalDateTime.now(),
-            notFoundException.getMessage(),
+            appErrorException.appError.getMessage(),
             request.getDescription(false)
         );
 
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(exceptionResponse, status);
     }
 }
