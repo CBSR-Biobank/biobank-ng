@@ -5,9 +5,25 @@ import java.util.List;
 public record PatientDTO(
     Integer id,
     String pnumber,
-    Integer sourceSpecimenCount,
-    Integer aliquotsCount,
+    Integer specimenCount,
+    Integer aliquotCount,
     Integer studyId,
     String studyNameShort,
     List<CollectionEventSummaryDTO> collectionEvents
-) {}
+) {
+    public Integer getId() {
+        return id;
+    }
+
+    public PatientDTO withCollectionEvents(List<CollectionEventSummaryDTO> collectionEvents) {
+        return new PatientDTO(
+            id,
+            pnumber,
+            specimenCount,
+            aliquotCount,
+            studyId,
+            studyNameShort,
+            collectionEvents
+        );
+    }
+}

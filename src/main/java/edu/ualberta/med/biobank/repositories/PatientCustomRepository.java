@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.repositories;
 
+import java.util.List;
 import edu.ualberta.med.biobank.dtos.PatientDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -41,6 +42,7 @@ public class PatientCustomRepository {
         this.collectionEventCustomRepository = collectionEventCustomRepository;
     }
 
+    // returns an empty list for collection events, the caller can populate these after
     public Either<String, PatientDTO> findByPnumber(String pnumber) {
         try {
             var query = entityManager.createQuery(PATIENT_INFO_HQL, Tuple.class).setParameter(1, pnumber);
@@ -55,7 +57,7 @@ public class PatientCustomRepository {
                     result.get("alqCount", Number.class).intValue(),
                     result.get("studyId", Number.class).intValue(),
                     result.get("studyNameShort", String.class),
-                    collectionEventCustomRepository.findByPatientId(patientId)
+                    List.of()
                 )
             );
         } catch (NoResultException e) {

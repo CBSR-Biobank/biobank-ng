@@ -18,19 +18,6 @@ public class CollectionEventCustomRepository {
 
     final Logger logger = LoggerFactory.getLogger(CollectionEventCustomRepository.class);
 
-    // LEFT JOIN FETCH cevent.eventAttrs eventAttrs
-    // LEFT JOIN FETCH eventAttrs.studyEventAttr studyEventAttr
-    // LEFT JOIN FETCH studyEventAttr.globalEventAttr globalEventAttr
-
-    private static final String CEVENT_INFO_QRY =
-        """
-        SELECT DISTINCT cevent
-        FROM CollectionEvent as cevent
-        LEFT JOIN FETCH cevent.comments comments
-        LEFT JOIN FETCH comments.user
-        WHERE cevent.patient.id=?1
-        """;
-
     private static final String CEVENT_COUNT_INFO_QRY =
         """
         SELECT cevent.id as id,
@@ -47,42 +34,10 @@ public class CollectionEventCustomRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<CollectionEventSummaryDTO> findByPatientId(Integer patientId) {
-        var counts = collectionEventSpecimenCounts(patientId);
-        var query = entityManager.createQuery(CEVENT_INFO_QRY).setParameter(1, patientId);
-
-        return query
-            .getResultStream()
-            .map(obj -> {
-                var cevent = (CollectionEvent) obj;
-                return toCollectionEventDTO(cevent, counts.get(cevent.getId()));
-            })
-            .toList();
-    }
-
-    public static CollectionEventSummaryDTO toCollectionEventDTO(CollectionEvent cevent, List<Integer> counts) {
-        return new CollectionEventSummaryDTO(
-            cevent.getId(),
-            cevent.getVisitNumber(),
-            counts.get(0),
-            counts.get(1),
-            cevent.getActivityStatus().getName(),
-            cevent
-                .getComments()
-                .stream()
-                .map(comment ->
-                    new CommentDTO(
-                        comment.getId(),
-                        comment.getMessage(),
-                        comment.getUser().getFullName(),
-                        comment.getCreatedAt().toString()
-                    )
-                )
-                .toList()
-        );
-    }
-
-    private Map<Integer, List<Integer>> collectionEventSpecimenCounts(Integer patientId) {
+    // returns a map of the collection event counts for a patient
+    //
+    // the keys of the map are the collection event IDs
+    public Map<Integer, List<Integer>> collectionEventSpecimenCounts(Integer patientId) {
         var result = new HashMap<Integer, List<Integer>>();
         var query = entityManager.createQuery(CEVENT_COUNT_INFO_QRY, Tuple.class).setParameter(1, patientId);
 
