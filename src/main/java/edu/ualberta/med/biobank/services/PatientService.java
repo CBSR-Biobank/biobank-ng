@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.domain.Patient;
 import edu.ualberta.med.biobank.dtos.CollectionEventSummaryDTO;
-import edu.ualberta.med.biobank.dtos.CommentDTO;
 import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.dtos.PatientSummaryDTO;
 import edu.ualberta.med.biobank.permission.patient.PatientReadPermission;
@@ -86,19 +85,7 @@ public class PatientService {
             cevent.getVisitNumber(),
             counts.get(0),
             counts.get(1),
-            cevent.getActivityStatus().getName(),
-            cevent
-                .getComments()
-                .stream()
-                .map(comment ->
-                    new CommentDTO(
-                        comment.getId(),
-                        comment.getMessage(),
-                        comment.getUser().getFullName(),
-                        comment.getCreatedAt().toString()
-                    )
-                )
-                .toList()
+            cevent.getActivityStatus().getName()
         );
     }
 }

@@ -7,6 +7,5 @@ public record CollectionEventSummaryDTO(
     Integer visitNumber,
     Integer specimenCount,
     Integer aliquotCount,
-    String status,
-    List<CommentDTO> comments
+    String status
 ) {}

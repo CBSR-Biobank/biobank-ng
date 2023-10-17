@@ -14,19 +14,7 @@ public interface PatientRepository extends JpaRepository<Patient, Integer>{
     @EntityGraph(attributePaths = {"study"})
     Optional<Patient> findById(Integer id);
 
-    @EntityGraph(attributePaths = {"study"})
-    @Query(
-           value = """
-           SELECT p
-           FROM Patient p
-           JOIN FETCH p.study study
-           LEFT JOIN FETCH study.researchGroup rgroup
-           LEFT JOIN FETCH p.collectionEvents ce
-           LEFT JOIN FETCH ce.eventAttrs evattr
-           LEFT JOIN FETCH evattr.studyEventAttr sattr
-           LEFT JOIN FETCH sattr.globalEventAttr gattr
-           WHERE p.pnumber = :pnumber
-           """
-           )
+    @EntityGraph(attributePaths = {"study", "collectionEvents", "comments"})
+    @Query("SELECT p FROM Patient p WHERE p.pnumber = :pnumber")
     List<Patient> findByPnumber(String pnumber);
 }

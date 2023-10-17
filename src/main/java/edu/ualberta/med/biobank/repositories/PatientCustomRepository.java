@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.repositories;
 
+import java.util.Date;
 import java.util.List;
 import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.errors.AppError;
@@ -22,6 +23,7 @@ public class PatientCustomRepository {
         """
         SELECT p.id as id,
                p.pnumber as pnumber,
+               p.createdAt as createdAt,
                p.study.id as studyId,
                p.study.nameShort as studyNameShort,
                COUNT(DISTINCT sourceSpecs) as spcCount,
@@ -49,6 +51,7 @@ public class PatientCustomRepository {
                 new PatientDTO(
                     patientId,
                     result.get("pnumber", String.class),
+                    result.get("createdAt", Date.class),
                     result.get("spcCount", Number.class).intValue(),
                     result.get("alqCount", Number.class).intValue(),
                     result.get("studyId", Number.class).intValue(),
