@@ -14,7 +14,7 @@ public interface PatientRepository extends JpaRepository<Patient, Integer>{
     @EntityGraph(attributePaths = {"study"})
     Optional<Patient> findById(Integer id);
 
-    @EntityGraph(attributePaths = {"study", "collectionEvents", "comments"})
+    @EntityGraph(attributePaths = {"study", "collectionEvents"})
     @Query("SELECT p FROM Patient p WHERE p.pnumber = :pnumber")
     List<Patient> findByPnumber(String pnumber);
 }

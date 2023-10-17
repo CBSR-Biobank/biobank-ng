@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.domain.Patient;
 import edu.ualberta.med.biobank.dtos.CollectionEventSummaryDTO;
 import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.dtos.PatientSummaryDTO;
+import edu.ualberta.med.biobank.dtos.SpecimenCountsDTO;
 import edu.ualberta.med.biobank.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.repositories.CollectionEventCustomRepository;
 import edu.ualberta.med.biobank.repositories.CollectionEventRepository;
@@ -55,13 +56,14 @@ public class PatientService {
     public Either<AppError, PatientDTO> findByPnumber(String pnumber) {
         return patientCustomRepository.findByPnumber(pnumber)
             .flatMap(patient -> {
-                    var permission = new PatientReadPermission(patient.getStudyId());
+                    var permission = new PatientReadPermission(patient.studyId());
                     var allowed = permission.isAllowed();
                     return allowed.map(a -> patient);
                 })
             .map(p -> {
-                    final var counts = collectionEventCustomRepository.collectionEventSpecimenCounts(p.getId());
-                    var collectionEvents = collectionEventRepository.findByPatientId(p.getId()).stream()
+                    final var counts = collectionEventCustomRepository.collectionEventCountsByPatientId(p.id());
+                    var collectionEvents = collectionEventRepository.findByPatientId(p.id())
+                        .stream()
                         .map(ce -> toCollectionEventDTO(ce, counts.get(ce.getId())))
                         .toList();
                     return p.withCollectionEvents(collectionEvents);
@@ -79,12 +81,12 @@ public class PatientService {
         return data.map(p -> new PatientSummaryDTO(p.getPnumber(), p.getStudy().getId(), p.getStudy().getNameShort()));
     }
 
-    private static CollectionEventSummaryDTO toCollectionEventDTO(CollectionEvent cevent, List<Integer> counts) {
+    private static CollectionEventSummaryDTO toCollectionEventDTO(CollectionEvent cevent, SpecimenCountsDTO counts) {
         return new CollectionEventSummaryDTO(
             cevent.getId(),
             cevent.getVisitNumber(),
-            counts.get(0),
-            counts.get(1),
+            counts.specimenCount(),
+            counts.aliquotCount(),
             cevent.getActivityStatus().getName()
         );
     }

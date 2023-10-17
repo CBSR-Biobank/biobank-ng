@@ -5,8 +5,11 @@ import java.util.List;
 public record CollectionEventDTO(
     Integer id,
     Integer visitNumber,
-    Integer specimenCount,
-    Integer aliquotCount,
     String status,
-    List<EventAttributeDTO> attributes
+    Integer patientId,
+    String patientNumber,
+    Integer studyId,
+    String studyNameShort,
+    List<EventAttributeDTO> attributes,
+    List<CommentDTO> comments
 ) {}

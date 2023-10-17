@@ -19,7 +19,7 @@ public class PatientCustomRepository {
 
     Logger logger = LoggerFactory.getLogger(PatientCustomRepository.class);
 
-    private static final String PATIENT_INFO_HQL =
+    private static final String FIND_BY_PNUMBER_QRY =
         """
         SELECT p.id as id,
                p.pnumber as pnumber,
@@ -43,7 +43,7 @@ public class PatientCustomRepository {
     // returns an empty list for collection events, the caller can populate these after
     public Either<AppError, PatientDTO> findByPnumber(String pnumber) {
         try {
-            var query = entityManager.createQuery(PATIENT_INFO_HQL, Tuple.class).setParameter(1, pnumber);
+            var query = entityManager.createQuery(FIND_BY_PNUMBER_QRY, Tuple.class).setParameter(1, pnumber);
             var result = query.getSingleResult();
 
             var patientId = result.get("id", Number.class).intValue();
