@@ -11,5 +11,6 @@ public record CollectionEventDTO(
     Integer studyId,
     String studyNameShort,
     List<EventAttributeDTO> attributes,
-    List<CommentDTO> comments
+    List<CommentDTO> comments,
+    List<SourceSpecimenDTO> sourceSpecimens
 ) {}

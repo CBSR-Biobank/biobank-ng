@@ -4,6 +4,7 @@ import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.dtos.CollectionEventDTO;
 import edu.ualberta.med.biobank.dtos.CommentDTO;
 import edu.ualberta.med.biobank.dtos.EventAttributeDTO;
+import edu.ualberta.med.biobank.dtos.SourceSpecimenDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.permission.patient.CollectionEventReadPermission;
@@ -77,6 +78,26 @@ public class CollectionEventService {
                         comment.getMessage(),
                         comment.getUser().getLogin(),
                         comment.getCreatedAt()
+                    )
+                )
+                .toList(),
+            cevent
+                .getOriginalSpecimens()
+                .stream()
+                .map(specimen ->
+                    new SourceSpecimenDTO(
+                        specimen.getId(),
+                        specimen.getInventoryId(),
+                        specimen.getSpecimenType().getId(),
+                        specimen.getSpecimenType().getNameShort(),
+                        specimen.getCreatedAt(),
+                        specimen.getQuantity(),
+                        specimen.getActivityStatus().getName(),
+                        specimen.getOriginInfo().getCenter().getId(),
+                        specimen.getOriginInfo().getCenter().getNameShort(),
+                        specimen.getCurrentCenter().getId(),
+                        specimen.getCurrentCenter().getNameShort(),
+                        specimen.getComments().size() > 0
                     )
                 )
                 .toList()

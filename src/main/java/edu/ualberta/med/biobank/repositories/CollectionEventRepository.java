@@ -29,7 +29,12 @@ public interface CollectionEventRepository
             "eventAttrs.studyEventAttr",
             "eventAttrs.studyEventAttr.study",
             "eventAttrs.studyEventAttr.study.researchGroup",
-            "eventAttrs.studyEventAttr.globalEventAttr"
+            "eventAttrs.studyEventAttr.globalEventAttr",
+            "originalSpecimens",
+            "originalSpecimens.specimenType",
+            "originalSpecimens.originInfo",
+            "originalSpecimens.originInfo.center",
+            "originalSpecimens.comments",
         }
     )
     public List<CollectionEvent> findAll(Specification<CollectionEvent> spec);
