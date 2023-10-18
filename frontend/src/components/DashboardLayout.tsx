@@ -56,7 +56,7 @@ export function DashboardLayout() {
             </Button>
           )}
           <Link to="/" className="flex items-center gap-2 px-4">
-            <span className="text-md font-sans font-semibold tracking-tight">Biobank</span>
+            <span className="text-md font-sans font-semibold tracking-tight">CBSR Biobank</span>
           </Link>
         </div>
         {!loggedIn && (

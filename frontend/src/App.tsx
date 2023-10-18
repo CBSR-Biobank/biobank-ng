@@ -37,7 +37,7 @@ function NoMatch() {
 
 export function App() {
   return (
-    <div className="flex flex-col">
+    <div className="grid grid-cols-1 gap-2">
       <RouterProvider router={router} fallbackElement={<p>Loading...</p>} />
     </div>
   );
