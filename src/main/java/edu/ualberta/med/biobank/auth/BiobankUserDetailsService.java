@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.auth;
 
 import edu.ualberta.med.biobank.domain.Status;
-import edu.ualberta.med.biobank.repositories.UserRepository;
 import edu.ualberta.med.biobank.services.UserService;
 
 import java.util.ArrayList;
@@ -29,12 +28,11 @@ public class BiobankUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         var dbUsers = userService.findByLogin(username);
 
-        if (dbUsers.size() <= 0) {
-            throw new UsernameNotFoundException("User details not found for this username: " + username);
+        if (dbUsers.isLeft()) {
+            throw new UsernameNotFoundException("User not found for this username: " + username);
         }
 
-        var dbUser = dbUsers.get(0);
-
+        var dbUser = dbUsers.getRight().get();
         List<SimpleGrantedAuthority> authList = new ArrayList<>();
         authList.add(new SimpleGrantedAuthority("ROLE_USER"));
 
