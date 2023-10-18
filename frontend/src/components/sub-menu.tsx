@@ -1,7 +1,7 @@
 import { cn } from '@app/utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
-import { MenuItem } from './menuItem';
+import { MenuItem } from './menu-item';
 
 export const SubMenu: React.FC<{ menuItems: MenuItem[]; open: boolean }> = ({ menuItems, open }) => {
   const navigate = useNavigate();

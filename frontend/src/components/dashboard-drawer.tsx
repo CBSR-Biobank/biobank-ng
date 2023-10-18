@@ -17,8 +17,8 @@ import {
   faWrench
 } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
-import { DrawerMenuItem } from './DrawerMenuItem';
-import { MenuItem } from './menuItem';
+import { DrawerMenuItem } from './drawer-menu-item';
+import { MenuItem } from './menu-item';
 
 // https://codepen.io/devdojo/pen/NWyPrGe
 // https://github.com/Sridhar-C-25/sidebar_reactTailwind/blob/main/src/App.jsx

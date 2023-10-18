@@ -1,14 +1,14 @@
 import { ApiError, login } from '@app/api/api';
-import { AdminPage } from '@app/pages/AdminPage';
+import { AdminPage } from '@app/pages/admin-page';
 import { useUserStore } from '@app/store';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { Alert } from './Alert';
-import { OkButton } from './OkButton';
-import { LabelledInput } from './forms/LabelledInput';
+import { Alert } from './alert';
+import { LabelledInput } from './forms/labelled-input';
+import { OkButton } from './ok-button';
 
 const schema = z.object({
   username: z.string().min(1, { message: 'A username is required' }),
@@ -21,7 +21,7 @@ export function Login() {
   const navigate = useNavigate();
   const { loggedIn, setLoggedIn } = useUserStore();
   const [loginError, setLoginError] = useState(false);
-  const [loginErrorMessage, setLoginErrorMessage] = useState("");
+  const [loginErrorMessage, setLoginErrorMessage] = useState('');
 
   const {
     register,
@@ -38,7 +38,8 @@ export function Login() {
 
   const onSubmit = async (values: FormInputs) => {
     try {
-      const result = await login(values.username, values.password);
+      //const _result = await login(values.username, values.password);
+      await login(values.username, values.password);
       setLoggedIn(true);
       navigate('/');
     } catch (e) {

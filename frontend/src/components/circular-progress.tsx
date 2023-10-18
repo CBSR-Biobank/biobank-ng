@@ -3,7 +3,7 @@ export const CircularProgress: React.FC = () => {
     <div role="status">
       <svg
         aria-hidden="true"
-        className="mr-2 h-8 w-8 animate-spin fill-primary-600 text-basic-200 dark:text-gray-600"
+        className="mr-2 h-8 w-8 animate-spin fill-sky-600 text-slate-200 dark:text-gray-600"
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

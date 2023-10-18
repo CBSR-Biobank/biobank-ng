@@ -1,7 +1,7 @@
 import { cn } from '@app/utils';
 import React from 'react';
 import { Input } from '../ui/input';
-import { FormLabel } from './FormLabel';
+import { FormLabel } from './form-label';
 
 export const labelClasses = cn('text-sm font-semibold text-gray-500');
 

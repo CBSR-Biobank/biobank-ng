@@ -5,8 +5,8 @@ type Route = Record<string, string>;
 export const API_ROUTES: Readonly<Record<string, Route>> = {
   auth: { index: '/api/auth' },
   patients: {
-    index: '/api/patients/',
-    patient: '/api/patients/:patientId/'
+    index: '/api/patients',
+    pnumber: '/api/patients/:pnumber'
   }
 } as const;
 
@@ -48,7 +48,7 @@ export async function login(username: string, password: string) {
     }
     const err: ApiError = {
       status: response.status,
-      error:  (response.status === 401) ? "unauthrorized" : "unknown"
+      error: response.status === 401 ? 'unauthrorized' : 'unknown'
     };
     console.error(err);
     throw err;

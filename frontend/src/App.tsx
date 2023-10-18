@@ -1,7 +1,7 @@
-import { Login } from '@app/components/Login';
-import { HomePage } from '@app/pages/HomePage';
+import { Login } from '@app/components/login';
+import { HomePage } from '@app/pages/homepage';
 import { Link, RouterProvider, createBrowserRouter } from 'react-router-dom';
-import { DashboardLayout } from './components/DashboardLayout';
+import { DashboardLayout } from './components/dashboard-layout';
 
 const router = createBrowserRouter([
   {
@@ -15,6 +15,25 @@ const router = createBrowserRouter([
       {
         path: 'login',
         element: <Login />
+      },
+      {
+        path: 'patients',
+        children: [
+          {
+            index: true,
+            async lazy() {
+              let { PatientSelect } = await import('@app/pages/patients/patient-select');
+              return { Component: PatientSelect };
+            }
+          },
+          {
+            path: ':pnumber',
+            async lazy() {
+              let { PatientView } = await import('@app/pages/patients/patient-view');
+              return { Component: PatientView };
+            }
+          }
+        ]
       },
       {
         path: '*',

@@ -12,7 +12,7 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MenuItem } from './menuItem';
+import { MenuItem } from './menu-item';
 
 export const PopupSubMenu: React.FC<{
   menuItem: MenuItem;

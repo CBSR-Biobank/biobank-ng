@@ -5,9 +5,9 @@ import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PopupSubMenu } from './PopupSubMenu';
-import { SubMenu } from './SubMenu';
-import { MenuItem } from './menuItem';
+import { MenuItem } from './menu-item';
+import { PopupSubMenu } from './popup-submenu';
+import { SubMenu } from './sub-menu';
 
 export const DrawerMenuItem: React.FC<{
   item: MenuItem;

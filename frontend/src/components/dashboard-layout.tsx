@@ -6,7 +6,7 @@ import { faBars, faCircleUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { DashboardDrawer } from './DashboardDrawer';
+import { DashboardDrawer } from './dashboard-drawer';
 
 const bgColor = 'bg-gray-700';
 const hoverColor = 'hover:bg-gray-600';
@@ -20,7 +20,7 @@ const logoClasses = [
 
 export function DashboardLayout() {
   const navigate = useNavigate();
-  const { loggedIn, user, setLoggedIn } = useUserStore();
+  const { loggedIn, setLoggedIn } = useUserStore();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
