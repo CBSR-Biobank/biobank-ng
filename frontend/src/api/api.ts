@@ -45,8 +45,10 @@ export async function login(username: string, password: string) {
     if (response.status === 401) {
       useUserStore.getState().setLoggedIn(false);
     }
-    const json = await response.json();
-    const err: ApiError = { status: response.status, error: json };
+    const err: ApiError = {
+      status: response.status,
+      error:  (response.status === 401) ? "unauthrorized" : "unknown"
+    };
     console.error(err);
     throw err;
   }

@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { User, userHasRole } from './models/user';
 import { UserRole } from './models/user-role';
 
+const LOCAL_SESSION_KEY = "biobank-logged-in";
+
 interface UserState {
   checkingAuth: boolean;
   loggedIn: boolean;
@@ -12,12 +14,19 @@ interface UserState {
   setUser: (user: User) => void;
 }
 
+function getInitialLoggedIn() {
+  return localStorage.getItem(LOCAL_SESSION_KEY) == "true" || false;
+};
+
 export const useUserStore = create<UserState>((set) => ({
   checkingAuth: true,
-  loggedIn: false,
+  loggedIn: getInitialLoggedIn(),
   username: '',
   isSuperuser: false,
   setCheckingAuth: (checking) => set((state) => ({ ...state, checkingAuth: checking })),
-  setLoggedIn: (loggedIn) => set((state) => ({ ...state, loggedIn, username: undefined })),
+  setLoggedIn: (loggedIn) => {
+    localStorage.setItem(LOCAL_SESSION_KEY, loggedIn ? "true" : "false"),
+    set((state) => ({ ...state, loggedIn, username: undefined }));
+  },
   setUser: (user) => set((state) => ({ ...state, user, isSuperuser: userHasRole(user, UserRole.SUPERUSER) }))
 }));

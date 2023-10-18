@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:4200"})
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/auth")
 public class AuthController {
 
-    @GetMapping(path = "/auth")
+    @GetMapping(path = "")
     public AuthenticationBean helloWorldBean() {
         //throw new RuntimeException("Some Error has Happened! Contact Support at ***-***");
         return new AuthenticationBean("You are authenticated");

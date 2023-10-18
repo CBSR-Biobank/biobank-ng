@@ -46,8 +46,6 @@ export function DashboardLayout() {
     }
   };
 
-  console.log({ loggedIn });
-
   return (
     <div className="relative">
       <div className={cn('absolute flex h-16 w-full grid-cols-2 items-center justify-between text-slate-200', bgColor)}>
