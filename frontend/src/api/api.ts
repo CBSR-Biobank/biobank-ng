@@ -36,6 +36,7 @@ export async function fetchAuthenticated() {
 export async function login(username: string, password: string) {
   const response = await fetch(API_ROUTES.auth.index, {
     headers: {
+      'X-Requested-With': 'XMLHttpRequest',
       authorization: 'Basic ' + window.btoa(username + ':' + password)
     },
     method: 'GET'

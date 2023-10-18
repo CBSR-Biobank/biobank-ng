@@ -21,6 +21,7 @@ export function Login() {
   const navigate = useNavigate();
   const { loggedIn, setLoggedIn } = useUserStore();
   const [loginError, setLoginError] = useState(false);
+  const [loginErrorMessage, setLoginErrorMessage] = useState("");
 
   const {
     register,
@@ -39,14 +40,17 @@ export function Login() {
     try {
       const result = await login(values.username, values.password);
       setLoggedIn(true);
-      console.log(result);
       navigate('/');
     } catch (e) {
       const apiError = e as ApiError;
       console.log(apiError);
       if (apiError.status === 401) {
-        setLoginError(true);
+        setLoginErrorMessage('invalid username or password');
       }
+      if (apiError.status === 500) {
+        setLoginErrorMessage('backend communication error');
+      }
+      setLoginError(true);
     }
   };
 
@@ -71,7 +75,7 @@ export function Login() {
           {loginError && (
             <div className="flex items-center justify-center">
               <Alert variant="destructive" className="border-2 border-red-600 bg-red-200 p-2 text-red-600">
-                {'invalid username or password'}
+                {loginErrorMessage}
               </Alert>
             </div>
           )}
