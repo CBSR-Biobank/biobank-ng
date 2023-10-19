@@ -1,0 +1,60 @@
+#
+# Run the docker compose command from the project's root folder to build / start.
+#
+# I.e:
+#    cd __project_root_dir
+#    docker compose --env-file .env -f docker/compose.yaml --project-directory docker up --build
+#
+
+version: '3.8'
+services:
+    db:
+        image: mariadb:11.0.3-jammy
+        command: --default-authentication-plugin=mariadb_native_password
+        volumes:
+            - ../database/lib:/var/lib/mysql
+            - ./my.cnf:/etc/mysql/my.cnf
+            - ../logs/mariadb:/var/log/mariadb
+            - ../database/db_initial.sql.gz:/db_initial.sql.gz
+            - ../database/_init.sh:/docker-entrypoint-initdb.d/_init.sh
+        environment:
+            - MARIADB_CONTAINER_USER=${uid}
+            - MARIADB_CONTAINER_GROUP=${gid}
+            - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+            - MARIADB_USER=${DB_USER}
+            - MARIADB_PASSWORD=${DB_PASSWORD}
+            - MARIADB_DATABASE=${DB_NAME}
+        ports:
+            - 3306:3306
+        restart: unless-stopped
+
+    # backend:
+    #     image: eclipse-temurin:17-jdk-jammy
+    #     working_dir: '/opt/biobank'
+    #     command: sh -c "./mvnw clean spring-boot:run"
+    #     volumes:
+    #         - ..:/opt/biobank
+    #     ports:
+    #         - 9000:9000
+    #     environment:
+    #         - DB_HOST=db
+    #         - DB_PORT=${DB_PORT}
+    #         - DB_USER=${DB_USER}
+    #         - DB_PASSWORD=${DB_PASSWORD}
+    #         - DB_NAME=${DB_NAME}
+    #     restart: unless-stopped
+
+    frontend:
+        image: node:18-alpine
+        user: '${uid}:${gid}'
+        working_dir: '/opt/biobank/frontend'
+        volumes:
+            - ../frontend:/opt/biobank/frontend
+        command: sh -c "npm install && npm run dev"
+        environment:
+            - BACKEND_SERVER=host.docker.internal:9000
+        ports:
+            - 3000:3000
+        restart: unless-stopped
+        extra_hosts:
+                - "host.docker.internal:host-gateway"

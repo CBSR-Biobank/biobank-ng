@@ -30,3 +30,6 @@ build/
 !**/src/test/**/build/
 /node_modules/
 /frontend/stats.html
+
+/database/lib
+/.env

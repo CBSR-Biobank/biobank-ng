@@ -62,17 +62,11 @@ export function PatientView() {
           {patient.collectionEvents.map((cevent) => (
             <Card key={cevent.id} className="bg-gray-300">
               <CardHeader className="py-2">
-                <CardTitle className="text-md grid grid-cols-2">
-                  Collection Event #{cevent.visitNumber}
-                  <Link to="" className="place-self-end">
-                    <Button className="bg-sky-500">
-                      View
-                      <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
-                    </Button>
-                  </Link>
-                </CardTitle>
+                <CardTitle className="text-md grid grid-cols-1 md:grid-cols-2">Visit {cevent.visitNumber}</CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-2 gap-2 py-2 text-sm text-gray-500">
+                <p>Created</p>
+                <p className="place-self-end text-gray-900">{format(cevent.createdAt, 'yyyy-MM-dd')}</p>
                 <p>Specimen Count</p>
                 <p className="place-self-end text-gray-900">{cevent.specimenCount}</p>
                 <p>Aliquot Count</p>
@@ -80,7 +74,14 @@ export function PatientView() {
                 <p>Status</p>
                 <p className="place-self-end text-gray-900">{cevent.status}</p>
               </CardContent>
-              <CardFooter className="py-2"></CardFooter>
+              <CardFooter className="text-md grid grid-cols-1 py-2">
+                <Link to="" className="place-self-end">
+                  <Button className="bg-sky-500 text-xs" size="sm">
+                    View
+                    <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
+                  </Button>
+                </Link>
+              </CardFooter>
             </Card>
           ))}
         </div>

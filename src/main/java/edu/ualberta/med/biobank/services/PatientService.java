@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.domain.Patient;
+import edu.ualberta.med.biobank.dtos.CollectionEventInfoDTO;
 import edu.ualberta.med.biobank.dtos.CollectionEventSummaryDTO;
 import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.dtos.PatientSummaryDTO;
@@ -61,10 +62,10 @@ public class PatientService {
                     return allowed.map(a -> patient);
                 })
             .map(p -> {
-                    final var counts = collectionEventCustomRepository.collectionEventCountsByPatientId(p.id());
+                    final var info = collectionEventCustomRepository.collectionEventCountsByPatientId(p.id());
                     var collectionEvents = collectionEventRepository.findByPatientId(p.id())
                         .stream()
-                        .map(ce -> toCollectionEventDTO(ce, counts.get(ce.getId())))
+                        .map(ce -> toCollectionEventDTO(ce, info.get(ce.getId())))
                         .toList();
                     return p.withCollectionEvents(collectionEvents);
                 });
@@ -81,12 +82,13 @@ public class PatientService {
         return data.map(p -> new PatientSummaryDTO(p.getPnumber(), p.getStudy().getId(), p.getStudy().getNameShort()));
     }
 
-    private static CollectionEventSummaryDTO toCollectionEventDTO(CollectionEvent cevent, SpecimenCountsDTO counts) {
+    private static CollectionEventSummaryDTO toCollectionEventDTO(CollectionEvent cevent, CollectionEventInfoDTO info) {
         return new CollectionEventSummaryDTO(
             cevent.getId(),
             cevent.getVisitNumber(),
-            counts.specimenCount(),
-            counts.aliquotCount(),
+            info.specimenCount(),
+            info.aliquotCount(),
+            info.createdAt(),
             cevent.getActivityStatus().getName()
         );
     }

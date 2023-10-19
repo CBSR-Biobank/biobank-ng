@@ -12,14 +12,14 @@ export function HomePage() {
       <div className="container mx-auto grid grid-cols-1 place-content-stretch gap-4 pt-10 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Record Collected Specimens</CardTitle>
-            <CardDescription>Add a collection event for a patient .</CardDescription>
+            <CardTitle>Add a Patient Visit</CardTitle>
+            <CardDescription>Record collected specimens for a patient.</CardDescription>
           </CardHeader>
           <CardFooter>
             <div className="w-full">
               <Link to={'/patients'}>
-                <Button className="w-full">
-                  <Check className="mr-2 h-4 w-4" /> Add a collection event
+                <Button className="w-full bg-sky-500">
+                  <Check className="mr-2 h-4 w-4" /> Add a patient visit
                 </Button>
               </Link>
             </div>
@@ -27,14 +27,14 @@ export function HomePage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Create a New Patient</CardTitle>
-            <CardDescription>Add a new patient to a study .</CardDescription>
+            <CardTitle>Add a Patient</CardTitle>
+            <CardDescription>Add a new patient to a study.</CardDescription>
           </CardHeader>
           <CardFooter>
             <div className="w-full">
               <Link to={'/patients/add'}>
-                <Button className="w-full">
-                  <Check className="mr-2 h-4 w-4" /> Add a patient
+                <Button className="w-full bg-sky-500">
+                  <Check className="mr-2 h-4 w-4" /> Add new patient
                 </Button>
               </Link>
             </div>

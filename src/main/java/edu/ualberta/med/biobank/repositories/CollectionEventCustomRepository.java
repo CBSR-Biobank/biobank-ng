@@ -1,9 +1,10 @@
 package edu.ualberta.med.biobank.repositories;
 
-import edu.ualberta.med.biobank.dtos.SpecimenCountsDTO;
+import edu.ualberta.med.biobank.dtos.CollectionEventInfoDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -18,10 +19,11 @@ public class CollectionEventCustomRepository {
     private static final String CEVENT_COUNTS_BY_PATIENT_ID_QRY =
         """
         SELECT cevent.id as id,
-               COUNT(DISTINCT sourcesSpecimens) as numSourceSpecimens,
-               COUNT(DISTINCT allSpecimens) - COUNT(DISTINCT sourcesSpecimens) as numAliquots
+               COUNT(DISTINCT sourceSpecimens) as numSourceSpecimens,
+               COUNT(DISTINCT allSpecimens) - COUNT(DISTINCT sourceSpecimens) as numAliquots,
+               MIN(sourceSpecimens.createdAt) as createdAt
         FROM CollectionEvent as cevent
-        LEFT JOIN cevent.originalSpecimens as sourcesSpecimens
+        LEFT JOIN cevent.originalSpecimens as sourceSpecimens
         LEFT JOIN cevent.allSpecimens as allSpecimens
         WHERE cevent.patient.id=?1
         GROUP BY cevent.id
@@ -33,8 +35,8 @@ public class CollectionEventCustomRepository {
     // returns a map of the collection event counts for a patient
     //
     // the keys of the map are the collection event IDs
-    public Map<Integer, SpecimenCountsDTO> collectionEventCountsByPatientId(Integer patientId) {
-        var result = new HashMap<Integer, SpecimenCountsDTO>();
+    public Map<Integer, CollectionEventInfoDTO> collectionEventCountsByPatientId(Integer patientId) {
+        var result = new HashMap<Integer, CollectionEventInfoDTO>();
         var query = entityManager.createQuery(CEVENT_COUNTS_BY_PATIENT_ID_QRY, Tuple.class).setParameter(1, patientId);
 
         var rows = query.getResultList();
@@ -42,10 +44,11 @@ public class CollectionEventCustomRepository {
             result.computeIfAbsent(
                 row.get("id", Integer.class),
                 id ->
-                    new SpecimenCountsDTO(
+                    new CollectionEventInfoDTO(
                         id,
                         row.get("numSourceSpecimens", Number.class).intValue(),
-                        row.get("numAliquots", Number.class).intValue()
+                        row.get("numAliquots", Number.class).intValue(),
+                        row.get("createdAt", Date.class)
                     )
             );
         }
