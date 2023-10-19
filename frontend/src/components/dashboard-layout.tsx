@@ -20,7 +20,7 @@ const logoClasses = [
 
 export function DashboardLayout() {
   const navigate = useNavigate();
-  const { loggedIn, setLoggedIn } = useUserStore();
+  const { userToken: loggedIn, setUserToken } = useUserStore();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -40,7 +40,7 @@ export function DashboardLayout() {
 
   const handleLogout = async () => {
     try {
-      setLoggedIn(false);
+      setUserToken(null);
     } catch (e) {
       console.error(e);
     }

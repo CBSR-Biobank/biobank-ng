@@ -18,7 +18,7 @@ export function HomePage() {
           <CardFooter>
             <div className="w-full">
               <Link to={'/patients'}>
-                <Button className="w-full bg-sky-500">
+                <Button className="w-full bg-sky-500 hover:bg-sky-400">
                   <Check className="mr-2 h-4 w-4" /> Add a patient visit
                 </Button>
               </Link>
@@ -33,7 +33,7 @@ export function HomePage() {
           <CardFooter>
             <div className="w-full">
               <Link to={'/patients/add'}>
-                <Button className="w-full bg-sky-500">
+                <Button className="w-full bg-sky-500 hover:bg-sky-400">
                   <Check className="mr-2 h-4 w-4" /> Add new patient
                 </Button>
               </Link>

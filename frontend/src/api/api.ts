@@ -3,7 +3,11 @@ import { useUserStore } from '@app/store';
 type Route = Record<string, string>;
 
 export const API_ROUTES: Readonly<Record<string, Route>> = {
-  auth: { index: '/api/auth' },
+  auth: {
+    index: '/api/auth',
+    login: '/api/login', // FIXME: still needed?
+    token: '/api/token'
+  },
   patients: {
     index: '/api/patients',
     pnumber: '/api/patients/:pnumber'
@@ -15,36 +19,35 @@ export type ApiError = {
   error: any;
 };
 
-export async function fetchAuthenticated() {
-  const response = await fetch(API_ROUTES.auth.index, {
-    headers: {
-      method: 'GET'
-    }
-  });
+// export async function fetchAuthenticated() {
+//   const response = await fetch(API_ROUTES.auth.index, {
+//     headers: {
+//       method: 'GET'
+//     }
+//   });
 
-  if (!response.ok) {
-    const json = await response.json();
-    const err: ApiError = { status: response.status, error: json };
-    console.error(err);
-    throw err;
-  }
+//   if (!response.ok) {
+//     const json = await response.json();
+//     const err: ApiError = { status: response.status, error: json };
+//     console.error(err);
+//     throw err;
+//   }
 
-  const json = await response.json();
-  return json;
-}
+//   const json = await response.json();
+//   return json;
+// }
 
 export async function login(username: string, password: string) {
-  const response = await fetch(API_ROUTES.auth.index, {
+  const response = await fetch(API_ROUTES.auth.token, {
     headers: {
-      'X-Requested-With': 'XMLHttpRequest',
       authorization: 'Basic ' + window.btoa(username + ':' + password)
     },
-    method: 'GET'
+    method: 'POST'
   });
 
   if (!response.ok) {
     if (response.status === 401) {
-      useUserStore.getState().setLoggedIn(false);
+      useUserStore.getState().setUserToken(null);
     }
     const err: ApiError = {
       status: response.status,
@@ -54,13 +57,15 @@ export async function login(username: string, password: string) {
     throw err;
   }
 
-  const json = await response.json();
-  return json;
+  const text = await response.text();
+  useUserStore.getState().setUserToken(text);
+  return text;
 }
 
 export async function fetchApi(route: string, init?: RequestInit) {
   const response = await fetch(route, {
     headers: {
+      Authorization: 'Bearer ' + useUserStore.getState().userToken,
       credentials: 'include',
       'Content-Type': 'application/json'
     },
@@ -78,6 +83,7 @@ export async function fetchApiFileUpload(route: string, file: File) {
     method: 'POST',
     body: data,
     headers: {
+      Authorization: authorization,
       credentials: 'include'
     }
   });
@@ -116,8 +122,14 @@ async function handleServerResponse(response: Response) {
     if (response.status === 401) {
       useUserStore.getState().setLoggedIn(false);
     }
-    const json = await response.json();
-    const err: ApiError = { status: response.status, error: json };
+
+    let error = 'unknown';
+
+    if (response.bodyUsed) {
+      error = await response.json();
+    }
+
+    const err: ApiError = { status: response.status, error };
     console.error(err);
     throw err;
   }

@@ -20,12 +20,16 @@ public class BiobankUserDetailsService implements UserDetailsService {
 
     private final Logger logger = LoggerFactory.getLogger(BiobankUserDetailsService.class);
 
-    @Autowired
     private UserService userService;
+
+    public BiobankUserDetailsService(UserService userService) {
+        this.userService = userService;
+    }
 
     // see https://javapointers.com/spring/spring-security/spring-custom-userdetailsservice-example/
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
         var dbUsers = userService.findByLogin(username);
 
         if (dbUsers.isLeft()) {

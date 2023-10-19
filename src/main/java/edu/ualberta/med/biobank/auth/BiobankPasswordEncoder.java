@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.auth;
 
-import javax.management.RuntimeErrorException;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import edu.ualberta.med.biobank.util.StringEncrypter;

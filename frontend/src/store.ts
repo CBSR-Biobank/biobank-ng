@@ -2,31 +2,35 @@ import { create } from 'zustand';
 import { User, userHasRole } from './models/user';
 import { UserRole } from './models/user-role';
 
-const LOCAL_SESSION_KEY = "biobank-logged-in";
+const LOGGED_IN_TOKEN_KEY = "biobank-logged-in-token";
 
 interface UserState {
   checkingAuth: boolean;
-  loggedIn: boolean;
+  userToken: string | null;
   user?: User;
   isSuperuser: boolean;
   setCheckingAuth: (checking: boolean) => void;
-  setLoggedIn: (loggedIn: boolean) => void;
+  setUserToken: (token: string | null) => void;
   setUser: (user: User) => void;
 }
 
-function getInitialLoggedIn() {
-  return localStorage.getItem(LOCAL_SESSION_KEY) == "true" || false;
+function getUserToken(): string | null {
+  return localStorage.getItem(LOGGED_IN_TOKEN_KEY);
 };
 
 export const useUserStore = create<UserState>((set) => ({
   checkingAuth: true,
-  loggedIn: getInitialLoggedIn(),
+  userToken: getUserToken(),
   username: '',
   isSuperuser: false,
   setCheckingAuth: (checking) => set((state) => ({ ...state, checkingAuth: checking })),
-  setLoggedIn: (loggedIn) => {
-    localStorage.setItem(LOCAL_SESSION_KEY, loggedIn ? "true" : "false"),
-    set((state) => ({ ...state, loggedIn, username: undefined }));
+  setUserToken: (token) => {
+    if (token) {
+      localStorage.setItem(LOGGED_IN_TOKEN_KEY, token);
+    } else {
+      localStorage.removeItem(LOGGED_IN_TOKEN_KEY);
+    }
+    set((state) => ({ ...state, userToken: token, username: undefined }));
   },
   setUser: (user) => set((state) => ({ ...state, user, isSuperuser: userHasRole(user, UserRole.SUPERUSER) }))
 }));

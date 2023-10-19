@@ -19,7 +19,7 @@ type FormInputs = z.infer<typeof schema>;
 
 export function Login() {
   const navigate = useNavigate();
-  const { loggedIn, setLoggedIn } = useUserStore();
+  const { userToken } = useUserStore();
   const [loginError, setLoginError] = useState(false);
   const [loginErrorMessage, setLoginErrorMessage] = useState('');
 
@@ -38,13 +38,10 @@ export function Login() {
 
   const onSubmit = async (values: FormInputs) => {
     try {
-      //const _result = await login(values.username, values.password);
       await login(values.username, values.password);
-      setLoggedIn(true);
       navigate('/');
     } catch (e) {
       const apiError = e as ApiError;
-      console.log(apiError);
       if (apiError.status === 401) {
         setLoginErrorMessage('invalid username or password');
       }
@@ -56,10 +53,10 @@ export function Login() {
   };
 
   useEffect(() => {
-    if (loggedIn) {
+    if (userToken !== null) {
       navigate('/');
     }
-  }, [loggedIn]);
+  }, [userToken]);
 
   return (
     <AdminPage className="grid justify-items-center gap-8">

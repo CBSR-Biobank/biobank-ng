@@ -1,19 +1,29 @@
 package edu.ualberta.med.biobank.controllers;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:4200"})
-@RestController
-@RequestMapping("/auth")
-public class AuthController {
+import edu.ualberta.med.biobank.services.TokenService;
 
-    @GetMapping(path = "")
-    public AuthenticationBean helloWorldBean() {
-        //throw new RuntimeException("Some Error has Happened! Contact Support at ***-***");
-        return new AuthenticationBean("You are authenticated");
+@RestController
+public class AuthController {
+    private final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
+    private final TokenService tokenService;
+
+    public AuthController(TokenService tokenService) {
+        this.tokenService = tokenService;
+    }
+
+    @PostMapping("/token")
+    public String token(Authentication authentication) {
+        logger.info("Token requested for user: '{}'", authentication.getName());
+        String token = tokenService.generateToken(authentication);
+        logger.info("Token granted: {}", token);
+        return token;
     }
 
 }

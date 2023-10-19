@@ -31,5 +31,7 @@ build/
 /node_modules/
 /frontend/stats.html
 
-/database/lib
+/database
 /.env
+/.mvn/
+/src/main/resources/certs/*.pem
