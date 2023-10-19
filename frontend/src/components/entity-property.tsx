@@ -35,8 +35,8 @@ export const EntityProperty: React.FC<
       <p className="text-sm font-semibold text-gray-500">{label}</p>
       <div className="flex gap-0">
         <div className={valueClasses}>
-          {!!children && <>{children}</>}
-          {!children && <Chip message="Not avaiable" size="sm" className="flex items-center gap-1" />}
+          {children !== null && <>{children}</>}
+          {children === null && <Chip message="Not avaiable" size="sm" className="flex items-center gap-1" />}
         </div>
         {allowChanges && (
           <div

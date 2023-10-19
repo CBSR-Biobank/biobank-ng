@@ -27,6 +27,13 @@ const router = createBrowserRouter([
             }
           },
           {
+            path: 'add',
+            async lazy() {
+              let { PatientAdd } = await import('@app/pages/patients/patient-add');
+              return { Component: PatientAdd };
+            }
+          },
+          {
             path: ':pnumber',
             async lazy() {
               let { PatientView } = await import('@app/pages/patients/patient-view');

@@ -15,7 +15,7 @@ public interface CollectionEventRepository
     extends JpaRepository<CollectionEvent, Integer>, JpaSpecificationExecutor<CollectionEvent> {
     final Logger logger = LoggerFactory.getLogger(CollectionEventCustomRepository.class);
 
-    @EntityGraph(attributePaths = { "comments", "comments.user" })
+    //@EntityGraph(attributePaths = { "comments", "comments.user" })
     public List<CollectionEvent> findByPatientId(Integer id);
 
     @EntityGraph(

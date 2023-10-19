@@ -6,7 +6,7 @@ import { Button } from './ui/button';
 const buttonVariants = cva('flex w-20 items-center gap-1 bg-warning-500 font-semibold', {
   variants: {
     variant: {
-      default: 'text-slate-600 bg-gray-300 hover:bg-gray-200',
+      default: 'text-slate-600 bg-gray-300 hover:bg-gray-400',
       primary: 'text-slate-600 bg-gray-300 hover:bg-slate-400',
       secondary: 'text-slate-600 bg-gray-600 hover:bg-slate-500',
       warning: 'text-basic-200 bg-warning-600 hover:bg-orange-500'

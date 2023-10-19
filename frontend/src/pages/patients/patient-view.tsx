@@ -1,9 +1,11 @@
+import { Alert, AlertDescription, AlertTitle } from '@app/components/alert';
+import { BiobankButton } from '@app/components/biobank-button';
 import { CircularProgress } from '@app/components/circular-progress';
 import { EntityProperty } from '@app/components/entity-property';
 import { Button } from '@app/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@app/components/ui/card';
 import { usePatient } from '@app/hooks/use-patient';
-import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import format from 'date-fns/format';
 import { Link, useParams } from 'react-router-dom';
@@ -23,6 +25,32 @@ export function PatientView() {
     // setPropertyToUpdate(propertyName);
     // setOpen(true);
   };
+
+  if (patientQry.isError) {
+    console.log(patientQry.error);
+    if (patientQry.error.status === 404) {
+      return (
+        <div className="grid grid-cols-1 gap-8">
+          <Alert className="border-amber-500 bg-amber-200">
+            <FontAwesomeIcon icon={faWarning} />
+            <AlertTitle>Patient Does Not Exist</AlertTitle>
+            <AlertDescription>
+              The patient with number <b>{params.pnumber}</b> is not in the system.
+            </AlertDescription>
+          </Alert>
+          <div className="flex gap-8">
+            <Link to="/patients">
+              <BiobankButton>Back</BiobankButton>
+            </Link>
+            <Link to="/patients/add">
+              <BiobankButton className="w-[10rem] whitespace-nowrap">Add Patient</BiobankButton>
+            </Link>
+          </div>
+        </div>
+      );
+    }
+    return <>Error</>;
+  }
 
   if (patientQry.isLoading || !patient) {
     return <CircularProgress />;
@@ -58,13 +86,13 @@ export function PatientView() {
           </EntityProperty>
         </div>
 
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {patient.collectionEvents.map((cevent) => (
             <Card key={cevent.id} className="bg-gray-300">
               <CardHeader className="py-2">
                 <CardTitle className="text-md grid grid-cols-1 md:grid-cols-2">Visit {cevent.visitNumber}</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-2 gap-2 py-2 text-sm text-gray-500">
+              <CardContent className="grid grid-cols-2 gap-2 bg-gray-100 p-4 py-2 text-sm text-gray-500">
                 <p>Created</p>
                 <p className="place-self-end text-gray-900">{format(cevent.createdAt, 'yyyy-MM-dd')}</p>
                 <p>Specimen Count</p>
@@ -74,13 +102,15 @@ export function PatientView() {
                 <p>Status</p>
                 <p className="place-self-end text-gray-900">{cevent.status}</p>
               </CardContent>
-              <CardFooter className="text-md grid grid-cols-1 py-2">
-                <Link to="" className="place-self-end">
-                  <Button className="bg-sky-500 text-xs" size="sm">
-                    View
-                    <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
-                  </Button>
-                </Link>
+              <CardFooter className="bg-gray-100 px-2 py-2">
+                <div className="text-md w-full">
+                  <Link to="" className="place-self-end">
+                    <Button className="w-full bg-sky-500 text-xs hover:bg-sky-400" size="sm">
+                      View
+                      <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
+                    </Button>
+                  </Link>
+                </div>
               </CardFooter>
             </Card>
           ))}

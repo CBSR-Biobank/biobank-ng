@@ -12,8 +12,8 @@ export function HomePage() {
       <div className="container mx-auto grid grid-cols-1 place-content-stretch gap-4 pt-10 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Add a Patient Visit</CardTitle>
-            <CardDescription>Record collected specimens for a patient.</CardDescription>
+            <CardTitle>Add or View Patient Visits</CardTitle>
+            <CardDescription>View patient visits, or Record collected specimens for a patient.</CardDescription>
           </CardHeader>
           <CardFooter>
             <div className="w-full">
