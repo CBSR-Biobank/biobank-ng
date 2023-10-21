@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.repositories;
 
 import edu.ualberta.med.biobank.domain.CollectionEvent;
+import edu.ualberta.med.biobank.dtos.CollectionEventInfoDTO;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,7 +15,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CollectionEventRepository
     extends JpaRepository<CollectionEvent, Integer>, JpaSpecificationExecutor<CollectionEvent> {
-    final Logger logger = LoggerFactory.getLogger(CollectionEventCustomRepository.class);
 
     //@EntityGraph(attributePaths = { "comments", "comments.user" })
     public List<CollectionEvent> findByPatientId(Integer id);
@@ -34,7 +35,7 @@ public interface CollectionEventRepository
             "originalSpecimens.specimenType",
             "originalSpecimens.originInfo",
             "originalSpecimens.originInfo.center",
-            "originalSpecimens.comments",
+            "originalSpecimens.comments"
         }
     )
     public List<CollectionEvent> findAll(Specification<CollectionEvent> spec);

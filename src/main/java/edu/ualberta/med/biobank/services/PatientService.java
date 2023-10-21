@@ -83,6 +83,10 @@ public class PatientService {
     }
 
     private static CollectionEventSummaryDTO toCollectionEventDTO(CollectionEvent cevent, CollectionEventInfoDTO info) {
+        if (info == null) {
+            throw new RuntimeException("info is null");
+        }
+
         return new CollectionEventSummaryDTO(
             cevent.getId(),
             cevent.getVisitNumber(),
