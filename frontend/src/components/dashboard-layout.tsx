@@ -20,7 +20,7 @@ const logoClasses = [
 
 export function DashboardLayout() {
   const navigate = useNavigate();
-  const { userToken: loggedIn, setUserToken } = useUserStore();
+  const { loggedIn, setUserToken } = useUserStore();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 

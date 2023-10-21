@@ -19,24 +19,6 @@ export type ApiError = {
   error: any;
 };
 
-// export async function fetchAuthenticated() {
-//   const response = await fetch(API_ROUTES.auth.index, {
-//     headers: {
-//       method: 'GET'
-//     }
-//   });
-
-//   if (!response.ok) {
-//     const json = await response.json();
-//     const err: ApiError = { status: response.status, error: json };
-//     console.error(err);
-//     throw err;
-//   }
-
-//   const json = await response.json();
-//   return json;
-// }
-
 export async function login(username: string, password: string) {
   const response = await fetch(API_ROUTES.auth.token, {
     headers: {
@@ -83,7 +65,7 @@ export async function fetchApiFileUpload(route: string, file: File) {
     method: 'POST',
     body: data,
     headers: {
-      Authorization: authorization,
+      Authorization: 'Bearer ' + useUserStore.getState().userToken,
       credentials: 'include'
     }
   });
@@ -120,7 +102,7 @@ export function routeReplace(baseRoute: string, replacements: Record<string, str
 async function handleServerResponse(response: Response) {
   if (!response.ok) {
     if (response.status === 401) {
-      useUserStore.getState().setLoggedIn(false);
+      useUserStore.getState().setUserToken(null);
     }
 
     let error = 'unknown';

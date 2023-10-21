@@ -27,7 +27,6 @@ export function PatientView() {
   };
 
   if (patientQry.isError) {
-    console.log(patientQry.error);
     if (patientQry.error.status === 404) {
       return (
         <div className="grid grid-cols-1 gap-8">

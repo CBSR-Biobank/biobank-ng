@@ -19,7 +19,7 @@ type FormInputs = z.infer<typeof schema>;
 
 export function Login() {
   const navigate = useNavigate();
-  const { userToken } = useUserStore();
+  const { loggedIn, userToken } = useUserStore();
   const [loginError, setLoginError] = useState(false);
   const [loginErrorMessage, setLoginErrorMessage] = useState('');
 
@@ -53,10 +53,10 @@ export function Login() {
   };
 
   useEffect(() => {
-    if (userToken !== null) {
+    if (loggedIn) {
       navigate('/');
     }
-  }, [userToken]);
+  }, [loggedIn]);
 
   return (
     <AdminPage className="grid justify-items-center gap-8">

@@ -8,6 +8,7 @@ interface UserState {
   checkingAuth: boolean;
   userToken: string | null;
   user?: User;
+  loggedIn: boolean,
   isSuperuser: boolean;
   setCheckingAuth: (checking: boolean) => void;
   setUserToken: (token: string | null) => void;
@@ -21,7 +22,8 @@ function getUserToken(): string | null {
 export const useUserStore = create<UserState>((set) => ({
   checkingAuth: true,
   userToken: getUserToken(),
-  username: '',
+  user: undefined,
+  loggedIn: getUserToken() !== null,
   isSuperuser: false,
   setCheckingAuth: (checking) => set((state) => ({ ...state, checkingAuth: checking })),
   setUserToken: (token) => {
@@ -30,7 +32,7 @@ export const useUserStore = create<UserState>((set) => ({
     } else {
       localStorage.removeItem(LOGGED_IN_TOKEN_KEY);
     }
-    set((state) => ({ ...state, userToken: token, username: undefined }));
+    set((state) => ({ ...state, userToken: token, username: undefined, loggedIn: token !== null }));
   },
   setUser: (user) => set((state) => ({ ...state, user, isSuperuser: userHasRole(user, UserRole.SUPERUSER) }))
 }));
