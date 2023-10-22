@@ -13,6 +13,8 @@ import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.dtos.PatientSummaryDTO;
 import edu.ualberta.med.biobank.exception.AppErrorException;
 import edu.ualberta.med.biobank.services.PatientService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/patients")
@@ -31,6 +33,7 @@ public class PatientController {
         });
     }
 
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @GetMapping("")
     public Page<PatientSummaryDTO> allPaginated(
             @RequestParam Optional<Integer> page,

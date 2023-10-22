@@ -1,12 +1,14 @@
 package edu.ualberta.med.biobank.controllers;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.ualberta.med.biobank.dtos.CollectionEventDTO;
 import edu.ualberta.med.biobank.exception.AppErrorException;
 import edu.ualberta.med.biobank.services.CollectionEventService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 public class CollectionEventController {
@@ -17,7 +19,8 @@ public class CollectionEventController {
         this.collectionEventService = collectionEventService;
     }
 
-    @RequestMapping("/patients/{pnumber}/collection-events/{vnumber}")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @GetMapping("/patients/{pnumber}/collection-events/{vnumber}")
     public CollectionEventDTO get(@PathVariable String pnumber, @PathVariable Integer vnumber) {
         return collectionEventService.findByPnumberAndVnumber(pnumber, vnumber).orElseThrow(err -> {
                 return new AppErrorException(err);

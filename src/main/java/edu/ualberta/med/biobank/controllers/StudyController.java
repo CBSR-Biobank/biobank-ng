@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import edu.ualberta.med.biobank.dtos.StudyDTO;
 import edu.ualberta.med.biobank.services.StudyService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/studies")
@@ -28,6 +30,7 @@ public class StudyController {
 
     }
 
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @GetMapping(name = "")
     public Page<StudyDTO> allPaginated(
             @RequestParam Optional<Integer> page,

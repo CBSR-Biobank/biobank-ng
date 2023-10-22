@@ -19,7 +19,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -27,7 +26,6 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
@@ -46,6 +44,17 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+            .securityMatchers(m -> m.requestMatchers("/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"))
+            .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+            .httpBasic(withDefaults())
+            .formLogin(withDefaults())
+            .logout(logout -> logout.permitAll())
+            .build();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
             .csrf(AbstractHttpConfigurer::disable)
@@ -60,7 +69,8 @@ public class SecurityConfiguration {
     }
 
     /*
-     * This will allow the /token endpoint to use basic auth and everything else uses the SFC above
+     * This will allow the /token endpoint to use basic auth and everything else
+     * uses the filters defined above
      */
     @Order(Ordered.HIGHEST_PRECEDENCE)
     @Bean
@@ -78,13 +88,6 @@ public class SecurityConfiguration {
             .build();
     }
 
-    // @Bean
-    // public InMemoryUserDetailsManager users() {
-    //     return new InMemoryUserDetailsManager(
-    //         User.withUsername("dvega").password("{noop}password").authorities("read").build()
-    //     );
-    // }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BiobankPasswordEncoder();
@@ -93,7 +96,6 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // FIXME configuration.setAllowedOrigins(List.of("*"));
         configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowedMethods(List.of("*"));
