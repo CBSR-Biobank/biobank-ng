@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.domain;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
@@ -11,10 +9,12 @@ import jakarta.persistence.Version;
 @MappedSuperclass
 public abstract class DomainEntity implements ValueObject {
 
+    @Version
+    @Column(name = "VERSION", nullable = false)
     private Integer version;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID", nullable = false)
     private Integer id;
 
     public Integer getId() {
@@ -26,8 +26,6 @@ public abstract class DomainEntity implements ValueObject {
         this.id = id;
     }
 
-    @Version
-    @Column(name = "VERSION", nullable = false)
     public Integer getVersion() {
         return this.version;
     }

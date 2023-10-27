@@ -69,6 +69,7 @@ public class User extends Principal implements HasComments {
     @Column(name = "EMAIL", unique = true)
     private String email;
 
+    @Column(name = "NEED_PWD_CHANGE")
     private boolean needPwdChange = true;
 
     @OneToMany(fetch = FetchType.LAZY)
