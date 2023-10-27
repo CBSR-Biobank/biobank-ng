@@ -8,7 +8,7 @@
 # To populate the databse
 #     docker exec -i container_name mysql -uroot -ppassword db_name < db.sql
 
-version: '3.8'
+version: '3.9'
 services:
     db:
         image: mariadb:11.0.3-jammy
@@ -17,7 +17,7 @@ services:
             - ../database/lib:/var/lib/mysql
             - ./my.cnf:/etc/mysql/my.cnf
             - ../database/db_initial.sql.gz:/db_initial.sql.gz
-            - ../database/_mariadb_init.sh:/docker-entrypoint-initdb.d/_init.sh
+            - ../database/_init.sh:/docker-entrypoint-initdb.d/_init.sh
         environment:
             - MARIADB_CONTAINER_USER=${uid}
             - MARIADB_CONTAINER_GROUP=${gid}
@@ -25,9 +25,9 @@ services:
             - MARIADB_USER=${DB_USER}
             - MARIADB_PASSWORD=${DB_PASSWORD}
             - MARIADB_DATABASE=${DB_NAME}
-        ports:
-            - 3306:3306
         restart: unless-stopped
+        #ports:
+        #    - 3306:3306
 
     # db:
     #     image: mysql:5.7
@@ -65,8 +65,8 @@ services:
             - JBOSS_LOG_DIR=/var/log/jboss
             - ANT_HOME=/opt/apache-ant-1.9.0
         restart: unless-stopped
-        ports:
-            - 8080:8080
+        # ports:
+        #     - 8080:8080
 
     nginx:
         image: nginx:1.25.2-alpine
@@ -80,6 +80,7 @@ services:
         depends_on:
             - jboss
         ports:
-            - 8000:8000
-            - 8443:8443
+            #- 8000:8000
+            #- 8443:8443
+            - 443:443
         restart: unless-stopped
