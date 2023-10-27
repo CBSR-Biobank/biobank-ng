@@ -1,8 +1,7 @@
 package edu.ualberta.med.biobank.services;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import edu.ualberta.med.biobank.domain.User;
@@ -14,8 +13,14 @@ import io.jbock.util.Either;
 
 @Service
 public class UserService {
-    @Autowired
-    UserRepository userRepository;
+    private final Logger logger = LoggerFactory.getLogger(UserService.class);
+
+
+    private UserRepository userRepository;
+
+    UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public Either<AppError, User> findByLogin(String login) {
         var users = userRepository.findByLogin(login);

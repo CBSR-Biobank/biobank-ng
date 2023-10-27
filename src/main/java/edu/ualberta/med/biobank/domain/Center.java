@@ -63,8 +63,8 @@ public class Center extends DomainEntity
     private Set<OriginInfo> originInfos = new HashSet<OriginInfo>(0);
 
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JoinTable(name = "STUDY_COMMENT",
-        joinColumns = { @JoinColumn(name = "STUDY_ID", nullable = false, updatable = false) },
+    @JoinTable(name = "CENTER_COMMENT",
+        joinColumns = { @JoinColumn(name = "CENTER_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
     private Set<Comment> comments = new HashSet<Comment>(0);
 
