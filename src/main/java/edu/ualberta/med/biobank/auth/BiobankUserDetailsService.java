@@ -30,25 +30,23 @@ public class BiobankUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        var dbUsers = userService.findByLogin(username);
+        var userInfoMaybe = userService.findByLogin(username);
 
-        if (dbUsers.isLeft()) {
+        if (userInfoMaybe.isLeft()) {
             throw new UsernameNotFoundException("User not found for this username: " + username);
         }
 
-        var dbUser = dbUsers.getRight().get();
+        var userInfo = userInfoMaybe.getRight().get();
         List<SimpleGrantedAuthority> authList = new ArrayList<>();
         authList.add(new SimpleGrantedAuthority("ROLE_USER"));
 
-        for (var group : dbUser.getGroups()) {
-            if (group.getName().equals("Global Administrators")) {
-                authList.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-            }
+        if (userInfo.isGlobalAdmin()) {
+            authList.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         }
 
         return User.withUsername(username)
-            .password(dbUser.getCsmUser().getPassword())
-            .disabled(!dbUser.getActivityStatus().equals(Status.ACTIVE))
+            .password(userInfo.password())
+            .disabled(!userInfo.isActive())
             .authorities(authList)
             .build();
     }
