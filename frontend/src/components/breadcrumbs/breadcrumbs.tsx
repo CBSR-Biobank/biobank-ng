@@ -16,15 +16,15 @@ export type Breadcrumb = {
 export const Breadcrumbs: React.FC<{ crumbs: Breadcrumb[] }> = ({ crumbs }) => {
   return (
     <nav className="pb-4 pt-2 text-sm">
-      <ul className="flex list-none items-center text-indigo-800">
+      <ul className="flex list-none items-center text-cyan-800">
         <li key="homepage" className="px-2">
-          <Link to={'/'} className={cn('flex items-center gap-2 text-indigo-600')}>
+          <Link to={'/'} className={cn('flex items-center gap-2 text-cyan-600')}>
             <FontAwesomeIcon icon={faHouse} />
             <FontAwesomeIcon icon={faChevronRight} size="2xs" />
           </Link>
         </li>
 
-        {crumbs.map(({ label, route, isLast }, index) => {
+        {crumbs.map(({ label, route, isLast }) => {
           if (isLast) {
             return (
               <li key={label} className={cn('text-primary-600 max-w-[12rem] truncate pl-2 font-semibold')}>
@@ -35,7 +35,7 @@ export const Breadcrumbs: React.FC<{ crumbs: Breadcrumb[] }> = ({ crumbs }) => {
 
           return (
             <li key={label} className="px-2">
-              <Link to={route} className={cn('flex items-baseline gap-2 text-indigo-600')}>
+              <Link to={route} className={cn('flex items-baseline gap-2 text-cyan-600')}>
                 <p className="max-w-[12rem] truncate">{label}</p>
                 <FontAwesomeIcon icon={faChevronRight} size="2xs" />
               </Link>
