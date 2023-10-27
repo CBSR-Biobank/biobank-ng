@@ -35,3 +35,5 @@ build/
 /.env
 /.mvn/
 /src/main/resources/certs/*.pem
+/docker/nginx-selfsigned.crt
+/docker/nginx-selfsigned.key
