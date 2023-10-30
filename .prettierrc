@@ -6,6 +6,6 @@
   "singleQuote": true,
   "printWidth": 120,
   "plugins": [
-    "prettier-plugin-java",
+    "/home/nelson/.nvm/versions/node/v18.17.1/lib/node_modules/prettier-plugin-java"
   ]
 }

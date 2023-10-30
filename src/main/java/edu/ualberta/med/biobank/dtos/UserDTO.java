@@ -15,7 +15,7 @@ public record UserDTO(
 
     public boolean isGlobalAdmin() {
         return groups.values().stream()
-            .filter(g -> g.name().contains("Global Administrators"))
+            .filter(g -> g.name() != null && g.name().contains("Global Administrators"))
             .findFirst()
             .isPresent();
     }

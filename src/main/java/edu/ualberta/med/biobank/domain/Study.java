@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.domain;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.annotations.Cascade;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -64,6 +66,14 @@ public class Study extends DomainEntity implements HasName, HasNameShort, HasSta
                     @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
     private Set<Comment> comments = new HashSet<Comment>(0);
 
+    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "study")
+    @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+    private Set<SourceSpecimen> sourceSpecimens = new HashSet<SourceSpecimen>(0);
+
+    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "study")
+    @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+    private Set<AliquotedSpecimen> aliquotedSpecimens = new HashSet<AliquotedSpecimen>(0);
+
     @Override
     public String getName() {
         return this.name;
@@ -108,5 +118,29 @@ public class Study extends DomainEntity implements HasName, HasNameShort, HasSta
 
     public void setResearchGroup(ResearchGroup researchGroup) {
         this.researchGroup = researchGroup;
+    }
+
+    public Set<StudyEventAttr> getStudyEventAttrs() {
+        return this.studyEventAttrs;
+    }
+
+    public void setStudyEventAttrs(Set<StudyEventAttr> studyEventAttrs) {
+        this.studyEventAttrs = studyEventAttrs;
+    }
+
+    public Set<SourceSpecimen> getSourceSpecimens() {
+        return this.sourceSpecimens;
+    }
+
+    public void setSourceSpecimens(Set<SourceSpecimen> sourceSpecimens) {
+        this.sourceSpecimens = sourceSpecimens;
+    }
+
+    public Set<AliquotedSpecimen> getAliquotedSpecimens() {
+        return this.aliquotedSpecimens;
+    }
+
+    public void setAliquotedSpecimens(Set<AliquotedSpecimen> aliquotedSpecimens) {
+        this.aliquotedSpecimens = aliquotedSpecimens;
     }
 }

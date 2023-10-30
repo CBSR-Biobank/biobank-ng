@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.services.UserService;
 
 @Service
@@ -29,7 +28,6 @@ public class BiobankUserDetailsService implements UserDetailsService {
     // see https://javapointers.com/spring/spring-security/spring-custom-userdetailsservice-example/
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
         var userInfoMaybe = userService.findByLogin(username);
 
         if (userInfoMaybe.isLeft()) {
