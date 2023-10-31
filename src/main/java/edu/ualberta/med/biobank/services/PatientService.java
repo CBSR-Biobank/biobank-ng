@@ -68,17 +68,6 @@ public class PatientService {
                 });
     }
 
-    public Page<PatientSummaryDTO> patientPagination(Integer pageNumber, Integer pageSize, String sort) {
-        Pageable pageable = null;
-        if (sort != null) {
-            pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, sort);
-        } else {
-            pageable = PageRequest.of(pageNumber, pageSize);
-        }
-        Page<Patient> data = patientRepository.findAll(pageable);
-        return data.map(p -> new PatientSummaryDTO(p.getPnumber(), p.getStudy().getId(), p.getStudy().getNameShort()));
-    }
-
     private static CollectionEventSummaryDTO toCollectionEventDTO(CollectionEvent cevent, CollectionEventInfoDTO info) {
         if (info == null) {
             throw new RuntimeException("info is null");

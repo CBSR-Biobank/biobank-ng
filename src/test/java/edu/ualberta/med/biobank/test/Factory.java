@@ -1,5 +1,14 @@
 package edu.ualberta.med.biobank.test;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+
+import org.springframework.stereotype.Service;
+
 import edu.ualberta.med.biobank.domain.Address;
 import edu.ualberta.med.biobank.domain.AliquotedSpecimen;
 import edu.ualberta.med.biobank.domain.Capacity;
@@ -43,18 +52,8 @@ import edu.ualberta.med.biobank.domain.util.EventAttrTypeEnum;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import jakarta.transaction.Transactional;
 import net.datafaker.Faker;
-import org.hibernate.Session;
-import org.springframework.context.ApplicationContext;
-import org.springframework.data.jpa.provider.HibernateUtils;
-import org.springframework.stereotype.Service;
 
 /**
  * Tries to make setting up test data easier by requiring the absolute minimum amount of data and
@@ -63,6 +62,7 @@ import org.springframework.stereotype.Service;
  * @author Jonathan Ferland
  *
  */
+@Transactional
 @Service
 public class Factory {
 

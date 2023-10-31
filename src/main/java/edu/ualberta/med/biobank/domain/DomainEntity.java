@@ -1,6 +1,11 @@
 package edu.ualberta.med.biobank.domain;
 
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
@@ -14,6 +19,14 @@ public abstract class DomainEntity implements ValueObject {
     private Integer version;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "id-generator")
+    @GenericGenerator(
+        name = "id-generator",
+        strategy = "edu.ualberta.med.biobank.domain.util.CustomTableGenerator",
+        parameters = {
+            @Parameter(name = "initial_value", value = "1"),
+            @Parameter(name = "increment_size", value = "50")
+        })
     @Column(name = "ID", nullable = false)
     private Integer id;
 
