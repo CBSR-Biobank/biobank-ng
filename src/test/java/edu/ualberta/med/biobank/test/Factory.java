@@ -6,11 +6,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.domain.Address;
 import edu.ualberta.med.biobank.domain.AliquotedSpecimen;
+import edu.ualberta.med.biobank.domain.CSMUser;
 import edu.ualberta.med.biobank.domain.Capacity;
 import edu.ualberta.med.biobank.domain.Center;
 import edu.ualberta.med.biobank.domain.Clinic;
@@ -50,9 +53,7 @@ import edu.ualberta.med.biobank.domain.User;
 import edu.ualberta.med.biobank.domain.type.LabelingLayout;
 import edu.ualberta.med.biobank.domain.util.EventAttrTypeEnum;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.transaction.Transactional;
 import net.datafaker.Faker;
 
 /**
@@ -62,12 +63,11 @@ import net.datafaker.Faker;
  * @author Jonathan Ferland
  *
  */
-@Transactional
-@Service
 public class Factory {
 
-    @PersistenceContext
     private EntityManager em;
+
+    private final Logger logger = LoggerFactory.getLogger(Factory.class);
 
     private static final Random R = new Random();
 
@@ -121,7 +121,8 @@ public class Factory {
     // https://www.datafaker.net/documentation/getting-started/
     private Faker faker;
 
-    public Factory() {
+    public Factory(EntityManager em) {
+        this.em = em;
         this.faker = new Faker();
         this.nameGenerator = new NameGenerator(new BigInteger(130, R).toString(32));
         this.schemeGetter = new ContainerLabelingSchemeGetter();
@@ -525,7 +526,7 @@ public class Factory {
         Comment comment = new Comment();
         comment.setUser(getDefaultUser());
         comment.setCreatedAt(new Date());
-        comment.setMessage("test");
+        comment.setMessage(faker.lorem().paragraph());
 
         setDefaultComment(comment);
         em.persist(comment);
@@ -556,7 +557,10 @@ public class Factory {
         Clinic clinic = new Clinic();
         clinic.setName(name);
         clinic.setNameShort(name);
-        clinic.getAddress().setCity("testville");
+
+        Address address = clinic.getAddress();
+        address.setCity(faker.address().city());
+        em.persist(address);
 
         setDefaultCenter(clinic);
         setDefaultClinic(clinic);
@@ -610,7 +614,10 @@ public class Factory {
         String name = nameGenerator.next(Center.class);
 
         ResearchGroup researchGroup = new ResearchGroup();
-        researchGroup.getAddress().setCity("testville");
+        Address address = researchGroup.getAddress();
+        address.setCity(faker.address().city());
+        em.persist(address);
+
         researchGroup.setName(name);
         researchGroup.setNameShort(name);
         researchGroup.setStudy(getDefaultStudy());
@@ -626,8 +633,7 @@ public class Factory {
         Request request = new Request();
 
         Address address = request.getAddress();
-        address.setCity("testville");
-
+        address.setCity(faker.address().city());
         em.persist(address);
 
         request.setCreatedAt(new Date());
@@ -682,7 +688,10 @@ public class Factory {
         Site site = new Site();
         site.setName(name);
         site.setNameShort(name);
-        site.getAddress().setCity("testville");
+
+        Address address = site.getAddress();
+        address.setCity(faker.address().city());
+        em.persist(address);
 
         setDefaultSite(site);
         setDefaultCenter(site);
@@ -1036,10 +1045,10 @@ public class Factory {
 
     public GlobalEventAttr getDefaultGlobalEventAttr() {
         getDefaultEventAttrTypeEnum();
-        @SuppressWarnings("unchecked")
         List<GlobalEventAttr> list = em
             .createQuery("select ge from GlobalEventAttr", GlobalEventAttr.class)
             .getResultList();
+
         for (GlobalEventAttr gea : list) {
             String name = gea.getEventAttrType().getName();
             if (defaultEventAttrTypeEnum.getName().equals(name)) {
@@ -1131,7 +1140,7 @@ public class Factory {
                 value = "1.0";
                 break;
             case DATE_TIME:
-                value = "2000-01-01 00:00";
+                value = faker.date().past(1000, TimeUnit.DAYS, "yyyy-MM-dd hh:mm");
                 break;
             case TEXT:
                 // do nothing
@@ -1151,30 +1160,25 @@ public class Factory {
     public User createUser() {
         String name = nameGenerator.next(User.class);
 
+        CSMUser csmUser = new CSMUser();
+        csmUser.setLoginName(faker.name().lastName());
+        csmUser.setMigratedFlag(true);
+        csmUser.setFirstName(faker.name().firstName());
+        csmUser.setLastName(faker.name().lastName());
+        csmUser.setUpdateDate(new Date());
+        em.persist(csmUser);
+
         User user = new User();
         user.setLogin(name);
         user.setEmail(name);
-        user.setFullName("joe testonson");
-
-        // cheap fix to avoid actually having to create a CSM user
-        // FIXME: need to assign a CMS User
-        // user.setCsmUserId(-Math.abs(R.nextLong()));
-
-        // temporary membership, for creating
-        Membership m = new Membership();
-        m.setPrincipal(user);
-        user.getMemberships().add(m);
+        user.setFullName(faker.name().fullName());
+        user.setCsmUser(csmUser);
+        em.persist(user);
+        em.flush();
 
         setDefaultUser(user);
         setDefaultPrincipal(user);
         em.persist(user);
-        em.flush();
-
-        // remove membership
-        user.getMemberships().clear();
-        em.remove(m);
-
-        em.merge(user);
         em.flush();
         return user;
     }

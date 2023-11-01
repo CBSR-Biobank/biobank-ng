@@ -22,7 +22,7 @@ public abstract class DomainEntity implements ValueObject {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "id-generator")
     @GenericGenerator(
         name = "id-generator",
-        strategy = "edu.ualberta.med.biobank.domain.util.CustomTableGenerator",
+        strategy = "edu.ualberta.med.biobank.domain.util.CustomIdGenerator",
         parameters = {
             @Parameter(name = "initial_value", value = "1"),
             @Parameter(name = "increment_size", value = "50")

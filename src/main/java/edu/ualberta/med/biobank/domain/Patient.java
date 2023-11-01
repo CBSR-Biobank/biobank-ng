@@ -4,10 +4,13 @@ import java.util.Date;
 import java.util.Set;
 import java.util.HashSet;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -26,7 +29,7 @@ import jakarta.validation.constraints.NotNull;
  */
 @Entity
 @Table(name = "PATIENT")
-public class Patient extends DomainEntity implements HasCreatedAt {
+public class Patient extends DomainEntity implements HasCreatedAt, HasComments {
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.domain.Patient.pnumber.NotEmpty}")
     @NotBlank(message = "{edu.ualberta.med.biobank.domain.Patient.pnumber.NotBlank}")
@@ -42,9 +45,14 @@ public class Patient extends DomainEntity implements HasCreatedAt {
     @JoinColumn(name = "STUDY_ID", nullable = false)
     private Study study;
 
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "patient")
     private Set<CollectionEvent> collectionEvents = new HashSet<CollectionEvent>(0);
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "PATIENT_COMMENT",
+        joinColumns = { @JoinColumn(name = "PATIENT_ID", nullable = false, updatable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
+    private Set<Comment> comments = new HashSet<Comment>(0);
 
     public String getPnumber() {
         return this.pnumber;
@@ -77,5 +85,15 @@ public class Patient extends DomainEntity implements HasCreatedAt {
 
     public void setCollectionEvents(Set<CollectionEvent> collectionEvents) {
         this.collectionEvents = collectionEvents;
+    }
+
+    @Override
+    public Set<Comment> getComments() {
+        return this.comments;
+    }
+
+    @Override
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
     }
 }

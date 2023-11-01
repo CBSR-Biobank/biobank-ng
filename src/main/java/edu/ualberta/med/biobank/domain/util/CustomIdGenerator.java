@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author Jonathan Ferland
  */
-public class CustomTableGenerator implements IdentifierGenerator {
+public class CustomIdGenerator implements IdentifierGenerator {
 
-    private final Logger logger = LoggerFactory.getLogger(CustomTableGenerator.class);
+    private final Logger logger = LoggerFactory.getLogger(CustomIdGenerator.class);
 
     @Override
     public Serializable generate(SharedSessionContractImplementor session, Object obj) throws HibernateException {
@@ -38,6 +38,8 @@ public class CustomTableGenerator implements IdentifierGenerator {
             session.getEntityPersister(obj.getClass().getName(), obj).getIdentifierPropertyName(),
             obj.getClass().getSimpleName()
         );
+
+        logger.info(">>>>>>>>>>>>> generate: {}", query);
 
         Integer id = session.createQuery(query, Integer.class).getSingleResultOrNull();
         if (id == null) {
