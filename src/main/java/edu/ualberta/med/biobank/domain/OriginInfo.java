@@ -14,14 +14,11 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Cascade;
-
 @Entity
 @Table(name = "ORIGIN_INFO")
 public class OriginInfo extends DomainEntity implements HasComments {
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "originInfo")
-    @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "originInfo", cascade = CascadeType.PERSIST)
     private Set<Specimen> specimens = new HashSet<Specimen>(0);
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

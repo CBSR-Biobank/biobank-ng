@@ -23,9 +23,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.Type;
-
 /**
  * caTissue Term - Aliquot: Pertaining to a portion of the whole; any one of two
  * or more samples of something, of the same volume or weight.
@@ -82,8 +79,7 @@ public class Specimen extends DomainEntity implements HasStatus, HasComments, Ha
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "specimen")
     private SpecimenPosition specimenPosition;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "parentSpecimen")
-    @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "parentSpecimen", cascade = CascadeType.PERSIST )
     private Set<Specimen> childSpecimens = new HashSet<Specimen>(0);
 
     @ManyToMany(fetch = FetchType.LAZY)

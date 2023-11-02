@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.domain.type.Person;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
@@ -23,11 +24,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-
-import edu.ualberta.med.biobank.domain.type.Person;
-
 @Entity
 @Table(name = "PROCESSING_EVENT")
 public class ProcessingEvent extends DomainEntity implements HasCreatedAt, HasStatus, HasComments {
@@ -46,8 +42,7 @@ public class ProcessingEvent extends DomainEntity implements HasCreatedAt, HasSt
     @JoinColumn(name = "CENTER_ID", nullable = false)
     private Center center;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "processingEvent")
-    @Cascade({ CascadeType.SAVE_UPDATE })
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "processingEvent", cascade = jakarta.persistence.CascadeType.PERSIST)
     private Set<Specimen> specimens = new HashSet<Specimen>(0);
 
     @AttributeOverrides({

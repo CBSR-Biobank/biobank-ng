@@ -66,12 +66,10 @@ public class Study extends DomainEntity implements HasName, HasNameShort, HasSta
                     @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
     private Set<Comment> comments = new HashSet<Comment>(0);
 
-    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "study")
-    @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "study")
     private Set<SourceSpecimen> sourceSpecimens = new HashSet<SourceSpecimen>(0);
 
-    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "study")
-    @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "study")
     private Set<AliquotedSpecimen> aliquotedSpecimens = new HashSet<AliquotedSpecimen>(0);
 
     @Override

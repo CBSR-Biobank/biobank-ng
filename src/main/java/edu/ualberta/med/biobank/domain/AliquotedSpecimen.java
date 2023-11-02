@@ -13,8 +13,6 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Type;
-
 /**
  * The specimens, derived from source specimens, that are collected for a study.
  *
