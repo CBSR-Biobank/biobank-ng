@@ -7,10 +7,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import edu.ualberta.med.biobank.domain.Address;
 import edu.ualberta.med.biobank.domain.AliquotedSpecimen;
 import edu.ualberta.med.biobank.domain.CSMUser;
@@ -119,7 +117,7 @@ public class Factory {
     private EventAttr defaultCeventEventAttr;
 
     // https://www.datafaker.net/documentation/getting-started/
-    private Faker faker;
+    private final Faker faker;
 
     public Factory(EntityManager em) {
         this.em = em;
@@ -135,6 +133,10 @@ public class Factory {
      */
     public NameGenerator getNameGenerator() {
         return nameGenerator;
+    }
+
+    public Faker getFaker() {
+        return faker;
     }
 
     public Comment getDefaultComment() {
@@ -856,7 +858,7 @@ public class Factory {
         em.persist(parentSpecimen);
         em.flush();
 
-        //setDefaultParentSpecimen(parentSpecimen);
+        // setDefaultParentSpecimen(parentSpecimen);
         return parentSpecimen;
     }
 
@@ -1322,6 +1324,8 @@ public class Factory {
         Membership membership = new Membership();
 
         switch (builder.centerQuantity) {
+            case NONE:
+                break;
             case ONE:
                 membership.getDomain().getCenters().add(getDefaultCenter());
                 break;
@@ -1331,6 +1335,8 @@ public class Factory {
         }
 
         switch (builder.studyQuantity) {
+            case NONE:
+                break;
             case ONE:
                 membership.getDomain().getStudies().add(getDefaultStudy());
                 break;

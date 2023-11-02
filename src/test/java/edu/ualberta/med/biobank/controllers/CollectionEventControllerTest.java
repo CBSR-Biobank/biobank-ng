@@ -1,18 +1,11 @@
 package edu.ualberta.med.biobank.controllers;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-
-import com.jayway.jsonpath.JsonPath;
-
-import org.exparity.hamcrest.date.InstantMatchers;
 import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,11 +32,11 @@ import jakarta.transaction.Transactional;
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-class PatientControllerTest extends BaseTest {
+class CollectionEventControllerTest extends BaseTest {
 
-    private final Logger logger = LoggerFactory.getLogger(PatientControllerTest.class);
+    private final Logger logger = LoggerFactory.getLogger(CollectionEventControllerTest.class);
 
-    private final String ENDPOINT_URL = "/patients/{pnumber}";
+    private final String ENDPOINT_URL = "/patients/{pnumber}/collection-events/{vnumber}";
 
     @PersistenceContext
     private EntityManager em;
@@ -67,16 +60,19 @@ class PatientControllerTest extends BaseTest {
     @Test
     @WithMockUser
     public void getWhenEmptyTableIs404() throws Exception {
-        this.mvc.perform(get(endpointUrl(factory.getFaker().lorem().word())))
+        var patient = factory.createPatient();
+
+        this.mvc.perform(get(endpointUrl(patient.getPnumber(), 9999)))
             .andExpect(status().isNotFound())
             .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
     public void getWhenPresentAndUnauthorized() throws Exception {
-        var patient = factory.createPatient();
+        var patient = TestFixtures.patientFixture(factory);
+        var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
 
-        this.mvc.perform(get(endpointUrl(patient.getPnumber())))
+        this.mvc.perform(get(endpointUrl(patient.getPnumber(), collectionEvent.getVisitNumber())))
             .andExpect(status().isUnauthorized())
             .andDo(MockMvcResultHandlers.print());
     }
@@ -85,27 +81,26 @@ class PatientControllerTest extends BaseTest {
     @WithMockUser(value = "testuser")
     public void getWhenPresentIsOk() throws Exception {
         var patient = TestFixtures.patientFixture(factory);
+        var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
 
         MvcResult result =
-            this.mvc.perform(get(endpointUrl(patient.getPnumber())))
+            this.mvc.perform(get(endpointUrl(patient.getPnumber(), collectionEvent.getVisitNumber())))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(jsonPath("$.pnumber", is(patient.getPnumber())))
-                .andExpect(jsonPath("$.specimenCount", is(1)))
-                .andExpect(jsonPath("$.aliquotCount", is(0)))
-                .andExpect(jsonPath("$.collectionEvents", hasSize(1)))
+                .andExpect(jsonPath("$.id", is(collectionEvent.getId())))
+                .andExpect(jsonPath("$.visitNumber", is(collectionEvent.getVisitNumber())))
+                .andExpect(jsonPath("$.patientId", is(patient.getId())))
+                .andExpect(jsonPath("$.patientNumber", is(patient.getPnumber())))
                 .andExpect(jsonPath("$.studyId", is(patient.getStudy().getId())))
                 .andExpect(jsonPath("$.studyNameShort", is(patient.getStudy().getNameShort())))
+                .andExpect(jsonPath("$.sourceSpecimens", hasSize(collectionEvent.getOriginalSpecimens().size())))
+                .andExpect(jsonPath("$.status", is(collectionEvent.getActivityStatus().toString())))
                 .andReturn();
-
-        String createdAt = JsonPath.read(result.getResponse().getContentAsString(), "$.createdAt");
-        assertThat(
-            Instant.parse(createdAt),
-            InstantMatchers.within(1, ChronoUnit.SECONDS, patient.getCreatedAt().toInstant())
-        );
     }
 
-    private String endpointUrl(String pnumber) {
-        return ENDPOINT_URL.replace("{pnumber}", pnumber);
+    private String endpointUrl(String pnumber, Integer visitNumber) {
+        return ENDPOINT_URL
+            .replace("{pnumber}", pnumber)
+            .replace("{vnumber}", visitNumber.toString());
     }
 }
