@@ -12,3 +12,5 @@ export const patientSchema = domainEntitySchema.extend({
   studyNameShort: z.string(),
   collectionEvents: z.array(collectionEventSchema)
 });
+
+export type Patient = z.infer<typeof patientSchema>;

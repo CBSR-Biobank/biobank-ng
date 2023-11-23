@@ -1,9 +1,9 @@
+import { Patient } from '@app/models/patient';
 import { capitalizeWord } from '@app/utils';
-import { matchPath, useLocation, useParams } from 'react-router-dom';
+import { matchPath, useLocation } from 'react-router-dom';
 import { Breadcrumbs } from './breadcrumbs';
 
-export const PatientBreadcrumbs: React.FC = () => {
-  const params = useParams();
+export const PatientBreadcrumbs: React.FC<{ patient?: Patient }> = ({ patient }) => {
   const { pathname } = useLocation();
 
   const pathnames = pathname.split('/').filter(Boolean);
@@ -14,7 +14,11 @@ export const PatientBreadcrumbs: React.FC = () => {
 
     const patientMatch = matchPath({ path: '/patients/:pnumber', end: true }, route);
     if (patientMatch && route === patientMatch.pathname) {
-      label = 'Patient ' + params.pnumber || '';
+      if (!patient) {
+        throw new Error('patient is invalid');
+      }
+
+      label = `${patient.studyNameShort}: Patient ${patient.pnumber}`;
     }
 
     return { label, route, isLast };

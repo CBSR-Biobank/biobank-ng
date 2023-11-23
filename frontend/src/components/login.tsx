@@ -19,7 +19,7 @@ type FormInputs = z.infer<typeof schema>;
 
 export function Login() {
   const navigate = useNavigate();
-  const { loggedIn, userToken } = useUserStore();
+  const { loggedIn } = useUserStore();
   const [loginError, setLoginError] = useState(false);
   const [loginErrorMessage, setLoginErrorMessage] = useState('');
 

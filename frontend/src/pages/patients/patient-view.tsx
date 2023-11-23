@@ -58,7 +58,7 @@ export function PatientView() {
 
   return (
     <>
-      <PatientBreadcrumbs />
+      <PatientBreadcrumbs patient={patient} />
       <AdminPage>
         <AdminPage.Title hasBorder>
           <p className="text-sm text-gray-400">Patient</p>

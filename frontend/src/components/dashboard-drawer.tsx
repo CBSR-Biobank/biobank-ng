@@ -16,7 +16,7 @@ import {
   faUsers,
   faWrench
 } from '@fortawesome/free-solid-svg-icons';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { DrawerMenuItem } from './drawer-menu-item';
 import { MenuItem } from './menu-item';
 
@@ -81,10 +81,6 @@ const menuItems: MenuItem[] = [
 export const DashboardDrawer: React.FC<{ open: boolean }> = ({ open }) => {
   const { user } = useUserStore();
   const [drawerOpen, setDrawerOpen] = useState(open);
-
-  useEffect(() => {
-    setDrawerOpen(open);
-  }, [open]);
 
   if (!user) {
     return null;
