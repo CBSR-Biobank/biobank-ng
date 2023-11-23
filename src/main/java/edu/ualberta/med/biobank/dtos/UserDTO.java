@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.dtos;
 
 import java.util.HashMap;
-
+import edu.ualberta.med.biobank.domain.PermissionEnum;
 import edu.ualberta.med.biobank.domain.Status;
 
 public record UserDTO(
@@ -24,4 +24,10 @@ public record UserDTO(
         return status.equals(Status.ACTIVE);
     }
 
+    public boolean hasPermission(PermissionEnum permission, Integer centerId, Integer studyId) {
+        for (MembershipDTO m : this.memberships.values()) {
+            if (m.isAllowed(permission, centerId, studyId)) return true;
+        }
+        return false;
+    }
 }

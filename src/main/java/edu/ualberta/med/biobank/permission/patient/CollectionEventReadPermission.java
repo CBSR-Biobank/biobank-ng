@@ -34,18 +34,14 @@ public class CollectionEventReadPermission implements Permission {
         return userService
             .findOneWithMemberships(auth.getName())
             .flatMap(user -> {
+                if (studyId == null) {
+                    return Either.right(user.hasPermission(PermissionEnum.COLLECTION_EVENT_READ, null, null));
+                }
+
                 var studyService = applicationContext.getBean(StudyService.class);
-                return (studyId == null)
-                    ? Either.right(PermissionEnum.COLLECTION_EVENT_READ.isAllowed(user, null, null))
-                    : studyService
-                        .getByStudyId(studyId)
-                        .flatMap(study -> {
-                            var result = PermissionEnum.COLLECTION_EVENT_READ.isAllowed(user, study);
-                            if (!result) {
-                                return Either.left(new Unauthorized("collectionEvent permission"));
-                            }
-                            return Either.right(result);
-                        });
+                return studyService
+                    .getByStudyId(studyId)
+                    .flatMap(study -> Either.right(user.hasPermission(PermissionEnum.COLLECTION_EVENT_READ, null, studyId)));
             });
     }
 }

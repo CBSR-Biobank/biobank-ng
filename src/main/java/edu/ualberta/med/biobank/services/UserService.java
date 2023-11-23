@@ -1,8 +1,14 @@
 package edu.ualberta.med.biobank.services;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.domain.PermissionEnum;
 import edu.ualberta.med.biobank.domain.Status;
-import edu.ualberta.med.biobank.domain.User;
 import edu.ualberta.med.biobank.dtos.DomainDTO;
 import edu.ualberta.med.biobank.dtos.GroupDTO;
 import edu.ualberta.med.biobank.dtos.MembershipDTO;
@@ -11,19 +17,11 @@ import edu.ualberta.med.biobank.dtos.UserDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.repositories.UserRepository;
-import edu.ualberta.med.biobank.repositories.UserSpecifications;
 import edu.ualberta.med.biobank.util.LoggingUtils;
 import io.jbock.util.Either;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
@@ -50,16 +48,18 @@ public class UserService {
         return Either.right(user);
     }
 
-    public Either<AppError, User> findOneWithMemberships(String username) {
-        var users = userRepository.findAll(UserSpecifications.isUsername(username));
+    public Either<AppError, UserDTO> findOneWithMemberships(String username) {
+        var users = userByLoginToDTO(username);
         if (users.size() != 1) {
             return Either.left(new EntityNotFound("user by username"));
         }
-        return Either.right(users.get(0));
+        var user = users.stream().findFirst().get();
+        return Either.right(user);
     }
 
     private Collection<UserDTO> userByLoginToDTO(String login) {
         Map<Integer, UserDTO> users = new HashMap<>();
+        int rowCount = 0;
 
         userRepository
             .findByLogin(login, Tuple.class)
@@ -101,7 +101,8 @@ public class UserService {
                                 membershipId,
                                 row.get("EVERY_PERMISSION", Boolean.class),
                                 new HashMap<>(),
-                                new HashMap<>()
+                                new HashMap<>(),
+                                new HashSet<>()
                             )
                     );
 
@@ -144,11 +145,17 @@ public class UserService {
                         );
 
                     var role = membership.roles().get(roleId);
-                    var permissionId = row.get("PERMISSION_ID", Integer.class);
+                    var permissionId = row.get("ROLE_PERMISSION_ID", Integer.class);
                     if (permissionId != null) {
                         role.permissions().add(PermissionEnum.fromId(permissionId));
                     }
                 }
+
+                var membershipPermissionId = row.get("MEMBERSHIP_PERMISSION_ID", Integer.class);
+                if (membershipPermissionId != null) {
+                    membership.permissions().add(PermissionEnum.fromId(membershipPermissionId));
+                }
+
             });
 
         return users.values();

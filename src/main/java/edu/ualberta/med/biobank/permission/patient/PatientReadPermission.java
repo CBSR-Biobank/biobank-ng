@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.permission.patient;
 import edu.ualberta.med.biobank.ApplicationContextProvider;
 import edu.ualberta.med.biobank.domain.PermissionEnum;
 import edu.ualberta.med.biobank.errors.AppError;
-import edu.ualberta.med.biobank.errors.Unauthorized;
 import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.services.StudyService;
 import edu.ualberta.med.biobank.services.UserService;
@@ -33,19 +32,14 @@ public class PatientReadPermission implements Permission {
         return userService
             .findOneWithMemberships(auth.getName())
             .flatMap(user -> {
-                var studyService = applicationContext.getBean(StudyService.class);
+                if (studyId == null) {
+                    return Either.right(user.hasPermission(PermissionEnum.PATIENT_READ, null, null));
+                }
 
-                return (studyId == null)
-                    ? Either.right(PermissionEnum.PATIENT_READ.isAllowed(user, null, null))
-                    : studyService
-                        .getByStudyId(studyId)
-                        .flatMap(study -> {
-                            var result = PermissionEnum.PATIENT_READ.isAllowed(user, study);
-                            if (!result) {
-                                return Either.left(new Unauthorized("patient permission"));
-                            }
-                            return Either.right(result);
-                        });
+                var studyService = applicationContext.getBean(StudyService.class);
+                return studyService
+                    .getByStudyId(studyId)
+                    .flatMap(study -> Either.right(user.hasPermission(PermissionEnum.PATIENT_READ, null, studyId)));
             });
     }
 }

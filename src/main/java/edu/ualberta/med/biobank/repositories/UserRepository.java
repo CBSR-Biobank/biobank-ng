@@ -31,7 +31,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
                   ds.CENTER_ID STUDY_ID,
                   r.ID ROLE_ID,
                   r.NAME ROLE_NAME,
-                  rp.PERMISSION_ID
+                  rp.PERMISSION_ID ROLE_PERMISSION_ID,
+                  mp.PERMISSION_ID MEMBERSHIP_PERMISSION_ID
                 from principal p
                 left join csm_user cu on cu.USER_ID  = p.CSM_USER_ID
                 left join group_user gu on gu.USER_ID = p.ID
