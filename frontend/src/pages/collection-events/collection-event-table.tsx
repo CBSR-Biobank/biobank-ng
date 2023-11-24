@@ -6,56 +6,58 @@ import { Link } from 'react-router-dom';
 
 const buttonClass = 'transition ease-in-out delay-150 hover:scale-[1.15] duration-200';
 
+// see https://tailwindcomponents.com/component/table-4
+
 export const CollectionEventTable: React.FC<{ collectionEvents: CollectionEvent[] }> = ({ collectionEvents }) => {
   return (
-    <div className="grid grid-cols-1 gap-8 overflow-x-auto">
+    <div className="grid grid-cols-1 gap-8 overflow-x-auto pt-6">
       <table className="w-full min-w-max table-auto text-left">
         <thead>
           <tr>
-            <th className="border-y border-gray-200 p-4">
-              <p className="block font-sans text-sm font-normal leading-none text-gray-900 antialiased opacity-70">
+            <th className="border-y border-gray-200 p-3">
+              <p className="block font-sans text-sm font-normal leading-none text-slate-700 antialiased opacity-70">
                 Visit
               </p>
             </th>
-            <th className="border-y border-gray-200 p-4">
-              <p className="block font-sans text-sm font-normal leading-none text-gray-900 antialiased opacity-70">
+            <th className="border-y border-gray-200 p-3">
+              <p className="block font-sans text-sm font-normal leading-none text-slate-700 antialiased opacity-70">
                 Date
               </p>
             </th>
-            <th className="border-y border-gray-200 p-4">
-              <p className="block font-sans text-sm font-normal leading-none text-gray-900 antialiased opacity-70">
+            <th className="border-y border-gray-200 p-3">
+              <p className="block font-sans text-sm font-normal leading-none text-slate-700 antialiased opacity-70">
                 Specimens
               </p>
             </th>
-            <th className="border-y border-gray-200 p-4">
-              <p className="block font-sans text-sm font-normal leading-none text-gray-900 antialiased opacity-70">
+            <th className="border-y border-gray-200 p-3">
+              <p className="block font-sans text-sm font-normal leading-none text-slate-700 antialiased opacity-70">
                 Aliquots
               </p>
             </th>
-            <th className="border-y border-gray-200 p-4"></th>
+            <th className="border-y border-gray-200 p-3"></th>
           </tr>
         </thead>
         <tbody>
           {collectionEvents.map((cevent) => (
             <tr key={cevent.id}>
               <td className="border-b border-gray-200 p-3">
-                <p className="block font-sans text-sm font-normal leading-normal text-gray-900 antialiased">
+                <p className="block font-sans text-sm font-normal leading-normal text-slate-700 antialiased">
                   {cevent.visitNumber}
                 </p>
               </td>
 
               <td className="border-b border-gray-200 p-3">
-                <p className="block font-sans text-sm font-normal leading-normal text-gray-900 antialiased">
+                <p className="block font-sans text-sm font-normal leading-normal text-slate-700 antialiased">
                   {format(cevent.createdAt, 'yyyy-MM-dd')}
                 </p>
               </td>
               <td className="border-b border-gray-200 p-3">
-                <p className="block font-sans text-sm font-normal leading-normal text-gray-900 antialiased">
+                <p className="block font-sans text-sm font-normal leading-normal text-slate-700 antialiased">
                   {cevent.specimenCount}
                 </p>
               </td>
               <td className="border-b border-gray-200 p-3">
-                <p className="block font-sans text-sm font-normal leading-normal text-gray-900 antialiased">
+                <p className="block font-sans text-sm font-normal leading-normal text-slate-700 antialiased">
                   {cevent.aliquotCount}
                 </p>
               </td>

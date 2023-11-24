@@ -17,7 +17,7 @@ export const EntityProperty: React.FC<
   }>
 > = ({ className, propName, label, icon = faPen, tooltip = 'Update', allowChanges, handleChange, children }) => {
   const valueClasses = cn(
-    'border-r-solid flex grow flex-wrap items-center rounded-l-lg border-gray-200 bg-gray-300 p-3 text-slate-700 ',
+    'border-r-solid flex grow flex-wrap items-center rounded-l-lg border-gray-200 bg-gray-300/50 p-3 text-slate-700 ',
     {
       'border-r': handleChange,
       'rounded-r-lg': !handleChange
@@ -32,7 +32,7 @@ export const EntityProperty: React.FC<
 
   return (
     <div className={cn('grid grid-cols-1 gap-2', className)}>
-      <p className="text-sm font-semibold text-gray-500">{label}</p>
+      <p className="text-sm font-semibold text-gray-400">{label}</p>
       <div className="flex gap-0">
         <div className={valueClasses}>
           {children !== null && <>{children}</>}
@@ -40,7 +40,7 @@ export const EntityProperty: React.FC<
         </div>
         {allowChanges && (
           <div
-            className="flex cursor-pointer items-center rounded-r-lg bg-gray-300 p-3 text-green-500 hover:bg-gray-400"
+            className="flex cursor-pointer items-center rounded-r-lg bg-gray-300/50 p-3 text-sky-400 hover:bg-gray-400"
             onClick={handleClick}
           >
             <Tooltip message={tooltip} orientation="right">
