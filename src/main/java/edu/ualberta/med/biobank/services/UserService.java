@@ -59,7 +59,6 @@ public class UserService {
 
     private Collection<UserDTO> userByLoginToDTO(String login) {
         Map<Integer, UserDTO> users = new HashMap<>();
-        int rowCount = 0;
 
         userRepository
             .findByLogin(login, Tuple.class)

@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.services;
 
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.domain.Patient;
-import edu.ualberta.med.biobank.dtos.CollectionEventInfoDTO;
+import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.dtos.CollectionEventSummaryDTO;
 import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.errors.AppError;
@@ -50,10 +50,7 @@ public class PatientService {
     }
 
     public Either<AppError, PatientDTO> findByPnumber(String pnumber) {
-        var found = patientRepository
-            .findByPnumber(pnumber, Tuple.class)
-            .stream()
-            .findFirst();
+        var found = patientRepository.findByPnumber(pnumber, Tuple.class).stream().findFirst();
 
         if (found.isEmpty()) {
             return Either.left(new EntityNotFound("patient"));
@@ -76,28 +73,22 @@ public class PatientService {
         return allowed
             .map(a -> patient)
             .map(p -> {
-                final var info = collectionEventCustomRepository.collectionEventCountsByPatientId(p.id());
-                var collectionEvents = collectionEventRepository
-                    .findByPatientId(p.id())
+                final var ceSummary = collectionEventRepository
+                    .findSummariesByPatient(pnumber, Tuple.class)
                     .stream()
-                    .map(ce -> toCollectionEventDTO(ce, info.get(ce.getId())))
+                    .map(row ->
+                        new CollectionEventSummaryDTO(
+                            row.get("id", Integer.class),
+                            row.get("visitNumber", Integer.class),
+                            row.get("specimenCount", Long.class),
+                            row.get("aliquotCount", Long.class),
+                            row.get("createdAt", Date.class),
+                            Status.fromId(row.get("ACTIVITY_STATUS_ID", Integer.class))
+                        )
+                    )
                     .toList();
-                return p.withCollectionEvents(collectionEvents);
+
+                return p.withCollectionEvents(ceSummary);
             });
-    }
-
-    private static CollectionEventSummaryDTO toCollectionEventDTO(CollectionEvent cevent, CollectionEventInfoDTO info) {
-        if (info == null) {
-            throw new RuntimeException("info is null");
-        }
-
-        return new CollectionEventSummaryDTO(
-            cevent.getId(),
-            cevent.getVisitNumber(),
-            info.specimenCount(),
-            info.aliquotCount(),
-            info.createdAt(),
-            cevent.getActivityStatus().getName()
-        );
     }
 }

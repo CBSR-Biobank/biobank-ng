@@ -54,8 +54,8 @@ public class PatientCustomRepository {
                     patientId,
                     result.get("pnumber", String.class),
                     result.get("createdAt", Date.class),
-                    result.get("spcCount", Number.class).intValue(),
-                    result.get("alqCount", Number.class).intValue(),
+                    result.get("spcCount", Number.class).longValue(),
+                    result.get("alqCount", Number.class).longValue(),
                     result.get("studyId", Number.class).intValue(),
                     result.get("studyNameShort", String.class),
                     List.of()

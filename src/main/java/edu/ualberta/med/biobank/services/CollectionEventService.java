@@ -1,5 +1,13 @@
 package edu.ualberta.med.biobank.services;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.dtos.CollectionEventDTO;
 import edu.ualberta.med.biobank.dtos.CommentDTO;
@@ -10,12 +18,8 @@ import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.permission.patient.CollectionEventReadPermission;
 import edu.ualberta.med.biobank.repositories.CollectionEventCustomRepository;
 import edu.ualberta.med.biobank.repositories.CollectionEventRepository;
-import edu.ualberta.med.biobank.repositories.CollectionEventSpecifications;
 import io.jbock.util.Either;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import jakarta.persistence.Tuple;
 
 @Service
 public class CollectionEventService {
@@ -36,71 +40,48 @@ public class CollectionEventService {
     }
 
     public Either<AppError, CollectionEventDTO> findByPnumberAndVnumber(String pnumber, Integer vnumber) {
-        var cevents = collectionEventRepository.findAll(
-            CollectionEventSpecifications
-                .isPatientNumber(pnumber)
-                .and(CollectionEventSpecifications.isVisitNumber(vnumber))
-        );
-        if (cevents.size() <= 0) {
+        Map<Integer, CollectionEventDTO> cevents = new HashMap<>();
+        Map<Integer, EventAttributeDTO> attributes = new HashMap<>();
+        Map<Integer, SourceSpecimenDTO> sourceSpecimens = new HashMap<>();
+        Map<Integer, CommentDTO> comments = new HashMap<>();
+
+        collectionEventRepository
+            .findByPatientAndVnumber(pnumber, vnumber, Tuple.class)
+            .stream()
+            .forEach(row -> {
+                var ceventId = row.get("id", Integer.class);
+                cevents.computeIfAbsent(ceventId, id -> CollectionEventDTO.fromTuple(row));
+
+                var attributeId = row.get("attributeId", Integer.class);
+                if (attributeId != null) {
+                    attributes.computeIfAbsent(attributeId, id -> EventAttributeDTO.fromTuple(row));
+                }
+
+                var isSourceSpecimen = row.get("isSourceSpecimen", Integer.class);
+                if (isSourceSpecimen == 1) {
+                    var specimenId = row.get("specimenId", Integer.class);
+                    if (specimenId != null) {
+                        sourceSpecimens.computeIfAbsent(specimenId, id -> SourceSpecimenDTO.fromTuple(row));
+                    }
+                }
+
+                var commentId = row.get("commentId", Integer.class);
+                if (commentId != null) {
+                    comments.computeIfAbsent(commentId, id -> CommentDTO.fromTuple(row));
+                }
+
+            });
+
+        if (cevents.size() != 1) {
             return Either.left(new EntityNotFound("collection event by pnumber and vnumber"));
         }
 
-        final var cevent = cevents.get(0);
-        var permission = new CollectionEventReadPermission(cevent.getPatient().getStudy().getId());
-        return permission.isAllowed().map(allowed -> toCollectionEventDTO(cevent));
-    }
-
-    public static CollectionEventDTO toCollectionEventDTO(CollectionEvent cevent) {
-        return new CollectionEventDTO(
-            cevent.getId(),
-            cevent.getVisitNumber(),
-            cevent.getActivityStatus().getName(),
-            cevent.getPatient().getId(),
-            cevent.getPatient().getPnumber(),
-            cevent.getPatient().getStudy().getId(),
-            cevent.getPatient().getStudy().getNameShort(),
-            cevent
-                .getEventAttrs()
-                .stream()
-                .map(eventAttr ->
-                    new EventAttributeDTO(
-                        eventAttr.getStudyEventAttr().getGlobalEventAttr().getLabel(),
-                        eventAttr.getValue()
-                    )
-                )
-                .toList(),
-            cevent
-                .getComments()
-                .stream()
-                .map(comment ->
-                    new CommentDTO(
-                        comment.getId(),
-                        comment.getMessage(),
-                        comment.getUser().getLogin(),
-                        comment.getCreatedAt()
-                    )
-                )
-                .toList(),
-            cevent
-                .getOriginalSpecimens()
-                .stream()
-                .map(specimen ->
-                    new SourceSpecimenDTO(
-                        specimen.getId(),
-                        specimen.getInventoryId(),
-                        specimen.getSpecimenType().getId(),
-                        specimen.getSpecimenType().getNameShort(),
-                        specimen.getCreatedAt(),
-                        specimen.getQuantity(),
-                        specimen.getActivityStatus().getName(),
-                        specimen.getOriginInfo().getCenter().getId(),
-                        specimen.getOriginInfo().getCenter().getNameShort(),
-                        specimen.getCurrentCenter().getId(),
-                        specimen.getCurrentCenter().getNameShort(),
-                        specimen.getComments().size() > 0
-                    )
-                )
-                .toList()
-        );
+        final var cevent = cevents.entrySet().iterator().next().getValue()
+            .withExtras(
+                new ArrayList<>(attributes.values()),
+                new ArrayList<>(comments.values()),
+                new ArrayList<>(sourceSpecimens.values()));
+        var permission = new CollectionEventReadPermission(cevent.studyId());
+        return permission.isAllowed().map(allowed -> cevent);
     }
 }
