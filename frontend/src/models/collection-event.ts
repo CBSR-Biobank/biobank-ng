@@ -9,3 +9,5 @@ export const collectionEventSchema = domainEntitySchema.extend({
   aliquotCount: z.number(),
   status: z.string()
 });
+
+export type CollectionEvent = z.infer<typeof collectionEventSchema>;
