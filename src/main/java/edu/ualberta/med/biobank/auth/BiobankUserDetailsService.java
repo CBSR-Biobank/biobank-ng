@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
+import edu.ualberta.med.biobank.applicationEvents.BiobankEventPublisher;
 import edu.ualberta.med.biobank.services.UserService;
 
 @Service
@@ -21,8 +21,11 @@ public class BiobankUserDetailsService implements UserDetailsService {
 
     private UserService userService;
 
-    public BiobankUserDetailsService(UserService userService) {
+    private BiobankEventPublisher eventPublisher;
+
+    public BiobankUserDetailsService(UserService userService, BiobankEventPublisher eventPublisher) {
         this.userService = userService;
+        this.eventPublisher = eventPublisher;
     }
 
     // see https://javapointers.com/spring/spring-security/spring-custom-userdetailsservice-example/
@@ -41,6 +44,8 @@ public class BiobankUserDetailsService implements UserDetailsService {
         if (userInfo.isGlobalAdmin()) {
             authList.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         }
+
+        eventPublisher.publishUserLoggedIn(username);
 
         return User.withUsername(username)
             .password(userInfo.password())
