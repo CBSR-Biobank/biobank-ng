@@ -21,21 +21,22 @@ public class PatientCustomRepository {
 
     Logger logger = LoggerFactory.getLogger(PatientCustomRepository.class);
 
-    private static final String FIND_BY_PNUMBER_QRY =
-        "SELECT p.id as id," +
-        "       p.pnumber as pnumber," +
-        "       p.createdAt as createdAt," +
-        "       p.study.id as studyId," +
-        "       p.study.nameShort as studyNameShort," +
-        "       COUNT(DISTINCT sourceSpecs) as spcCount," +
-        "       COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourceSpecs) as alqCount" +
-        " FROM Patient p" +
-        " JOIN p.study study" +
-        " LEFT JOIN p.collectionEvents ce" +
-        " LEFT JOIN ce.originalSpecimens sourceSpecs" +
-        " LEFT JOIN ce.allSpecimens allSpecs" +
-        " WHERE p.pnumber= :pnumber" +
-        " GROUP BY p.id";
+    private static final String FIND_BY_PNUMBER_QRY = """
+        SELECT p.id as id,
+               p.pnumber as pnumber,
+               p.createdAt as createdAt,
+               p.study.id as studyId,
+               p.study.nameShort as studyNameShort,
+               COUNT(DISTINCT sourceSpecs) as spcCount,
+               COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourceSpecs) as alqCount
+        FROM Patient p
+        JOIN p.study study
+        LEFT JOIN p.collectionEvents ce
+        LEFT JOIN ce.originalSpecimens sourceSpecs
+        LEFT JOIN ce.allSpecimens allSpecs
+        WHERE p.pnumber= :pnumber
+        GROUP BY p.id
+        """;
 
     @PersistenceContext
     private EntityManager entityManager;

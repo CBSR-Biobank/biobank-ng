@@ -7,8 +7,8 @@ public record PatientDTO(
     Integer id,
     String pnumber,
     Date createdAt,
-    Integer specimenCount,
-    Integer aliquotCount,
+    Long specimenCount,
+    Long aliquotCount,
     Integer studyId,
     String studyNameShort,
     List<CollectionEventSummaryDTO> collectionEvents
