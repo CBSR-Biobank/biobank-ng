@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.dtos;
 import java.util.HashMap;
 import edu.ualberta.med.biobank.domain.PermissionEnum;
 import edu.ualberta.med.biobank.domain.Status;
+import jakarta.persistence.Tuple;
 
 public record UserDTO(
     Integer userId,
@@ -12,6 +13,16 @@ public record UserDTO(
     HashMap<Integer, GroupDTO> groups,
     HashMap<Integer, MembershipDTO> memberships
 ) {
+    public static UserDTO fromTuple(Tuple data) {
+        return new UserDTO(
+            data.get("ID", Number.class).intValue(),
+            data.get("LOGIN", String.class),
+            data.get("PASSWORD", String.class),
+            Status.fromId(data.get("ACTIVITY_STATUS_ID", Integer.class)),
+            new HashMap<>(),
+            new HashMap<>()
+        );
+    }
 
     public boolean isGlobalAdmin() {
         return groups.values().stream()

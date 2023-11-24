@@ -8,8 +8,8 @@ public record CommentDTO(Integer id, String message, String user, Date createdAt
         return new CommentDTO(
             data.get("commentId", Number.class).intValue(),
             data.get("commentMessage", String.class),
-            data.get("commentUser", Number.class).intValue(),
+            data.get("commentUser", String.class),
             data.get("createdAt", Date.class)
-        )
+        );
     }
 }

@@ -2,13 +2,11 @@ package edu.ualberta.med.biobank.services;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.domain.PermissionEnum;
-import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.dtos.DomainDTO;
 import edu.ualberta.med.biobank.dtos.GroupDTO;
 import edu.ualberta.med.biobank.dtos.MembershipDTO;
@@ -65,25 +63,14 @@ public class UserService {
             .stream()
             .forEach(row -> {
                 var userId = row.get("ID", Integer.class);
-                users.computeIfAbsent(
-                    userId,
-                    id ->
-                        new UserDTO(
-                            id,
-                            row.get("LOGIN", String.class),
-                            row.get("PASSWORD", String.class),
-                            Status.fromId(row.get("ACTIVITY_STATUS_ID", Integer.class)),
-                            new HashMap<>(),
-                            new HashMap<>()
-                        )
-                );
+                users.computeIfAbsent(userId, id ->UserDTO.fromTuple(row));
 
                 var groupId = row.get("GROUP_ID", Integer.class);
                 if (groupId != null) {
                     users
                         .get(userId)
                         .groups()
-                        .computeIfAbsent(groupId, id -> new GroupDTO(groupId, row.get("GROUP_NAME", String.class)));
+                        .computeIfAbsent(groupId, id -> GroupDTO.fromTuple(row));
                 }
 
                 var membershipId = row.get("MEMBERSHIP_ID", Integer.class);
@@ -93,34 +80,14 @@ public class UserService {
                 users
                     .get(userId)
                     .memberships()
-                    .computeIfAbsent(
-                        membershipId,
-                        id ->
-                            new MembershipDTO(
-                                membershipId,
-                                row.get("EVERY_PERMISSION", Boolean.class),
-                                new HashMap<>(),
-                                new HashMap<>(),
-                                new HashSet<>()
-                            )
-                    );
+                    .computeIfAbsent(membershipId, id -> MembershipDTO.fromTuple(row));
 
                 var membership = users.get(userId).memberships().get(membershipId);
                 var domainId = row.get("DOMAIN_ID", Integer.class);
                 if (domainId != null) {
                     membership
                         .domains()
-                        .computeIfAbsent(
-                            domainId,
-                            id ->
-                                new DomainDTO(
-                                    domainId,
-                                    row.get("ALL_CENTERS", Boolean.class),
-                                    row.get("ALL_STUDIES", Boolean.class),
-                                    new HashSet<>(),
-                                    new HashSet<>()
-                                )
-                        );
+                        .computeIfAbsent(domainId, id -> DomainDTO.fromTuple(row));
 
                     var domain = membership.domains().get(domainId);
                     var centerId = row.get("CENTER_ID", Integer.class);
@@ -138,10 +105,7 @@ public class UserService {
                 if (roleId != null) {
                     membership
                         .roles()
-                        .computeIfAbsent(
-                            roleId,
-                            id -> new RoleDTO(roleId, row.get("ROLE_NAME", String.class), new HashSet<>())
-                        );
+                        .computeIfAbsent(roleId, id -> RoleDTO.fromTuple(row));
 
                     var role = membership.roles().get(roleId);
                     var permissionId = row.get("ROLE_PERMISSION_ID", Integer.class);
