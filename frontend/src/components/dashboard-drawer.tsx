@@ -80,7 +80,7 @@ const menuItems: MenuItem[] = [
 
 export const DashboardDrawer: React.FC<{ open: boolean }> = ({ open }) => {
   const { user } = useUserStore();
-  const [drawerOpen, setDrawerOpen] = useState(open);
+  const [drawerOpen, _setDrawerOpen] = useState(open);
 
   if (!user) {
     return null;
