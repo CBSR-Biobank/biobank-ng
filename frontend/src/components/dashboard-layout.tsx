@@ -87,7 +87,7 @@ export function DashboardLayout() {
           </Menubar>
         )}
       </div>
-      <div className="flex h-screen w-full flex-grow pt-16">
+      <div className="flex min-h-screen w-full flex-grow pt-16">
         {loggedIn && <DashboardDrawer open={drawerOpen} />}
         <div className="w-full bg-gray-200 p-4">
           <Outlet />
