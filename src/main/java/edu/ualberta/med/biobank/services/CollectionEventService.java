@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.services;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,6 @@ import edu.ualberta.med.biobank.dtos.SourceSpecimenDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.permission.patient.CollectionEventReadPermission;
-import edu.ualberta.med.biobank.repositories.CollectionEventCustomRepository;
 import edu.ualberta.med.biobank.repositories.CollectionEventRepository;
 import io.jbock.util.Either;
 import jakarta.persistence.Tuple;
@@ -28,9 +26,6 @@ public class CollectionEventService {
 
     @Autowired
     CollectionEventRepository collectionEventRepository;
-
-    @Autowired
-    CollectionEventCustomRepository collectionEventCustomRepository;
 
     public Either<AppError, CollectionEvent> getByCollectionEventId(Integer id) {
         return collectionEventRepository
