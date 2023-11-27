@@ -11,8 +11,10 @@ import edu.ualberta.med.biobank.domain.Study;
 import edu.ualberta.med.biobank.dtos.StudyDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
+import edu.ualberta.med.biobank.permission.patient.StudyReadPermission;
 import edu.ualberta.med.biobank.repositories.StudyRepository;
 import io.jbock.util.Either;
+import jakarta.persistence.Tuple;
 
 @Service
 public class StudyService {
@@ -23,20 +25,29 @@ public class StudyService {
         studyRepository.save(study);
     }
 
-    public Either<AppError, Study> getByStudyId(Integer id) {
-        return studyRepository.findById(id)
-            .map(Either::<AppError, Study>right)
-            .orElseGet(() -> Either.left(new EntityNotFound("not found")));
+    public Either<AppError, StudyDTO> getByStudyId(Integer id) {
+        var found = studyRepository.findById(id, Tuple.class).stream().findFirst();
+
+        if (found.isEmpty()) {
+            return Either.left(new EntityNotFound("study"));
+        }
+
+        var study = StudyDTO.fromTuple(found.get());
+
+        var permission = new StudyReadPermission(id);
+        var allowed = permission.isAllowed();
+        return allowed.map(a -> study);
     }
 
     public Page<StudyDTO> studyPagination(Integer pageNumber, Integer pageSize, String sort) {
+        // FIXME: check user memberships here and return only studies they have access to
         Pageable pageable = null;
         if (sort != null) {
             pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, sort);
         } else {
             pageable = PageRequest.of(pageNumber, pageSize);
         }
-        Page<Study> data = studyRepository.findAll(pageable);
-        return data.map(s -> new StudyDTO(s.getId(), s.getName(), s.getNameShort(), s.getActivityStatus().getName()));
+        Page<Tuple> data = studyRepository.findAll(pageable, Tuple.class);
+        return data.map(d -> StudyDTO.fromTuple(d));
     }
 }
