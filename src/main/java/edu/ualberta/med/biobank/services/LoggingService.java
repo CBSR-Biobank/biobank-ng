@@ -3,11 +3,17 @@ package edu.ualberta.med.biobank.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.applicationEvents.PatientReadEvent;
 import edu.ualberta.med.biobank.applicationEvents.UserLoggedInEvent;
 import edu.ualberta.med.biobank.domain.Log;
+import edu.ualberta.med.biobank.dtos.LoggingDTO;
 import edu.ualberta.med.biobank.repositories.LoggingRepository;
+import jakarta.persistence.Tuple;
 
 @Service
 public class LoggingService {
@@ -18,6 +24,17 @@ public class LoggingService {
 
     public LoggingService(LoggingRepository loggingRepository) {
         this.loggingRepository = loggingRepository;
+    }
+
+    public Page<LoggingDTO> loggingPagination(Integer pageNumber, Integer pageSize, String sort) {
+        Pageable pageable = null;
+        if (sort != null) {
+            pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, sort);
+        } else {
+            pageable = PageRequest.of(pageNumber, pageSize);
+        }
+        Page<Tuple> data = loggingRepository.findAllWithPagination(pageable);
+        return data.map(d -> LoggingDTO.fromTuple(d));
     }
 
     @EventListener
