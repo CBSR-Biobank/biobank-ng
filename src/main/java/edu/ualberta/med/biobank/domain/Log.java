@@ -1,15 +1,14 @@
 package edu.ualberta.med.biobank.domain;
 
-import org.hibernate.annotations.Parameter;
-
-import java.util.Date;
-import org.hibernate.annotations.GenericGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.Date;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
 @Entity
 @Table(name = "LOG")
@@ -21,9 +20,9 @@ public class Log implements ValueObject {
         name = "id-generator",
         strategy = "edu.ualberta.med.biobank.domain.util.CustomIdGenerator",
         parameters = {
-            @Parameter(name = "initial_value", value = "1"),
-            @Parameter(name = "increment_size", value = "50")
-        })
+            @Parameter(name = "initial_value", value = "1"), @Parameter(name = "increment_size", value = "50")
+        }
+    )
     @Column(name = "ID", nullable = false)
     private Integer id;
 
@@ -48,7 +47,7 @@ public class Log implements ValueObject {
     @Column(name = "LOCATION_LABEL")
     private String locationLabel;
 
-    @Column(name = "DETAILS", columnDefinition="TEXT")
+    @Column(name = "DETAILS", columnDefinition = "TEXT")
     private String details;
 
     @Column(name = "TYPE", length = 100)
@@ -133,5 +132,84 @@ public class Log implements ValueObject {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public static final class LogBuilder {
+
+        private Date createdAt;
+        private String username;
+        private String center;
+        private String action;
+        private String patientNumber;
+        private String inventoryId;
+        private String locationLabel;
+        private String details;
+        private String type;
+
+        public LogBuilder() {
+            this.createdAt = new Date();
+            this.username = "";
+            this.center = "";
+            this.action = "";
+            this.patientNumber = "";
+            this.inventoryId = "";
+            this.locationLabel = "";
+            this.details = "";
+            this.type = "";
+        }
+
+        public LogBuilder username(String username) {
+            this.username = username;
+            return this;
+        }
+
+        public LogBuilder center(String center) {
+            this.center = center;
+            return this;
+        }
+
+        public LogBuilder action(String action) {
+            this.action = action;
+            return this;
+        }
+
+        public LogBuilder patientNumber(String patientNumber) {
+            this.patientNumber = patientNumber;
+            return this;
+        }
+
+        public LogBuilder inventoryId(String inventoryId) {
+            this.inventoryId = inventoryId;
+            return this;
+        }
+
+        public LogBuilder locationLabel(String locationLabel) {
+            this.locationLabel = locationLabel;
+            return this;
+        }
+
+        public LogBuilder details(String details) {
+            this.details = details;
+            return this;
+        }
+
+        public LogBuilder type(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public Log build() {
+            Log logEvent = new Log();
+            logEvent.setUsername(this.username);
+            logEvent.setCreatedAt(this.createdAt);
+            logEvent.setAction(this.action);
+            logEvent.setCenter(this.center);
+            logEvent.setPatientNumber(this.patientNumber);
+            logEvent.setInventoryId(this.inventoryId);
+            logEvent.setLocationLabel(this.locationLabel);
+            logEvent.setDetails(this.details);
+            logEvent.setType(this.type);
+            return logEvent;
+        }
     }
 }

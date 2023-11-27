@@ -1,6 +1,11 @@
 package edu.ualberta.med.biobank.services;
 
-import edu.ualberta.med.biobank.domain.CollectionEvent;
+import java.util.Date;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import edu.ualberta.med.biobank.applicationEvents.BiobankEventPublisher;
 import edu.ualberta.med.biobank.domain.Patient;
 import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.dtos.CollectionEventSummaryDTO;
@@ -8,35 +13,31 @@ import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.permission.patient.PatientReadPermission;
-import edu.ualberta.med.biobank.repositories.CollectionEventCustomRepository;
 import edu.ualberta.med.biobank.repositories.CollectionEventRepository;
-import edu.ualberta.med.biobank.repositories.PatientCustomRepository;
 import edu.ualberta.med.biobank.repositories.PatientRepository;
 import io.jbock.util.Either;
 import jakarta.persistence.Tuple;
-import java.util.Date;
-import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 public class PatientService {
 
     Logger logger = LoggerFactory.getLogger(PatientService.class);
 
-    @Autowired
     PatientRepository patientRepository;
 
-    @Autowired
-    PatientCustomRepository patientCustomRepository;
-
-    @Autowired
     CollectionEventRepository collectionEventRepository;
 
-    @Autowired
-    CollectionEventCustomRepository collectionEventCustomRepository;
+    private BiobankEventPublisher eventPublisher;
+
+    public PatientService(PatientRepository patientRepository,
+        CollectionEventRepository collectionEventRepository, BiobankEventPublisher eventPublisher) {
+        this.patientRepository = patientRepository;
+        this.collectionEventRepository = collectionEventRepository;
+        this.eventPublisher = eventPublisher;
+    }
+
 
     public void save(Patient patient) {
         patientRepository.save(patient);
@@ -73,6 +74,10 @@ public class PatientService {
         return allowed
             .map(a -> patient)
             .map(p -> {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                logger.info(">>>>>>>>>>> username: {}", auth.getName());
+                eventPublisher.publishPatientRead(auth.getName(), pnumber);
+
                 final var ceSummary = collectionEventRepository
                     .findSummariesByPatient(pnumber, Tuple.class)
                     .stream()
