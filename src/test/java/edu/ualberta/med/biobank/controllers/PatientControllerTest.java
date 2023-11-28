@@ -34,6 +34,7 @@ import edu.ualberta.med.biobank.test.TestFixtures;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import net.datafaker.Faker;
 
 @Testcontainers
 @Transactional
@@ -103,6 +104,16 @@ class PatientControllerTest extends BaseTest {
             Instant.parse(createdAt),
             InstantMatchers.within(1, ChronoUnit.SECONDS, patient.getCreatedAt().toInstant())
         );
+    }
+
+    @Test
+    @WithMockUser(value = "testuser")
+    public void getWhenNotExistIsNotFound() throws Exception {
+        var badname = (new Faker()).lorem().fixedString(10);
+
+        this.mvc.perform(get(endpointUrl(badname)))
+            .andExpect(status().isNotFound())
+            .andDo(MockMvcResultHandlers.print());
     }
 
     private String endpointUrl(String pnumber) {

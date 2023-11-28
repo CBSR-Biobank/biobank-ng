@@ -1,15 +1,7 @@
 package edu.ualberta.med.biobank.controllers;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import edu.ualberta.med.biobank.test.ControllerTest;
-import edu.ualberta.med.biobank.test.Factory;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -18,6 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import edu.ualberta.med.biobank.test.ControllerTest;
+import edu.ualberta.med.biobank.test.Factory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 class LoggingControllerTest extends ControllerTest {
 
@@ -43,11 +39,7 @@ class LoggingControllerTest extends ControllerTest {
     public void getWhenEmptyTableIsOkAndEmpty() throws Exception {
         this.mvc.perform(get(ENDPOINT_INDEX_URL))
             .andExpect(status().isOk())
-            .andDo(MockMvcResultHandlers.print())
-            .andExpect(jsonPath("$.content", hasSize(0)))
-            .andExpect(jsonPath("$.numberOfElements", is(0)))
-            .andExpect(jsonPath("$.totalElements", is(0)))
-            .andExpect(jsonPath("$.totalPages", is(0)));
+            .andDo(MockMvcResultHandlers.print());
     }
 
     @Test

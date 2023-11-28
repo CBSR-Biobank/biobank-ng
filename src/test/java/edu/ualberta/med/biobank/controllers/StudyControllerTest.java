@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.test.ControllerTest;
 import edu.ualberta.med.biobank.test.Factory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -84,6 +85,16 @@ class StudyControllerTest extends ControllerTest {
             .andExpect(jsonPath("$.name", is(study.getName())))
             .andExpect(jsonPath("$.nameShort", is(study.getNameShort())))
             .andExpect(jsonPath("$.activityStatus", is(study.getActivityStatus().getName())));
+    }
+
+    @Test
+    @WithMockUser(value = "testuser")
+    public void getSingleWhenNotExistIsNotFound() throws Exception {
+        var badname = (new Faker()).lorem().fixedString(10);
+
+        this.mvc.perform(get(endpointUrl(badname)))
+            .andExpect(status().isNotFound())
+            .andDo(MockMvcResultHandlers.print());
     }
 
     private String endpointUrl(String studyNameShort) {

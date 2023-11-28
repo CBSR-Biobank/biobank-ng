@@ -82,19 +82,30 @@ class CollectionEventControllerTest extends BaseTest {
         var patient = TestFixtures.patientFixture(factory);
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
 
-        MvcResult result =
-            this.mvc.perform(get(endpointUrl(patient.getPnumber(), collectionEvent.getVisitNumber())))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(jsonPath("$.id", is(collectionEvent.getId())))
-                .andExpect(jsonPath("$.visitNumber", is(collectionEvent.getVisitNumber())))
-                .andExpect(jsonPath("$.patientId", is(patient.getId())))
-                .andExpect(jsonPath("$.patientNumber", is(patient.getPnumber())))
-                .andExpect(jsonPath("$.studyId", is(patient.getStudy().getId())))
-                .andExpect(jsonPath("$.studyNameShort", is(patient.getStudy().getNameShort())))
-                .andExpect(jsonPath("$.sourceSpecimens", hasSize(collectionEvent.getOriginalSpecimens().size())))
-                .andExpect(jsonPath("$.status", is(collectionEvent.getActivityStatus().getName())))
-                .andReturn();
+        this.mvc.perform(get(endpointUrl(patient.getPnumber(), collectionEvent.getVisitNumber())))
+            .andExpect(status().isOk())
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(jsonPath("$.id", is(collectionEvent.getId())))
+            .andExpect(jsonPath("$.visitNumber", is(collectionEvent.getVisitNumber())))
+            .andExpect(jsonPath("$.patientId", is(patient.getId())))
+            .andExpect(jsonPath("$.patientNumber", is(patient.getPnumber())))
+            .andExpect(jsonPath("$.studyId", is(patient.getStudy().getId())))
+            .andExpect(jsonPath("$.studyNameShort", is(patient.getStudy().getNameShort())))
+            .andExpect(jsonPath("$.sourceSpecimens", hasSize(collectionEvent.getOriginalSpecimens().size())))
+            .andExpect(jsonPath("$.status", is(collectionEvent.getActivityStatus().getName())))
+            .andReturn();
+    }
+
+    @Test
+    @WithMockUser(value = "testuser")
+    public void getWhenNotExistIsNotFound() throws Exception {
+        var patient = TestFixtures.patientFixture(factory);
+        var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
+        var badVisitNumber = collectionEvent.getVisitNumber() + 9999;
+
+        this.mvc.perform(get(endpointUrl(patient.getPnumber(), badVisitNumber)))
+            .andExpect(status().isNotFound())
+            .andDo(MockMvcResultHandlers.print());
     }
 
     private String endpointUrl(String pnumber, Integer visitNumber) {
