@@ -9,7 +9,7 @@ public record UserDTO(
     Integer userId,
     String username,
     String password,
-    Status status,
+    String status,
     HashMap<Integer, GroupDTO> groups,
     HashMap<Integer, MembershipDTO> memberships
 ) {
@@ -18,7 +18,7 @@ public record UserDTO(
             data.get("ID", Number.class).intValue(),
             data.get("LOGIN", String.class),
             data.get("PASSWORD", String.class),
-            Status.fromId(data.get("ACTIVITY_STATUS_ID", Integer.class)),
+            Status.fromId(data.get("ACTIVITY_STATUS_ID", Integer.class)).getName(),
             new HashMap<>(),
             new HashMap<>()
         );
@@ -32,7 +32,7 @@ public record UserDTO(
     }
 
     public boolean isActive() {
-        return status.equals(Status.ACTIVE);
+        return status.equals(Status.ACTIVE.getName());
     }
 
     public boolean hasPermission(PermissionEnum permission, Integer centerId, Integer studyId) {

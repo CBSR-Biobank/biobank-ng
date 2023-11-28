@@ -6,6 +6,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import edu.ualberta.med.biobank.test.BaseTest;
+import edu.ualberta.med.biobank.test.Factory;
+import edu.ualberta.med.biobank.test.TestFixtures;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,13 +26,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
-import edu.ualberta.med.biobank.test.BaseTest;
-import edu.ualberta.med.biobank.test.Factory;
-import edu.ualberta.med.biobank.test.TestFixtures;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 
 @Testcontainers
 @Transactional
@@ -94,13 +93,11 @@ class CollectionEventControllerTest extends BaseTest {
                 .andExpect(jsonPath("$.studyId", is(patient.getStudy().getId())))
                 .andExpect(jsonPath("$.studyNameShort", is(patient.getStudy().getNameShort())))
                 .andExpect(jsonPath("$.sourceSpecimens", hasSize(collectionEvent.getOriginalSpecimens().size())))
-                .andExpect(jsonPath("$.status", is(collectionEvent.getActivityStatus().toString())))
+                .andExpect(jsonPath("$.status", is(collectionEvent.getActivityStatus().getName())))
                 .andReturn();
     }
 
     private String endpointUrl(String pnumber, Integer visitNumber) {
-        return ENDPOINT_URL
-            .replace("{pnumber}", pnumber)
-            .replace("{vnumber}", visitNumber.toString());
+        return ENDPOINT_URL.replace("{pnumber}", pnumber).replace("{vnumber}", visitNumber.toString());
     }
 }

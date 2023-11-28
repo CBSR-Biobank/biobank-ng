@@ -7,7 +7,7 @@ import java.util.List;
 public record CollectionEventDTO(
     Integer id,
     Integer visitNumber,
-    Status status,
+    String status,
     Integer patientId,
     String patientNumber,
     Integer studyId,
@@ -20,7 +20,7 @@ public record CollectionEventDTO(
         return new CollectionEventDTO(
             data.get("id", Number.class).intValue(),
             data.get("visitNumber", Number.class).intValue(),
-            Status.fromId(data.get("ACTIVITY_STATUS_ID", Integer.class)),
+            Status.fromId(data.get("ACTIVITY_STATUS_ID", Integer.class)).getName(),
             data.get("patientId", Number.class).intValue(),
             data.get("patientNumber", String.class),
             data.get("studyId", Number.class).intValue(),
