@@ -42,7 +42,7 @@ class StudyControllerTest extends ControllerTest {
 
     @Test
     @WithMockUser
-    public void getWhenEmptyTableIsOkAndEmpty() throws Exception {
+    public void getPageWhenEmptyTableIsOkAndEmpty() throws Exception {
         this.mvc.perform(get(ENDPOINT_INDEX_URL))
             .andExpect(status().isOk())
             .andDo(MockMvcResultHandlers.print())
@@ -61,7 +61,7 @@ class StudyControllerTest extends ControllerTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    public void getWhenPresentIsOk() throws Exception {
+    public void getPageWhenPresentIsOk() throws Exception {
         factory.createStudy();
 
         this.mvc.perform(get(ENDPOINT_INDEX_URL))
@@ -71,6 +71,19 @@ class StudyControllerTest extends ControllerTest {
             .andExpect(jsonPath("$.numberOfElements", is(1)))
             .andExpect(jsonPath("$.totalElements", is(1)))
             .andExpect(jsonPath("$.totalPages", is(1)));
+    }
+
+    @Test
+    @WithMockUser(value = "testuser")
+    public void getSinglePresentIsOk() throws Exception {
+        var study = factory.createStudy();
+
+        this.mvc.perform(get(endpointUrl(study.getNameShort())))
+            .andExpect(status().isOk())
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(jsonPath("$.name", is(study.getName())))
+            .andExpect(jsonPath("$.nameShort", is(study.getNameShort())))
+            .andExpect(jsonPath("$.activityStatus", is(study.getActivityStatus().getName())));
     }
 
     private String endpointUrl(String studyNameShort) {

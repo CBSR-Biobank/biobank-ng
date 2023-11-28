@@ -39,6 +39,20 @@ public class StudyService {
         return allowed.map(a -> study);
     }
 
+    public Either<AppError, StudyDTO> findByNameShort(String nameshort) {
+        var found = studyRepository.findByNameShort(nameshort, Tuple.class).stream().findFirst();
+
+        if (found.isEmpty()) {
+            return Either.left(new EntityNotFound("study"));
+        }
+
+        var study = StudyDTO.fromTuple(found.get());
+
+        var permission = new StudyReadPermission(study.id());
+        var allowed = permission.isAllowed();
+        return allowed.map(a -> study);
+    }
+
     public Page<StudyDTO> studyPagination(Integer pageNumber, Integer pageSize, String sort) {
         // FIXME: check user memberships here and return only studies they have access to
         Pageable pageable = null;

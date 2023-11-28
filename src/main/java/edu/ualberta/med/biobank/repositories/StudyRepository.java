@@ -34,6 +34,21 @@ public interface StudyRepository extends JpaRepository<Study, Long>{
                     s.activity_status_id activityStatusId,
                     s.version
                 from study s
+                where s.name_short = :nameshort
+                """,
+        nativeQuery = true
+    )
+    <T> Collection<T> findByNameShort(String nameshort, Class<T> type);
+
+    @Query(
+        value = """
+                select
+                    s.id,
+                    s.name,
+                    s.name_short nameShort,
+                    s.activity_status_id activityStatusId,
+                    s.version
+                from study s
                 """,
         nativeQuery = true
     )
