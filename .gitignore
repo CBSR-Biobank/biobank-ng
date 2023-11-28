@@ -38,3 +38,4 @@ build/
 /docker/nginx-selfsigned.crt
 /docker/nginx-selfsigned.key
 /logs/nginx/
+/frontend/.vite/
