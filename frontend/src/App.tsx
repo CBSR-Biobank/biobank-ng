@@ -36,9 +36,25 @@ const router = createBrowserRouter([
           {
             path: ':pnumber',
             async lazy() {
-              let { PatientView } = await import('@app/pages/patients/patient-view');
-              return { Component: PatientView };
-            }
+              let { PatientPage: PatientPage } = await import('@app/pages/patients/patient-page');
+              return { Component: PatientPage };
+            },
+            children: [
+              {
+                index: true,
+                async lazy() {
+                  let { PatientDetails } = await import('@app/components/patients/patient-details');
+                  return { Component: PatientDetails };
+                }
+              },
+              {
+                path: ':vnumber',
+                async lazy() {
+                  let { CollectionEventView } = await import('@app/pages/collection-events/collection-event-view');
+                  return { Component: CollectionEventView };
+                }
+              }
+            ]
           }
         ]
       },

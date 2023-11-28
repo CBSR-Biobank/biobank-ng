@@ -10,7 +10,9 @@ export const API_ROUTES: Readonly<Record<string, Route>> = {
   },
   patients: {
     index: '/api/patients',
-    pnumber: '/api/patients/:pnumber'
+    pnumber: '/api/patients/:pnumber',
+    'collection-events': '/api/patients/:pnumber/collection-events',
+    'collection-event': '/api/patients/:pnumber/collection-events/:vnumber'
   }
 } as const;
 

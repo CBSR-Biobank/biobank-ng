@@ -13,13 +13,13 @@ export function HomePage() {
         <Card>
           <CardHeader>
             <CardTitle>Add or View Patient Visits</CardTitle>
-            <CardDescription>View patient visits, or Record collected specimens for a patient.</CardDescription>
+            <CardDescription>View patient visits, or Record a visit for a patient.</CardDescription>
           </CardHeader>
           <CardFooter>
             <div className="w-full">
               <Link to={'/patients'}>
                 <Button className="w-full bg-sky-500 hover:bg-sky-400">
-                  <Check className="mr-2 h-4 w-4" /> Add a patient visit
+                  <Check className="mr-2 h-4 w-4" /> Patient visit
                 </Button>
               </Link>
             </div>
@@ -34,7 +34,7 @@ export function HomePage() {
             <div className="w-full">
               <Link to={'/patients/add'}>
                 <Button className="w-full bg-sky-500 hover:bg-sky-400">
-                  <Check className="mr-2 h-4 w-4" /> Add new patient
+                  <Check className="mr-2 h-4 w-4" /> New patient
                 </Button>
               </Link>
             </div>

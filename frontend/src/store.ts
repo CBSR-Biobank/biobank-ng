@@ -1,14 +1,16 @@
 import { create } from 'zustand';
+import { CollectionEvent } from './models/collection-event';
+import { Patient } from './models/patient';
 import { User, userHasRole } from './models/user';
 import { UserRole } from './models/user-role';
 
-const LOGGED_IN_TOKEN_KEY = "biobank-logged-in-token";
+const LOGGED_IN_TOKEN_KEY = 'biobank-logged-in-token';
 
 interface UserState {
   checkingAuth: boolean;
   userToken: string | null;
   user?: User;
-  loggedIn: boolean,
+  loggedIn: boolean;
   isSuperuser: boolean;
   setCheckingAuth: (checking: boolean) => void;
   setUserToken: (token: string | null) => void;
@@ -17,7 +19,7 @@ interface UserState {
 
 function getUserToken(): string | null {
   return localStorage.getItem(LOGGED_IN_TOKEN_KEY);
-};
+}
 
 export const useUserStore = create<UserState>((set) => ({
   checkingAuth: true,
@@ -35,4 +37,18 @@ export const useUserStore = create<UserState>((set) => ({
     set((state) => ({ ...state, userToken: token, username: undefined, loggedIn: token !== null }));
   },
   setUser: (user) => set((state) => ({ ...state, user, isSuperuser: userHasRole(user, UserRole.SUPERUSER) }))
+}));
+
+interface PatientState {
+  patient?: Patient;
+  collectionEvent?: CollectionEvent;
+  setPatient: (patient?: Patient) => void;
+  setCollectionEvent: (collectionEvent?: CollectionEvent) => void;
+}
+
+export const usePatientStore = create<PatientState>((set) => ({
+  patient: undefined,
+  collectionEvent: undefined,
+  setPatient: (patient) => set((state) => ({ ...state, patient })),
+  setCollectionEvent: (collectionEvent) => set((state) => ({ ...state, collectionEvent }))
 }));

@@ -1,16 +1,16 @@
 import { z } from 'zod';
-import { collectionEventSchema } from './collection-event';
+import { collectionEventBriefSchema } from './collection-event';
 import { domainEntitySchema } from './domain-entity';
 
 export const patientSchema = domainEntitySchema.extend({
   id: z.number(),
-  createdAt: z.coerce.date(),
+  createdAt: z.string().pipe(z.coerce.date()),
   pnumber: z.string(),
   specimenCount: z.number(),
   aliquotCount: z.number(),
   studyId: z.number(),
   studyNameShort: z.string(),
-  collectionEvents: z.array(collectionEventSchema)
+  collectionEvents: z.array(collectionEventBriefSchema)
 });
 
 export type Patient = z.infer<typeof patientSchema>;

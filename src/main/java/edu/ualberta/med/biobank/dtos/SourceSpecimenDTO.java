@@ -22,12 +22,12 @@ public record SourceSpecimenDTO(
     public static SourceSpecimenDTO fromTuple(Tuple data) {
         return new SourceSpecimenDTO(
             data.get("specimenId", Number.class).intValue(),
-            data.get("inventoryId", String.class),
+            data.get("specimenInventoryId", String.class),
             data.get("specimenTypeId", Number.class).intValue(),
             data.get("specimenTypeNameShort", String.class),
-            data.get("timeDrawn", Date.class),
-            data.get("quantity", BigDecimal.class),
-            Status.fromId(data.get("ACTIVITY_STATUS_ID", Integer.class)).getName(),
+            data.get("specimenTimeDrawn", Date.class),
+            data.get("specimenQuantity", BigDecimal.class),
+            Status.fromId(data.get("specimenActivityStatusId", Integer.class)).getName(),
             data.get("originCenterId", Number.class).intValue(),
             data.get("originCenterNameShort", String.class),
             data.get("currentCenterId", Number.class).intValue(),

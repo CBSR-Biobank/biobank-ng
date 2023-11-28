@@ -1,10 +1,11 @@
-import { Patient } from '@app/models/patient';
+import { usePatientStore } from '@app/store';
 import { capitalizeWord } from '@app/utils';
 import { matchPath, useLocation } from 'react-router-dom';
 import { Breadcrumbs } from './breadcrumbs';
 
-export const PatientBreadcrumbs: React.FC<{ patient?: Patient }> = ({ patient }) => {
+export const PatientBreadcrumbs: React.FC = () => {
   const { pathname } = useLocation();
+  const { patient, collectionEvent } = usePatientStore();
 
   const pathnames = pathname.split('/').filter(Boolean);
   const breadcrumbs = pathnames.map((name, index) => {
@@ -13,12 +14,13 @@ export const PatientBreadcrumbs: React.FC<{ patient?: Patient }> = ({ patient })
     let label = capitalizeWord(name);
 
     const patientMatch = matchPath({ path: '/patients/:pnumber', end: true }, route);
-    if (patientMatch && route === patientMatch.pathname) {
-      if (!patient) {
-        throw new Error('patient is invalid');
-      }
-
+    if (patientMatch && patient && route === patientMatch.pathname) {
       label = `${patient.studyNameShort}: Patient ${patient.pnumber}`;
+    }
+
+    const ceventMatch = matchPath({ path: '/patients/:pnumber/:vnumber', end: true }, route);
+    if (ceventMatch && collectionEvent && route === ceventMatch.pathname) {
+      label = `Visit ${collectionEvent.visitNumber}`;
     }
 
     return { label, route, isLast };

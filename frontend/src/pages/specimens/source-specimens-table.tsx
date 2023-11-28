@@ -1,83 +1,79 @@
-import { InfoCard } from '@app/components/info-card';
-import { Button } from '@app/components/ui/button';
-import { CollectionEventBrief } from '@app/models/collection-event';
-import { cn } from '@app/utils';
+import { StatusChip } from '@app/components/status-chip';
+import { SourceSpecimen } from '@app/models/specimen';
 import format from 'date-fns/format';
-import { Link } from 'react-router-dom';
 
-const buttonClass = 'transition ease-in-out delay-150 hover:scale-[1.15] duration-200';
-
-// see https://tailwindcomponents.com/component/table-4
-
-export const CollectionEventTable: React.FC<{ collectionEvents: CollectionEventBrief[] }> = ({ collectionEvents }) => {
-  if (collectionEvents.length <= 0) {
-    return <InfoCard title="No Visits" message="This patient does not have any visits on record" />;
-  }
-
+export const SourceSpecimenTable: React.FC<{ specimens: SourceSpecimen[] }> = ({ specimens }) => {
   return (
-    <div className="grid grid-cols-1 gap-8 overflow-x-auto pt-6">
+    <div className="grid grid-cols-1 gap-8 overflow-x-auto">
       <table className="w-full min-w-max table-auto text-left">
         <thead>
           <tr>
             <th className="border-y border-gray-200 p-3">
               <p className="block font-sans text-sm font-normal leading-none text-slate-700 antialiased opacity-70">
-                Visit
+                Inventory ID
               </p>
             </th>
             <th className="border-y border-gray-200 p-3">
               <p className="block font-sans text-sm font-normal leading-none text-slate-700 antialiased opacity-70">
-                Date
+                Quantity
               </p>
             </th>
             <th className="border-y border-gray-200 p-3">
               <p className="block font-sans text-sm font-normal leading-none text-slate-700 antialiased opacity-70">
-                Specimens
+                Specimen Type
               </p>
             </th>
             <th className="border-y border-gray-200 p-3">
               <p className="block font-sans text-sm font-normal leading-none text-slate-700 antialiased opacity-70">
-                Aliquots
+                Status
+              </p>
+            </th>
+            <th className="border-y border-gray-200 p-3">
+              <p className="block font-sans text-sm font-normal leading-none text-slate-700 antialiased opacity-70">
+                Time Drawn
+              </p>
+            </th>
+            <th className="border-y border-gray-200 p-3">
+              <p className="block font-sans text-sm font-normal leading-none text-slate-700 antialiased opacity-70">
+                Current Center
               </p>
             </th>
             <th className="border-y border-gray-200 p-3"></th>
           </tr>
         </thead>
         <tbody>
-          {collectionEvents.map((cevent) => (
-            <tr key={cevent.id}>
+          {specimens.map((specimen) => (
+            <tr key={specimen.id}>
               <td className="border-b border-gray-200 p-3">
                 <p className="block font-sans text-sm font-normal leading-normal text-slate-700 antialiased">
-                  {cevent.visitNumber}
+                  {specimen.inventoryId}
                 </p>
+              </td>
+              <td className="border-b border-gray-200 p-3">
+                <p className="block font-sans text-sm font-normal leading-normal text-slate-700 antialiased">
+                  {specimen.quantity}
+                </p>
+              </td>
+              <td className="border-b border-gray-200 p-3">
+                <p className="block font-sans text-sm font-normal leading-normal text-slate-700 antialiased">
+                  {specimen.specimenTypeNameShort}
+                </p>
+              </td>
+              <td className="border-b border-gray-200 p-3">
+                <div className="flex">
+                  <StatusChip status={specimen.status} />
+                </div>
               </td>
 
               <td className="border-b border-gray-200 p-3">
                 <p className="block font-sans text-sm font-normal leading-normal text-slate-700 antialiased">
-                  {format(cevent.createdAt, 'yyyy-MM-dd')}
+                  {format(specimen.timeDrawn, 'yyyy-MM-dd')}
                 </p>
               </td>
               <td className="border-b border-gray-200 p-3">
                 <p className="block font-sans text-sm font-normal leading-normal text-slate-700 antialiased">
-                  {cevent.specimenCount}
+                  {specimen.currentCenterNameShort}
                 </p>
-              </td>
-              <td className="border-b border-gray-200 p-3">
-                <p className="block font-sans text-sm font-normal leading-normal text-slate-700 antialiased">
-                  {cevent.aliquotCount}
-                </p>
-              </td>
-              <td className="border-b border-gray-200 p-3">
-                <Link to={`${cevent.visitNumber}`} className="place-self-end">
-                  <Button
-                    className={cn(
-                      buttonClass,
-                      'h-6 bg-sky-200 py-1 text-xs font-semibold text-sky-500 hover:bg-sky-300'
-                    )}
-                    size="sm"
-                  >
-                    View
-                  </Button>
-                </Link>
               </td>
             </tr>
           ))}

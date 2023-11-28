@@ -75,22 +75,12 @@ public class PatientService {
             .map(a -> patient)
             .map(p -> {
                 Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                logger.info(">>>>>>>>>>> username: {}", auth.getName());
                 eventPublisher.publishPatientRead(auth.getName(), pnumber);
 
                 final var ceSummary = collectionEventRepository
                     .findSummariesByPatient(pnumber, Tuple.class)
                     .stream()
-                    .map(row ->
-                        new CollectionEventSummaryDTO(
-                            row.get("id", Integer.class),
-                            row.get("visitNumber", Integer.class),
-                            row.get("specimenCount", Long.class),
-                            row.get("aliquotCount", Long.class),
-                            row.get("createdAt", Date.class),
-                            Status.fromId(row.get("ACTIVITY_STATUS_ID", Integer.class))
-                        )
-                    )
+                    .map(row -> CollectionEventSummaryDTO.fromTuple(row))
                     .toList();
 
                 return p.withCollectionEvents(ceSummary);
