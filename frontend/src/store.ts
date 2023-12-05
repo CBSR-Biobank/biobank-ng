@@ -1,20 +1,36 @@
 import { create } from 'zustand';
 import { CollectionEvent } from './models/collection-event';
 import { Patient } from './models/patient';
-import { User, userHasRole } from './models/user';
-import { UserRole } from './models/user-role';
+import { User } from './models/user';
+
+const DRAWER_OPEN_KEY = 'biobank-drawer-open';
+
+const DRAWER_MENU_OPEN_KEY = 'biobank-drawer-menus-open';
 
 const LOGGED_IN_TOKEN_KEY = 'biobank-logged-in-token';
+
+function getDrawerOpen(): boolean {
+  return localStorage.getItem(DRAWER_OPEN_KEY) === 'true';
+}
+
+function getDrawerMenuOpen(title: string): boolean {
+  return (localStorage.getItem(DRAWER_MENU_OPEN_KEY) ?? '').includes(title);
+}
 
 interface UserState {
   checkingAuth: boolean;
   userToken: string | null;
   user?: User;
   loggedIn: boolean;
-  isSuperuser: boolean;
+  isGlobalAdmin: boolean;
+  isDrawerOpen: boolean;
+  isDrawerMenuOpen: (title: string) => boolean;
   setCheckingAuth: (checking: boolean) => void;
+  setLoggedIn: (loggedIn: boolean) => void;
   setUserToken: (token: string | null) => void;
   setUser: (user: User) => void;
+  setDrawerOpen: (open: boolean) => void;
+  setDrawerMenuOpen: (title: string, open: boolean) => void;
 }
 
 function getUserToken(): string | null {
@@ -26,8 +42,11 @@ export const useUserStore = create<UserState>((set) => ({
   userToken: getUserToken(),
   user: undefined,
   loggedIn: getUserToken() !== null,
-  isSuperuser: false,
+  isGlobalAdmin: false,
+  isDrawerOpen: getDrawerOpen(),
+  isDrawerMenuOpen: (title: string) => getDrawerMenuOpen(title),
   setCheckingAuth: (checking) => set((state) => ({ ...state, checkingAuth: checking })),
+  setLoggedIn: (loggedIn) => set((state) => ({ ...state, loggedIn, username: undefined })),
   setUserToken: (token) => {
     if (token) {
       localStorage.setItem(LOGGED_IN_TOKEN_KEY, token);
@@ -36,7 +55,27 @@ export const useUserStore = create<UserState>((set) => ({
     }
     set((state) => ({ ...state, userToken: token, username: undefined, loggedIn: token !== null }));
   },
-  setUser: (user) => set((state) => ({ ...state, user, isSuperuser: userHasRole(user, UserRole.SUPERUSER) }))
+  setUser: (user) => {
+    set((state) => ({ ...state, user, isGlobalAdmin: user.isGlobalAdmin }));
+  },
+  setDrawerOpen: (open) => {
+    if (open) {
+      localStorage.setItem(DRAWER_OPEN_KEY, `${open}`);
+    } else {
+      localStorage.removeItem(DRAWER_OPEN_KEY);
+    }
+    set((state) => ({ ...state, isDrawerOpen: open }));
+  },
+  setDrawerMenuOpen: (title, open) => {
+    const item = `:${title}`;
+    let openMenus = localStorage.getItem(DRAWER_MENU_OPEN_KEY) ?? '';
+    if (open && !openMenus.includes(item)) {
+      openMenus += item;
+    } else if (openMenus.includes(item)) {
+      openMenus = openMenus.replace(item, '');
+    }
+    localStorage.setItem(DRAWER_MENU_OPEN_KEY, openMenus);
+  }
 }));
 
 interface PatientState {

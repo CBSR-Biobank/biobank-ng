@@ -1,20 +1,16 @@
 import { Login } from '@app/components/login';
 import { HomePage } from '@app/pages/homepage';
 import { Link, RouterProvider, createBrowserRouter } from 'react-router-dom';
-import { DashboardLayout } from './components/dashboard-layout';
+import { BasicPage } from './pages/basic-page';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <DashboardLayout />,
+    element: <BasicPage />,
     children: [
       {
         index: true,
         element: <HomePage />
-      },
-      {
-        path: 'login',
-        element: <Login />
       },
       {
         path: 'patients',
@@ -63,6 +59,14 @@ const router = createBrowserRouter([
         element: <NoMatch />
       }
     ]
+  },
+  {
+    path: 'login',
+    element: <Login />
+  },
+  {
+    path: '*',
+    element: <NoMatch />
   }
 ]);
 

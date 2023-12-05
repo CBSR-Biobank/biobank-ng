@@ -1,3 +1,4 @@
+import { userSchema } from '@app/models/user';
 import { useUserStore } from '@app/store';
 
 type Route = Record<string, string>;
@@ -21,6 +22,24 @@ export type ApiError = {
   error: any;
 };
 
+export async function fetchAuthenticated() {
+  const response = await fetch(API_ROUTES.auth.index, {
+    headers: {
+      Authorization: 'Bearer ' + useUserStore.getState().userToken,
+      credentials: 'include',
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    const err: ApiError = { status: response.status, error: 'Unable to authenticate' };
+    throw err;
+  }
+
+  const json = await response.json();
+  return json;
+}
+
 export async function login(username: string, password: string) {
   const response = await fetch(API_ROUTES.auth.token, {
     headers: {
@@ -41,9 +60,12 @@ export async function login(username: string, password: string) {
     throw err;
   }
 
-  const text = await response.text();
-  useUserStore.getState().setUserToken(text);
-  return text;
+  const token = response.headers.get('Authorization');
+  useUserStore.getState().setUserToken(token);
+
+  const user = userSchema.parse(await response.json());
+  useUserStore.getState().setUser(user);
+  return user;
 }
 
 export async function fetchApi(route: string, init?: RequestInit) {

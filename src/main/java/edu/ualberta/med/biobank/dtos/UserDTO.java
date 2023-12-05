@@ -7,6 +7,7 @@ import jakarta.persistence.Tuple;
 
 public record UserDTO(
     Integer userId,
+    String fullName,
     String username,
     String password,
     String status,
@@ -16,6 +17,7 @@ public record UserDTO(
     public static UserDTO fromTuple(Tuple data) {
         return new UserDTO(
             data.get("ID", Number.class).intValue(),
+            data.get("FULL_NAME", String.class),
             data.get("LOGIN", String.class),
             data.get("PASSWORD", String.class),
             Status.fromId(data.get("ACTIVITY_STATUS_ID", Integer.class)).getName(),

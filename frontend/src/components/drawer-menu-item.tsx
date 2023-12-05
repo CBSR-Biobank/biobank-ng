@@ -1,4 +1,3 @@
-import { userHasRoles } from '@app/models/user';
 import { useUserStore } from '@app/store';
 import { cn } from '@app/utils';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
@@ -14,9 +13,8 @@ export const DrawerMenuItem: React.FC<{
   drawerOpen: boolean;
 }> = ({ item, drawerOpen }) => {
   const navigate = useNavigate();
-  const { user } = useUserStore();
-
-  const [submenuOpen, setSubmenuOpen] = useState(false);
+  const { user, isDrawerMenuOpen, setDrawerMenuOpen } = useUserStore();
+  const [submenuOpen, setSubmenuOpen] = useState(isDrawerMenuOpen(item.title));
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     if (!drawerOpen) {
@@ -27,12 +25,14 @@ export const DrawerMenuItem: React.FC<{
   };
 
   const handleSubmenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setSubmenuOpen(!submenuOpen);
+    const open = !submenuOpen;
+    setSubmenuOpen(open);
+    setDrawerMenuOpen(item.title, open);
     event.preventDefault();
   };
 
   const liClasses = cn([
-    'text-basic-600 flex items-center justify-between gap-4 overflow-x-hidden rounded px-2 text-sm',
+    'flex items-center justify-between gap-4 overflow-x-hidden rounded px-2 text-sm text-slate-600',
     { ' hover:bg-basic-300': drawerOpen },
     { 'mt-9': item?.gap },
     { 'mt-2': !item?.gap }
@@ -42,7 +42,8 @@ export const DrawerMenuItem: React.FC<{
     return null;
   }
 
-  const allowedSubmenuItems = (item?.submenu ?? []).filter((item) => userHasRoles(user, item?.requiredRoles ?? []));
+  //const allowedSubmenuItems = (item?.submenu ?? []).filter((item) => userHasGroups(user, item?.requiredGroups ?? []));
+  const allowedSubmenuItems = item?.submenu ?? [];
 
   return (
     <>
@@ -57,11 +58,13 @@ export const DrawerMenuItem: React.FC<{
           )}
         </div>
         {drawerOpen && allowedSubmenuItems.length > 0 && (
-          <div className={cn('duration-300 ease-in-out', { 'rotate-90': submenuOpen })}>
-            <button className="rounded-full" onClick={handleSubmenuClick}>
-              <FontAwesomeIcon icon={faChevronRight} size="sm" />
-            </button>
-          </div>
+          <button className="rounded-full" onClick={handleSubmenuClick}>
+            <FontAwesomeIcon
+              icon={faChevronRight}
+              size="sm"
+              className={cn('duration-300 ease-in-out', { 'rotate-90': submenuOpen })}
+            />
+          </button>
         )}
       </li>
       {item.submenu && allowedSubmenuItems.length > 0 && (

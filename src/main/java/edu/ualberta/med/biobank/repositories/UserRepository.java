@@ -15,6 +15,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
         value = """
                 select
                   p.ID,
+                  p.FULL_NAME,
                   p.LOGIN,
                   cu.PASSWORD,
                   p.ACTIVITY_STATUS_ID,

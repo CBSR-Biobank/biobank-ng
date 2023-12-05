@@ -1,11 +1,17 @@
 package edu.ualberta.med.biobank.controllers;
 
-import edu.ualberta.med.biobank.services.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import edu.ualberta.med.biobank.dtos.UserDTOClient;
+import edu.ualberta.med.biobank.services.TokenService;
+import edu.ualberta.med.biobank.services.UserService;
 
 @RestController
 public class AuthController {
@@ -14,15 +20,44 @@ public class AuthController {
 
     private final TokenService tokenService;
 
-    public AuthController(TokenService tokenService) {
+    private UserService userService;
+
+    public AuthController(TokenService tokenService, UserService userService) {
         this.tokenService = tokenService;
+        this.userService = userService;
+    }
+
+    @GetMapping("/auth")
+    public ResponseEntity<UserDTOClient> isAuthorized(Authentication authentication) {
+        var username = authentication.getName();
+        var userInfoMaybe = userService.findByLogin(username);
+
+        if (userInfoMaybe.isLeft()) {
+            throw new UsernameNotFoundException("User not found for this username: " + username);
+        }
+
+        var userInfo = UserDTOClient.fromUserDTO(userInfoMaybe.getRight().get());
+        String token = tokenService.generateToken(authentication);
+        return ResponseEntity.ok().header(
+            HttpHeaders.AUTHORIZATION,
+            token
+        ).body(userInfo);
     }
 
     @PostMapping("/token")
-    public String token(Authentication authentication) {
-        logger.debug("Token requested for user: '{}'", authentication.getName());
+    public ResponseEntity<UserDTOClient> token(Authentication authentication) {
+        var username = authentication.getName();
+        var userInfoMaybe = userService.findByLogin(username);
+
+        if (userInfoMaybe.isLeft()) {
+            throw new UsernameNotFoundException("User not found for this username: " + username);
+        }
+
+        var userInfo = UserDTOClient.fromUserDTO(userInfoMaybe.getRight().get());
         String token = tokenService.generateToken(authentication);
-        logger.debug("Token granted: {}", token);
-        return token;
+        return ResponseEntity.ok().header(
+            HttpHeaders.AUTHORIZATION,
+            token
+        ).body(userInfo);
     }
 }

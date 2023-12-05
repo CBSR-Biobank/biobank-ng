@@ -5,7 +5,7 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger
 } from '@app/components/ui/context-menu';
-import { userHasRoles } from '@app/models/user';
+import { userHasGroups } from '@app/models/user';
 import { useUserStore } from '@app/store';
 import { cn } from '@app/utils';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
@@ -43,7 +43,9 @@ export const PopupSubMenu: React.FC<{
     return null;
   }
 
-  const allowedSubmenuItems = (menuItem?.submenu ?? []).filter((item) => userHasRoles(user, item?.requiredRoles ?? []));
+  const allowedSubmenuItems = (menuItem?.submenu ?? []).filter((item) =>
+    userHasGroups(user, item?.requiredGroups ?? [])
+  );
 
   return (
     <div className={cn('hover:bg-basic-300 relative cursor-pointer rounded-md px-2 py-1')} onClick={handleParentClick}>

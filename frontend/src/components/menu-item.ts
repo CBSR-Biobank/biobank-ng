@@ -1,4 +1,4 @@
-import { UserRole } from '@app/models/user-role';
+import { UserGroup } from '@app/models/user-group';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 export type MenuItem = {
@@ -6,6 +6,6 @@ export type MenuItem = {
   icon: IconProp;
   route: string;
   gap?: boolean;
-  requiredRoles?: UserRole[];
+  requiredGroups?: UserGroup[];
   submenu?: MenuItem[];
 };

@@ -21,7 +21,7 @@ export const SubMenu: React.FC<{ menuItems: MenuItem[]; open: boolean }> = ({ me
       {open &&
         menuItems.map((item, index) => {
           const liClasses = cn(
-            'text-basic-600 hover:bg-basic-300 flex cursor-pointer items-center gap-x-4 rounded p-1 text-sm',
+            'hover:bg-basic-300 flex cursor-pointer items-center gap-x-4 rounded p-1 text-sm text-slate-600',
             { 'mt-9': item?.gap },
             { 'mt-2': !item?.gap }
           );
