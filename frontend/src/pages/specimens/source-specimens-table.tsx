@@ -8,37 +8,37 @@ export const SourceSpecimenTable: React.FC<{ specimens: SourceSpecimen[] }> = ({
       <table className="w-full min-w-max table-auto text-left">
         <thead>
           <tr>
-            <th className="border-y border-gray-200 p-3">
+            <th className="border-b border-gray-200 p-3">
               <p className="block font-sans text-sm font-normal leading-none text-slate-700 antialiased opacity-70">
                 Inventory ID
               </p>
             </th>
-            <th className="border-y border-gray-200 p-3">
+            <th className="border-b border-gray-200 p-3">
               <p className="block font-sans text-sm font-normal leading-none text-slate-700 antialiased opacity-70">
                 Quantity
               </p>
             </th>
-            <th className="border-y border-gray-200 p-3">
+            <th className="border-b border-gray-200 p-3">
               <p className="block font-sans text-sm font-normal leading-none text-slate-700 antialiased opacity-70">
                 Specimen Type
               </p>
             </th>
-            <th className="border-y border-gray-200 p-3">
+            <th className="border-b border-gray-200 p-3">
               <p className="block font-sans text-sm font-normal leading-none text-slate-700 antialiased opacity-70">
                 Status
               </p>
             </th>
-            <th className="border-y border-gray-200 p-3">
+            <th className="border-b border-gray-200 p-3">
               <p className="block font-sans text-sm font-normal leading-none text-slate-700 antialiased opacity-70">
                 Time Drawn
               </p>
             </th>
-            <th className="border-y border-gray-200 p-3">
+            <th className="border-b border-gray-200 p-3">
               <p className="block font-sans text-sm font-normal leading-none text-slate-700 antialiased opacity-70">
                 Current Center
               </p>
             </th>
-            <th className="border-y border-gray-200 p-3"></th>
+            <th className="border-b border-gray-200 p-3"></th>
           </tr>
         </thead>
         <tbody>
