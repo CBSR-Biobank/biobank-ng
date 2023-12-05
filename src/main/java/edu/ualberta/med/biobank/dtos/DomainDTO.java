@@ -22,10 +22,10 @@ public record DomainDTO(
     }
 
     public boolean hasCenter(Integer centerId) {
-        return centerIds.contains(centerId);
+        return allCenters || centerIds.contains(centerId);
     }
 
     public boolean hasStudy(Integer studyId) {
-        return studyIds.contains(studyId);
+        return allStudies || studyIds.contains(studyId);
     }
 }

@@ -12,6 +12,8 @@ import edu.ualberta.med.biobank.dtos.CollectionEventSummaryDTO;
 import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
+import edu.ualberta.med.biobank.errors.PermissionError;
+import edu.ualberta.med.biobank.errors.Unauthorized;
 import edu.ualberta.med.biobank.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.repositories.CollectionEventRepository;
 import edu.ualberta.med.biobank.repositories.PatientRepository;
@@ -69,10 +71,17 @@ public class PatientService {
             List.of()
         );
 
+
         var permission = new PatientReadPermission(patient.studyId());
-        var allowed = permission.isAllowed();
-        return allowed
-            .map(a -> patient)
+        var allowedMaybe = permission.isAllowed();
+        logger.info("patient study id: {}, allowed: {}", patient.studyId(), allowedMaybe);
+        return allowedMaybe
+            .flatMap(allowed -> {
+                if (!allowed) {
+                    return Either.left(new PermissionError("study"));
+                }
+                return Either.right(patient);
+            })
             .map(p -> {
                 Authentication auth = SecurityContextHolder.getContext().getAuthentication();
                 eventPublisher.publishPatientRead(auth.getName(), pnumber);

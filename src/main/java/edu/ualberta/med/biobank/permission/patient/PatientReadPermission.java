@@ -37,6 +37,7 @@ public class PatientReadPermission implements Permission {
                 }
 
                 var studyService = applicationContext.getBean(StudyService.class);
+
                 return studyService
                     .getByStudyId(studyId)
                     .flatMap(study -> Either.right(user.hasPermission(PermissionEnum.PATIENT_READ, null, studyId)));

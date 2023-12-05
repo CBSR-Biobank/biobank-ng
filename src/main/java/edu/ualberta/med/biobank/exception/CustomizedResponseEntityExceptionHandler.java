@@ -12,6 +12,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import edu.ualberta.med.biobank.errors.EntityNotFound;
+import edu.ualberta.med.biobank.errors.PermissionError;
 import edu.ualberta.med.biobank.errors.Unauthorized;
 import edu.ualberta.med.biobank.errors.ValidationError;
 
@@ -46,6 +47,10 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 
         if (appErrorException.appError instanceof Unauthorized) {
             status = HttpStatus.UNAUTHORIZED;
+        }
+
+        if (appErrorException.appError instanceof PermissionError) {
+            status = HttpStatus.BAD_REQUEST;
         }
 
         if (appErrorException.appError instanceof ValidationError) {

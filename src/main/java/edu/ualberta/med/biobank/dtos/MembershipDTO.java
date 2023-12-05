@@ -7,6 +7,8 @@ import edu.ualberta.med.biobank.domain.Membership;
 import edu.ualberta.med.biobank.domain.PermissionEnum;
 import edu.ualberta.med.biobank.domain.PermissionEnum.Require;
 import jakarta.persistence.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public record MembershipDTO(
     Integer id,
@@ -15,6 +17,9 @@ public record MembershipDTO(
     HashMap<Integer, RoleDTO> roles,
     Set<PermissionEnum> permissions
 ) {
+
+    private static final Logger logger = LoggerFactory.getLogger(MembershipDTO.class);
+
     public static MembershipDTO fromTuple(Tuple data) {
         return new MembershipDTO(
             data.get("MEMBERSHIP_ID", Number.class).intValue(),
@@ -36,7 +41,6 @@ public record MembershipDTO(
         boolean hasCenter = centerId == null || domain.hasCenter(centerId);
         boolean hasStudy = studyId == null || domain.hasStudy(studyId);
         boolean hasPermission = hasPermission(permission);
-
         boolean allowed = requiresMet && hasCenter && hasStudy && hasPermission;
         return allowed;
     }
@@ -62,7 +66,20 @@ public record MembershipDTO(
         if (everyPermission) {
             return true;
         }
-        return permissions.contains(permission);
+        return getAllPermissions().contains(permission);
+    }
+
+    public Set<PermissionEnum> getAllPermissions() {
+        Set<PermissionEnum> allPermissions = new HashSet<PermissionEnum>();
+        if (everyPermission) {
+            allPermissions.addAll(PermissionEnum.valuesList());
+        } else {
+            permissions.addAll(permissions);
+            for (RoleDTO role : roles.values()) {
+                permissions.addAll(role.permissions());
+            }
+        }
+        return permissions;
     }
 
     private DomainDTO getDomain() {

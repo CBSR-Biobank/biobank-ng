@@ -129,11 +129,7 @@ async function handleServerResponse(response: Response) {
       useUserStore.getState().setUserToken(null);
     }
 
-    let error = 'unknown';
-
-    if (response.bodyUsed) {
-      error = await response.json();
-    }
+    let error = await response.json();
 
     const err: ApiError = { status: response.status, error };
     console.error(err);

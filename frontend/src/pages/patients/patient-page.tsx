@@ -24,6 +24,16 @@ export function PatientPage() {
     return <ShowError message="pnumber is invalid" />;
   }
 
+  if (patientQry.isError) {
+    const error: any = patientQry.error.error;
+    if (error.message) {
+      if (error.message.includes('permission')) {
+        return <ShowError message="You do not have the privileges to view this patient" />;
+      }
+    }
+    return <ShowError error={patientQry.error} />;
+  }
+
   if (patientQry.isLoading) {
     return <CircularProgress />;
   }
