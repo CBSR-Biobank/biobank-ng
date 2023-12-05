@@ -66,7 +66,7 @@ export function CollectionEventView() {
             </EntityProperty>
 
             <EntityProperty propName="status" label="Status" allowChanges={true} handleChange={handlePropChange}>
-              <StatusChip status={collectionEvent.status} />
+              <StatusChip status={collectionEvent.status} size="xs" />
             </EntityProperty>
           </div>
 

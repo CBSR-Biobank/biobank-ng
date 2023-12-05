@@ -60,9 +60,7 @@ export const SourceSpecimenTable: React.FC<{ specimens: SourceSpecimen[] }> = ({
                 </p>
               </td>
               <td className="border-b border-gray-200 p-3">
-                <div className="flex">
-                  <StatusChip status={specimen.status} />
-                </div>
+                <StatusChip status={specimen.status} variant="table" />
               </td>
 
               <td className="border-b border-gray-200 p-3">

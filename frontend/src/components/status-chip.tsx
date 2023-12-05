@@ -6,14 +6,15 @@ import { Chip } from './chip';
 const chipVariants = cva('rounded-lg font-semibold uppercase px-2 py-1', {
   variants: {
     variant: {
-      default: 'flex items-center text-xs',
-      table: 'text-xs'
+      default: 'flex items-center',
+      table: ''
     },
     size: {
-      default: 'md',
-      sm: 'sm',
-      md: 'md',
-      lg: 'lg'
+      default: 'text-xs',
+      xs: 'text-xs',
+      sm: 'text-sm',
+      md: 'text-md',
+      lg: 'text-lg'
     }
   },
   defaultVariants: {
@@ -46,7 +47,6 @@ export const StatusChip: React.FC<StatusChipProps> = ({ className, status, varia
       'bg-slate-400/70': status === Status.CLOSED
     }
   );
-  return (
-    <Chip message={StatusLabels[status]} size={size} className={cn(chipVariants({ variant }), classes, className)} />
-  );
+
+  return <Chip message={StatusLabels[status]} className={cn(chipVariants({ variant, size }), classes, className)} />;
 };
