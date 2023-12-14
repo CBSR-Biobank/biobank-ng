@@ -15,7 +15,7 @@ export const PatientBreadcrumbs: React.FC = () => {
 
     const patientMatch = matchPath({ path: '/patients/:pnumber', end: true }, route);
     if (patientMatch && patient && route === patientMatch.pathname) {
-      label = `${patient.studyNameShort}: Patient ${patient.pnumber}`;
+      label = `Patient ${patient.pnumber}`;
     }
 
     const ceventMatch = matchPath({ path: '/patients/:pnumber/:vnumber', end: true }, route);

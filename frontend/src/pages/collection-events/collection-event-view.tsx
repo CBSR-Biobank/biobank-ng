@@ -51,7 +51,9 @@ export function CollectionEventView() {
     <>
       <AdminPage>
         <AdminPage.Title hasBorder>
-          <p className="text-sm font-semibold text-gray-400">Patient {patient.pnumber}</p>
+          <p className="text-sm font-semibold text-gray-400">
+            {patient.studyNameShort} Patient: {patient.pnumber}
+          </p>
           <p className="text-4xl font-semibold text-sky-600">Visit {params.vnumber}</p>
         </AdminPage.Title>
 
