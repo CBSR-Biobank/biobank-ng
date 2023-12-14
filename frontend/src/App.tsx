@@ -13,6 +13,18 @@ const router = createBrowserRouter([
         element: <HomePage />
       },
       {
+        path: 'logging',
+        children: [
+          {
+            index: true,
+            async lazy() {
+              let { LoggingPage } = await import('@app/pages/logging/logging-page');
+              return { Component: LoggingPage };
+            }
+          }
+        ]
+      },
+      {
         path: 'patients',
         children: [
           {

@@ -6,8 +6,11 @@ type Route = Record<string, string>;
 export const API_ROUTES: Readonly<Record<string, Route>> = {
   auth: {
     index: '/api/auth',
-    login: '/api/login', // FIXME: still needed?
     token: '/api/token'
+  },
+  logging: {
+    index: '/api/logging',
+    latest: 'api/logging/latest'
   },
   patients: {
     index: '/api/patients',

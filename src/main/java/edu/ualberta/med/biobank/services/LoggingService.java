@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.services;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -35,6 +38,11 @@ public class LoggingService {
         }
         Page<Tuple> data = loggingRepository.findAllWithPagination(pageable);
         return data.map(d -> LoggingDTO.fromTuple(d));
+    }
+
+    public List<LoggingDTO> loggingLatest() {
+        Collection<Tuple> data = loggingRepository.getLastest();
+        return data.stream().map(d -> LoggingDTO.fromTuple(d)).toList();
     }
 
     @EventListener

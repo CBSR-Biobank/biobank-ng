@@ -1,6 +1,6 @@
 import { useUserStore } from '@app/store';
 import { cn } from '@app/utils';
-import { faSquarePlus, faUserDoctor, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faFileLines, faSquarePlus, faUserDoctor, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { DrawerMenuItem } from './drawer-menu-item';
 import { MenuItem } from './menu-item';
 
@@ -26,6 +26,12 @@ const menuItems: MenuItem[] = [
         //requiredRoles: [UserRole.SUPERUSER, UserRole.NORWEB_PEOPLE_ADMIN]
       }
     ]
+  },
+  {
+    title: 'Logging',
+    icon: faFileLines,
+    route: '/logging',
+    submenu: []
   }
 ];
 
