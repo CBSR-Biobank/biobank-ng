@@ -12,18 +12,25 @@ export const BasicPage: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const result = await fetchAuthenticated();
-      setCheckingAuth(false);
+      setCheckingAuth(true);
+      setLoggedIn(false);
 
-      if (result.username) {
-        setLoggedIn(true);
-        setUser(userSchema.parse({ ...user, ...result }));
-      } else {
-        navigate('/login');
+      try {
+        const result = await fetchAuthenticated();
+        setCheckingAuth(false);
+
+        if (result.username) {
+          setLoggedIn(true);
+          setUser(userSchema.parse({ ...user, ...result }));
+        } else {
+          navigate('/login');
+        }
+      } catch (e) {
+        // do nothing
       }
     };
     fetchData();
-  }, [loggedIn]);
+  }, []);
 
   return <DashboardLayout>{loggedIn ? <Outlet /> : <HomePage />}</DashboardLayout>;
 };
