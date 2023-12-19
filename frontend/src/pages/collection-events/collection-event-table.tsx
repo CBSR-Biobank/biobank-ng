@@ -53,7 +53,7 @@ export const CollectionEventTable: React.FC<{ collectionEvents: CollectionEventB
 
               <td className="border-b border-gray-200 p-3">
                 <p className="block font-sans text-sm font-normal leading-normal text-slate-700 antialiased">
-                  {format(cevent.createdAt, 'yyyy-MM-dd')}
+                  {cevent.createdAt ? format(cevent.createdAt, 'yyyy-MM-dd') : ''}
                 </p>
               </td>
               <td className="border-b border-gray-200 p-3">

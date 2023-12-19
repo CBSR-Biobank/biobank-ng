@@ -11,7 +11,7 @@ export const eventAttributeSchema = z.object({
 
 export const collectionEventBriefSchema = domainEntitySchema.extend({
   id: z.number(),
-  createdAt: z.string().pipe(z.coerce.date()),
+  createdAt: z.union([z.null(), z.string().pipe(z.coerce.date())]),
   visitNumber: z.number(),
   specimenCount: z.number(),
   aliquotCount: z.number(),
