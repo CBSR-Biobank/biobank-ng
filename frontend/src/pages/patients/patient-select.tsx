@@ -43,7 +43,12 @@ export function PatientSelect() {
           <p className="text-4xl font-semibold text-sky-600">Select a Patient</p>
         </AdminPage.Title>
         <form className="flex w-full max-w-sm items-center space-x-2 pt-8" onClick={handleSubmit} autoComplete="on">
-          <Input placeholder="Patient Number" onChange={handleInputChange} onKeyUp={handleInputKeyUp} />
+          <Input
+            id="patientNumber"
+            placeholder="Patient Number"
+            onChange={handleInputChange}
+            onKeyUp={handleInputKeyUp}
+          />
           <Button type="submit" className="flex gap-2 bg-sky-500 hover:bg-sky-400">
             Submit
             <FontAwesomeIcon icon={faPaperPlane} />
