@@ -31,7 +31,7 @@ export function PatientDetails() {
       </AdminPage.Title>
 
       <div className="bg-basic-100 border-top flex flex-col gap-8 rounded-md drop-shadow-md">
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <EntityProperty propName="pnumber" label="Patient Number" allowChanges={true} handleChange={handlePropChange}>
             {patient.pnumber}
           </EntityProperty>
