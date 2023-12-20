@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AdminPage } from '../admin-page';
 import { SourceSpecimenTable } from '../specimens/source-specimens-table';
+import { Aliquots } from '@app/components/patients/aliquots';
 
 export function CollectionEventView() {
   const { patient, setCollectionEvent } = usePatientStore();
@@ -113,6 +114,9 @@ export function CollectionEventView() {
               <SourceSpecimenTable specimens={collectionEvent.sourceSpecimens} />
             </div>
           )}
+          {collectionEvent.sourceSpecimens.map((sourceSpecimen, index) => (
+            <Aliquots key={index} parentSpecimen={sourceSpecimen} />
+          ))}
         </div>
       </AdminPage>
     </>

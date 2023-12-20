@@ -17,6 +17,9 @@ export const API_ROUTES: Readonly<Record<string, Route>> = {
     pnumber: '/api/patients/:pnumber',
     'collection-events': '/api/patients/:pnumber/collection-events',
     'collection-event': '/api/patients/:pnumber/collection-events/:vnumber'
+  },
+  specimens: {
+    aliquots: '/api/specimens/aliquots/:inventoryId',
   }
 } as const;
 

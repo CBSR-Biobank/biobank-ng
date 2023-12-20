@@ -4,23 +4,21 @@ import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.applicationEvents.BiobankEventPublisher;
 import edu.ualberta.med.biobank.domain.Patient;
-import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.dtos.CollectionEventSummaryDTO;
 import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.errors.PermissionError;
-import edu.ualberta.med.biobank.errors.Unauthorized;
 import edu.ualberta.med.biobank.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.repositories.CollectionEventRepository;
 import edu.ualberta.med.biobank.repositories.PatientRepository;
 import io.jbock.util.Either;
 import jakarta.persistence.Tuple;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 public class PatientService {
@@ -33,13 +31,15 @@ public class PatientService {
 
     private BiobankEventPublisher eventPublisher;
 
-    public PatientService(PatientRepository patientRepository,
-        CollectionEventRepository collectionEventRepository, BiobankEventPublisher eventPublisher) {
+    public PatientService(
+        PatientRepository patientRepository,
+        CollectionEventRepository collectionEventRepository,
+        BiobankEventPublisher eventPublisher
+    ) {
         this.patientRepository = patientRepository;
         this.collectionEventRepository = collectionEventRepository;
         this.eventPublisher = eventPublisher;
     }
-
 
     public void save(Patient patient) {
         patientRepository.save(patient);
@@ -70,7 +70,6 @@ public class PatientService {
             values.get("studyNameShort", String.class),
             List.of()
         );
-
 
         var permission = new PatientReadPermission(patient.studyId());
         var allowedMaybe = permission.isAllowed();

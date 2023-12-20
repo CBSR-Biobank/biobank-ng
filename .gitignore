@@ -39,3 +39,4 @@ build/
 /docker/nginx-selfsigned.key
 /logs/nginx/
 /frontend/.vite/
+/.sqls/

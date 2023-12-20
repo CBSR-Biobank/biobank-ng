@@ -1,7 +1,7 @@
 import { patientSchema } from '@app/models/patient';
 import { API_ROUTES, fetchApi } from './api';
 
-export class PeopleApi {
+export class CollectionEventApi {
   static async getByPnumber(pnumber: string) {
     const route = API_ROUTES.patients.pnumber.replace(':pnumber', pnumber);
     const response = await fetchApi(route);
