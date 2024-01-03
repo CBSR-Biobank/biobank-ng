@@ -13,14 +13,36 @@ services:
             file: compose.yaml
             service: db
         ports:
-           - 3306:3306
+            - 3306:3306
 
     jboss:
         extends:
             file: compose.yaml
             service: jboss
+        depends_on:
+            - db
         ports:
             - 8080:8080
+
+    # app:
+    #     build:
+    #         context: ../
+    #         dockerfile: Dockerfile
+    #     image: app-image
+    #     command: sh -c "/app/mvnw clean spring-boot:run"
+    #     working_dir: /app
+    #     volumes:
+    #        - ../src:/app/src
+    #     ports:
+    #         - 9000:9000
+    #         - 35729:35729
+    #     depends_on:
+    #         - db
+    #     environment:
+    #        - DB_HOST=db
+    #        - DB_NAME=$DB_NAME
+    #        - DB_USER=$DB_USER
+    #        - DB_PASSWORD=$DB_PASSWORD
 
     frontend:
         image: node:18-alpine
@@ -35,4 +57,4 @@ services:
             - 3000:3000
         restart: unless-stopped
         extra_hosts:
-                - "host.docker.internal:host-gateway"
+            - "host.docker.internal:host-gateway"
