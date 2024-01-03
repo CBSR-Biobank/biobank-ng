@@ -1,0 +1,9 @@
+{
+    "gantt": {
+        "titleTopMargin": 0,
+        "barHeight": 15,
+        "barGap": 3,
+        "topPadding": 50,
+        "sidePadding": 50
+    }
+}

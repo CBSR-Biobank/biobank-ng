@@ -40,3 +40,4 @@ build/
 /logs/nginx/
 /frontend/.vite/
 /.sqls/
+*.svg
