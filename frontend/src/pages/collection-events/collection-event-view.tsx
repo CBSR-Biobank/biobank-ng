@@ -4,18 +4,16 @@ import { EntityProperty } from '@app/components/entity-property';
 import { ShowError } from '@app/components/show-error';
 import { StatusChip } from '@app/components/status-chip';
 import { Button } from '@app/components/ui/button';
-import { Collapsible, CollapsibleContent } from '@app/components/ui/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@app/components/ui/collapsible';
 import { useCollectionEvent } from '@app/hooks/useCollectionEvent';
 import { usePatientStore } from '@app/store';
 import { cn } from '@app/utils';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AdminPage } from '../admin-page';
 import { SourceSpecimenTable } from '../specimens/source-specimens-table';
-import { Aliquots } from '@app/components/patients/aliquots';
 
 export function CollectionEventView() {
   const { patient, setCollectionEvent } = usePatientStore();
@@ -110,13 +108,10 @@ export function CollectionEventView() {
           )}
           {collectionEvent.sourceSpecimens.length > 0 && (
             <div className="space-y-2 rounded-md border-2 border-solid">
-              <h4 className="bg-gray-300/50 px-4 py-2 text-sm font-normal text-slate-700">Source Specimens</h4>
+              <h4 className="bg-gray-300/50 px-4 py-2 text-sm font-normal text-slate-700">Specimens</h4>
               <SourceSpecimenTable specimens={collectionEvent.sourceSpecimens} />
             </div>
           )}
-          {collectionEvent.sourceSpecimens.map((sourceSpecimen, index) => (
-            <Aliquots key={index} parentSpecimen={sourceSpecimen} />
-          ))}
         </div>
       </AdminPage>
     </>

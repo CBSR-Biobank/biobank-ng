@@ -5,6 +5,7 @@ import { Status } from './status';
 export const sourceSpecimenSchema = domainEntitySchema.extend({
   inventoryId: z.string(),
   quantity: z.number().nullable(),
+  createdAt: z.string().pipe(z.coerce.date()),
   status: z.nativeEnum(Status),
   specimenTypeId: z.number(),
   specimenTypeNameShort: z.string(),
@@ -12,7 +13,9 @@ export const sourceSpecimenSchema = domainEntitySchema.extend({
   originCenterNameShort: z.string(),
   currentCenterId: z.number(),
   currentCenterNameShort: z.string(),
-  timeDrawn: z.string().pipe(z.coerce.date())
+  position: z.string().nullable(),
+  worksheet: z.string().nullable(),
+  hasComments: z.boolean().optional()
 });
 
 export type SourceSpecimen = z.infer<typeof sourceSpecimenSchema>;
@@ -35,7 +38,7 @@ export const aliquotSchema = domainEntitySchema.extend({
   studyId: z.number().min(1),
   studyNameShort: z.string(),
   processingEventId: z.number().min(1),
-  worksheet: z.string(),
+  worksheet: z.string()
 });
 
 export type Aliquot = z.infer<typeof aliquotSchema>;
