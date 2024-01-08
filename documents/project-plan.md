@@ -22,7 +22,7 @@ gantt
     REST API endpoints                  :15d
     Testing                             :10d
     Frontend                            :5d
-    Reports / Advanced Reports / Specimen Pull : milestone, m2
+    Reports / Advanced Reports / Specimen Pull :crit, milestone, m2
 
     section Specimen Collection
     REST API endpoints                  :10d
