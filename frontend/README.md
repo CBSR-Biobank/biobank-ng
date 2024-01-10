@@ -1,7 +1,9 @@
 # Biobank-ng Frontend Project
 
 This project contains the source code for Biobank-ng's' web-client for. It is a react application written in
-TypeScript. This project has the following dependencies:
+TypeScript that uses React Functional Components.
+
+This project has the following dependencies:
 
 * [React](https://react.dev/reference/react)
 
@@ -27,6 +29,11 @@ TypeScript. This project has the following dependencies:
 
     A small, fast, and scalable bearbones state management solution. Zustand has a comfy API based on hooks.
     It isn't boilerplatey or opinionated, but has enough convention to be explicit and flux-like.
+
+* [Zod](https://zod.dev/)
+
+    Zod is a TypeScript-first schema declaration and validation library. I'm using the term "schema" to
+    broadly refer to any data type, from a simple `string` to a complex nested object.
 
 * [shadcn/ui](https://ui.shadcn.com/)
 
