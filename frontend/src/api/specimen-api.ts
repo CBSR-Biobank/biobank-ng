@@ -1,6 +1,6 @@
-import { z } from 'zod';
-import { API_ROUTES, fetchApi } from './api';
 import { aliquotSchema } from '@app/models/specimen';
+import { z } from 'zod';
+import { httpClient } from './api';
 
 export class SpecimenApi {
   static async getByParentInventoryId(inventoryId?: string) {
@@ -8,8 +8,11 @@ export class SpecimenApi {
       return null;
     }
 
-    const route = API_ROUTES.specimens.aliquots.replace(':inventoryId', inventoryId);
-    const response = await fetchApi(route);
+    const response = await httpClient({
+      method: 'GET',
+      path: ['specimens', 'aliquots', inventoryId],
+      query: undefined
+    });
     const result = await response.json();
     const specimens = z.array(aliquotSchema).parse(result);
     return specimens;

@@ -65,7 +65,7 @@ export const AliquotsTable = forwardRef<HTMLTableElement, AliquotsTableProps>(({
           <TableCell className=" text-sm font-normal leading-normal text-slate-700">{specimen.position}</TableCell>
           <TableCell className=" text-sm font-normal leading-normal text-slate-700">{specimen.worksheet}</TableCell>
           <TableCell className=" text-sm font-normal leading-normal text-slate-700">
-            {format(specimen.createdAt, 'yyyy-MM-dd HH:MM')}
+            {format(specimen.createdAt, 'yyyy-MM-dd hh:mm')}
           </TableCell>
           <TableCell className=" text-sm font-normal leading-normal text-slate-700">
             <StatusChip status={specimen.status} variant="table" />

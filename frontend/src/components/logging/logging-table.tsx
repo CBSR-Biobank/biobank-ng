@@ -64,7 +64,7 @@ export const LoggingTable: React.FC<{ logging: Logging[] }> = ({ logging }) => {
               </td>
               <td className="border-b border-gray-200 p-2">
                 <p className="block font-sans text-sm font-normal leading-normal text-slate-700 antialiased">
-                  {format(logMessage.createdAt, 'yyyy-MM-dd')}
+                  {format(logMessage.createdAt, 'yyyy-MM-dd hh:mm')}
                 </p>
               </td>
               <td className="border-b border-gray-200 p-2">

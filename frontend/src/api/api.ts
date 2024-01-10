@@ -1,53 +1,88 @@
 import { userSchema } from '@app/models/user';
 import { useUserStore } from '@app/store';
 
-type Route = Record<string, string>;
+// For "Endpoint" type, see
+// https://medium.com/flock-community/contract-first-strictly-typed-endpoints-in-typescript-with-runtime-validation-c409b2603287
 
-export const API_ROUTES: Readonly<Record<string, Route>> = {
-  auth: {
-    index: '/api/auth',
-    token: '/api/token'
-  },
-  logging: {
-    index: '/api/logging',
-    latest: 'api/logging/latest'
-  },
-  patients: {
-    index: '/api/patients',
-    pnumber: '/api/patients/:pnumber',
-    'collection-events': '/api/patients/:pnumber/collection-events',
-    'collection-event': '/api/patients/:pnumber/collection-events/:vnumber'
-  },
-  specimens: {
-    aliquots: '/api/specimens/aliquots/:inventoryId',
-  }
-} as const;
+type Auth = {
+  method: 'GET';
+  path: ['auth'];
+  query: undefined;
+};
+
+type Logging = {
+  method: 'GET';
+  path: ['logging'];
+  query: undefined;
+};
+
+type LoggingLatest = {
+  method: 'GET';
+  path: ['logging', 'latest'];
+  query: undefined;
+};
+
+type PatientGet = {
+  method: 'GET';
+  path: ['patients', string];
+  query: undefined;
+};
+
+type CollectionEventsGet = {
+  method: 'GET';
+  path: ['patients', string, 'collection-events'];
+  query: undefined;
+};
+
+type CollectionEventGet = {
+  method: 'GET';
+  path: ['patients', string, 'collection-events', number];
+  query: undefined;
+};
+
+type AliquotsGet = {
+  method: 'GET';
+  path: ['specimens', 'aliquots', string];
+  query: undefined;
+};
+
+export type Endpoint =
+  | Auth
+  | Logging
+  | LoggingLatest
+  | PatientGet
+  | CollectionEventsGet
+  | CollectionEventGet
+  | AliquotsGet;
 
 export type ApiError = {
   status: number;
   error: any;
 };
 
-export async function fetchAuthenticated() {
-  const response = await fetch(API_ROUTES.auth.index, {
-    headers: {
-      Authorization: 'Bearer ' + useUserStore.getState().userToken,
-      credentials: 'include',
-      'Content-Type': 'application/json'
-    }
-  });
+export async function httpClient(endpoint: Endpoint) {
+  const method = endpoint.method;
+  const path = endpoint.path.join('/');
+  const headers = {
+    Authorization: 'Bearer ' + useUserStore.getState().userToken,
+    credentials: 'include',
+    'Content-Type': 'application/json'
+  };
 
-  if (!response.ok) {
-    const err: ApiError = { status: response.status, error: 'Unable to authenticate' };
-    throw err;
+  let url = `/api/${path}`;
+  if (endpoint.query !== undefined) {
+    const queryString = new URLSearchParams(endpoint.query).toString();
+    if (queryString.length > 0) {
+      url += `?${queryString}`;
+    }
   }
 
-  const json = await response.json();
-  return json;
+  const response = await fetch(url, { method, headers });
+  return handleServerResponse(response);
 }
 
 export async function login(username: string, password: string) {
-  const response = await fetch(API_ROUTES.auth.token, {
+  const response = await fetch('/api/token', {
     headers: {
       authorization: 'Basic ' + window.btoa(username + ':' + password)
     },
@@ -74,17 +109,20 @@ export async function login(username: string, password: string) {
   return user;
 }
 
-export async function fetchApi(route: string, init?: RequestInit) {
-  const response = await fetch(route, {
-    headers: {
-      Authorization: 'Bearer ' + useUserStore.getState().userToken,
-      credentials: 'include',
-      'Content-Type': 'application/json'
-    },
-    ...init
+export async function fetchAuthenticated() {
+  const response = await httpClient({
+    method: 'GET',
+    path: ['auth'],
+    query: undefined
   });
 
-  return handleServerResponse(response);
+  if (!response.ok) {
+    const err: ApiError = { status: response.status, error: 'Unable to authenticate' };
+    throw err;
+  }
+
+  const json = await response.json();
+  return json;
 }
 
 export async function fetchApiFileUpload(route: string, file: File) {
@@ -101,32 +139,6 @@ export async function fetchApiFileUpload(route: string, file: File) {
   });
 
   return handleServerResponse(response);
-}
-
-export function paginationToQueryParams(page?: number, searchTerm?: string): string {
-  const params = new URLSearchParams();
-
-  if (page && page > 1) {
-    params.append('page', `${page}`);
-  }
-
-  if (searchTerm && searchTerm.length > 0) {
-    params.append('search', searchTerm);
-  }
-
-  let paramsAsString = params.toString();
-  if (paramsAsString.length <= 0) {
-    return '';
-  }
-  return '?' + paramsAsString;
-}
-
-export function routeReplace(baseRoute: string, replacements: Record<string, string>): string {
-  const result = baseRoute.replace(/\/(:\w+)\//gi, (_match, p1) => {
-    const subst = replacements[p1] || p1;
-    return `/${subst}/`;
-  });
-  return result;
 }
 
 async function handleServerResponse(response: Response) {
