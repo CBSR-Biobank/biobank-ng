@@ -1,6 +1,6 @@
 # Biobank-ng Frontend Project
 
-This project contains the source code for Biobank-ng's' web-client for. It is a react application written in
+This project contains the source code for **Biobank-ng**'s web-client. It is a React application written in
 TypeScript that uses React Functional Components.
 
 This project has the following dependencies:
