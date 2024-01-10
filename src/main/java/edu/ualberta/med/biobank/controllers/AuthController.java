@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.ualberta.med.biobank.dtos.UserDTOClient;
 import edu.ualberta.med.biobank.services.TokenService;
 import edu.ualberta.med.biobank.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 public class AuthController {
@@ -27,6 +29,7 @@ public class AuthController {
         this.userService = userService;
     }
 
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @GetMapping("/auth")
     public ResponseEntity<UserDTOClient> isAuthorized(Authentication authentication) {
         var username = authentication.getName();
@@ -44,6 +47,7 @@ public class AuthController {
         ).body(userInfo);
     }
 
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @PostMapping("/token")
     public ResponseEntity<UserDTOClient> token(Authentication authentication) {
         var username = authentication.getName();

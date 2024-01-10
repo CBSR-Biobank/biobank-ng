@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.ualberta.med.biobank.dtos.AliquotSpecimenDTO;
 import edu.ualberta.med.biobank.exception.AppErrorException;
 import edu.ualberta.med.biobank.services.SpecimenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 public class SpecimenController {
@@ -22,6 +24,7 @@ public class SpecimenController {
         this.specimenService = specimenService;
     }
 
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @GetMapping("/specimens/aliquots/{inventoryId}")
     public Collection<AliquotSpecimenDTO> get(@PathVariable String inventoryId) {
         return specimenService.findByParentInventoryId(inventoryId).orElseThrow(err -> {

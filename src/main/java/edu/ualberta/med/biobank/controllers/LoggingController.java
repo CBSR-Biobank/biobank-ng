@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import edu.ualberta.med.biobank.dtos.LoggingDTO;
 import edu.ualberta.med.biobank.services.LoggingService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/logging")
@@ -25,6 +27,7 @@ public class LoggingController {
 
     }
 
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @GetMapping( name = "")
     public Page<LoggingDTO> allPaginated(
             @RequestParam Optional<Integer> page,
@@ -35,6 +38,7 @@ public class LoggingController {
         return data;
     }
 
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @GetMapping("/latest")
     public List<LoggingDTO> latest() {
         var data = loggingService.loggingLatest();
