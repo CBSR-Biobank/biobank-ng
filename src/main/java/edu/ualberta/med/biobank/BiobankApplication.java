@@ -32,7 +32,7 @@ public class BiobankApplication {
         var mitLicense = new License().name("MIT License").url("https://choosealicense.com/licenses/mit/");
 
         Info info = new Info()
-            .title("CBSR Biobank Management API")
+            .title("CBSR Biobank NG API")
             .version("1.0")
             .contact(contact)
             .description("This API exposes endpoints to manage Biobank information.")

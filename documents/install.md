@@ -47,7 +47,7 @@ git clone https://github.com/CBSR-Biobank/biobank-ng.git
 
 ## Build
 
-To build the backend:
+### Backend
 
 1. Create the following file and place it in `/opt/biobank/biobank-ng/.env`:
 
@@ -78,7 +78,7 @@ To build the backend:
     mvn -Dmaven.test.skip clean package
     ```
 
-To build the frontend:
+### Frontend
 
 1. Compile the frontend
 
@@ -90,7 +90,9 @@ To build the frontend:
 
 ## Ubuntu Service
 
-The application can be made into an Ubuntu service so that it starts when the computer restarts. Follow these steps:
+The application can be made into an Ubuntu service so that it starts when the computer boots.
+
+Follow these steps:
 
 1. Create the following file and place it in `/etc/systemd/system/biobank.service` (root access required):
 
