@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.domain;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -20,7 +19,6 @@ import java.util.Map;
  * @author Jonathan Ferland
  *
  */
-@SuppressWarnings("nls")
 public enum PermissionEnum {
     UNUSED0(0, "Unused-0"),
     UNUSED1(1, "Unused-1"),

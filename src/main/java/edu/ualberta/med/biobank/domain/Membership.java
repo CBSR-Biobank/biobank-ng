@@ -20,8 +20,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Type;
-
 /**
  * A {@link User} should only be able to create
  * {@link getManageablePermissionsMembership}-s on other {@link User}-s that are

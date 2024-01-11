@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 
 @Repository
-public interface StudyRepository extends JpaRepository<Study, Long>{
+public interface StudyRepository extends JpaRepository<Study, Integer>{
     @Query(
         value = """
                 select

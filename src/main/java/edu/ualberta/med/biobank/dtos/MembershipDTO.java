@@ -18,6 +18,7 @@ public record MembershipDTO(
     Set<PermissionEnum> permissions
 ) {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = LoggerFactory.getLogger(MembershipDTO.class);
 
     public static MembershipDTO fromTuple(Tuple data) {

@@ -15,6 +15,7 @@ import io.jbock.util.Either;
 
 public class SpecimenReadPermission implements Permission {
 
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(SpecimenReadPermission.class);
 
     private Integer studyId;

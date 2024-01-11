@@ -37,6 +37,7 @@ import net.datafaker.Faker;
 @AutoConfigureMockMvc
 class PatientControllerTest extends BaseTest {
 
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(PatientControllerTest.class);
 
     private final String ENDPOINT_URL = "/patients/{pnumber}";

@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class PatientReadPermission implements Permission {
 
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(PatientReadPermission.class);
 
     private Integer studyId;

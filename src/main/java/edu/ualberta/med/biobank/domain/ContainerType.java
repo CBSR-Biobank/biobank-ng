@@ -20,7 +20,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.annotations.SQLInsert;
-import org.hibernate.annotations.Type;
 
 import edu.ualberta.med.biobank.domain.type.LabelingLayout;
 import edu.ualberta.med.biobank.domain.util.RowColPos;

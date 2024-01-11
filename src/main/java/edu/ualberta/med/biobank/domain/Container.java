@@ -20,8 +20,6 @@ import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Type;
-
 import edu.ualberta.med.biobank.domain.util.RowColPos;
 
 /**
@@ -269,7 +267,6 @@ public class Container extends DomainEntity implements HasComments, HasStatus {
      *
      * @throws Exception
      */
-    @SuppressWarnings("nls")
     @Transient
     public RowColPos getPositionFromLabelingScheme(String position)
         throws Exception {

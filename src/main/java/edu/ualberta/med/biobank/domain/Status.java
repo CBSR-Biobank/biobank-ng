@@ -15,7 +15,6 @@ import java.util.List;
  *
  * @author Jonathan Ferland
  */
-@SuppressWarnings("nls")
 public enum Status {
     NONE(0, "None"),
     ACTIVE(1, "Active"),

@@ -17,6 +17,7 @@ import jakarta.persistence.PersistenceContext;
 
 class LoggingControllerTest extends ControllerTest {
 
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(LoggingControllerTest.class);
 
     private final String ENDPOINT_INDEX_URL = "/logs";
@@ -25,10 +26,8 @@ class LoggingControllerTest extends ControllerTest {
     private EntityManager em;
 
     @Autowired
+    
     private MockMvc mvc;
-
-    private Factory factory;
-
     @BeforeEach
     void setup() throws Exception {
         this.factory = new Factory(em);

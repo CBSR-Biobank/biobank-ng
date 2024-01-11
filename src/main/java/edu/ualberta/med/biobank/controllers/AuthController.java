@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RestController
 public class AuthController {
 
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     private final TokenService tokenService;

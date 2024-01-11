@@ -15,7 +15,6 @@ import jakarta.persistence.Transient;
 @Entity
 @Table(name = "CONTAINER_LABELING_SCHEME")
 public class ContainerLabelingScheme extends DomainEntity implements HasName {
-    private static final long serialVersionUID = 1L;
 
     public static final String CBSR_2_CHAR_LABELLING_PATTERN = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
@@ -123,7 +122,6 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
      *
      * @throws BiobankCheckException
      */
-    @SuppressWarnings("nls")
     public static String rowColToCbsrTwoChar(RowColPos rcp, int totalRows, int totalCols,
         LabelingLayout labelingLayout) {
         int pos1, pos2, index;
@@ -155,7 +153,6 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
     /**
      * Convert a position in row*column to two char numeric.
      */
-    @SuppressWarnings("nls")
     public static String rowColToTwoCharNumeric(RowColPos rcp, int totalRows, int totalCols,
         LabelingLayout labelingLayout) {
         if (labelingLayout.equals(LabelingLayout.VERTICAL)) {
@@ -173,7 +170,6 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
     /**
      * Convert a position in row*column to Dewar labelling (AA, BB, CC...).
      */
-    @SuppressWarnings("nls")
     public static String rowColToDewar(RowColPos rcp, Integer colCapacity) {
         int pos = colCapacity * rcp.getRow() + rcp.getCol();
         if (pos >= DEWAR_ROW_LABELLING_PATTERN.length()) {
@@ -190,7 +186,6 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
      * Get the string corresponding to the given RowColPos and using the SBS standard. 2:1 will
      * return C2.
      */
-    @SuppressWarnings("nls")
     public static String rowColtoCbsrSbs(RowColPos rcp) {
         int row = rcp.getRow();
         int col = rcp.getCol();
@@ -206,7 +201,6 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
         return result.toString();
     }
 
-    @SuppressWarnings("nls")
     public static String rowColToBox85by2(RowColPos rcp) {
         int row = rcp.getRow();
         int col = rcp.getCol();
@@ -229,7 +223,6 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
      *
      * @throws BiobankCheckException
      */
-    @SuppressWarnings("nls")
     public static String rowColToTwoChar(RowColPos rcp, int totalRows, int totalCols,
         LabelingLayout labelingLayout) {
         int pos1, pos2, index;
@@ -295,7 +288,6 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
      * get the RowColPos in the given container corresponding to the given label AB and will return
      * 1:0.
      */
-    @SuppressWarnings("nls")
     public RowColPos cbsrTwoCharToRowCol(String label, int rowCap, int colCap,
         String containerTypeName, LabelingLayout labelingLayout)
         throws IllegalArgumentException {
@@ -342,7 +334,6 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
      * Get the RowColPos in the given container corresponding to the given label using the 2 char
      * numeric labelling.
      */
-    @SuppressWarnings("nls")
     public RowColPos twoCharNumericToRowCol(String label, int totalRows, int totalCols,
         LabelingLayout labelingLayout)
         throws IllegalArgumentException {
@@ -378,7 +369,6 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
      *
      * @throws Exception
      */
-    @SuppressWarnings("nls")
     public RowColPos dewarToRowCol(String label, int totalCol)
         throws IllegalArgumentException {
         int len = label.length();
@@ -404,7 +394,6 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
      * Get the rowColPos corresponding to the given CBSR SBS 2 char string position. Could be A2 or
      * F9. (CBSR SBS skip I and O)
      */
-    @SuppressWarnings("nls")
     public RowColPos cbsrSbsToRowCol(String pos) {
         if ((pos.length() != getMinChars()) && (pos.length() != getMaxChars())) {
             throw new IllegalArgumentException("pos has an invalid length: " + pos);
@@ -414,7 +403,6 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
         return new RowColPos(row, col);
     }
 
-    @SuppressWarnings("nls")
     public RowColPos box85by2ToRowCol(String pos) {
         if ((pos.length() != getMinChars()) && (pos.length() != getMaxChars())) {
             throw new IllegalArgumentException("pos has an invalid length: " + pos);
@@ -434,7 +422,6 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
      * get the RowColPos in the given container corresponding to the given label AB and will return
      * 1:0.
      */
-    @SuppressWarnings("nls")
     public RowColPos twoCharToRowCol(
         String label,
         int rowCap,

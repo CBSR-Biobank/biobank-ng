@@ -54,8 +54,8 @@ public class StudyService {
     }
 
     public Page<StudyDTO> studyPagination(Integer pageNumber, Integer pageSize, String sort) {
-        // FIXME: check user memberships here and return only studies they have access to
         Pageable pageable = null;
+        // FIXME: check user memberships here and return only studies they have access to
         if (sort != null) {
             pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, sort);
         } else {

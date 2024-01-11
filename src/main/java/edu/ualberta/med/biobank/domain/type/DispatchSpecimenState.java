@@ -15,7 +15,6 @@ import java.util.List;
  *
  * @author Jonathan Ferland
  */
-@SuppressWarnings("nls")
 public enum DispatchSpecimenState implements ItemState {
     NONE(0, "None"),
     RECEIVED(1, "Received"),

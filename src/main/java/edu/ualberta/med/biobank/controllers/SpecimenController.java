@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RestController
 public class SpecimenController {
 
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(SpecimenController.class);
 
 

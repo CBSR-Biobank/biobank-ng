@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.permission.patient;
 import edu.ualberta.med.biobank.ApplicationContextProvider;
 import edu.ualberta.med.biobank.domain.PermissionEnum;
 import edu.ualberta.med.biobank.errors.AppError;
-import edu.ualberta.med.biobank.errors.Unauthorized;
 import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.services.StudyService;
 import edu.ualberta.med.biobank.services.UserService;
@@ -16,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class CollectionEventReadPermission implements Permission {
 
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(CollectionEventReadPermission.class);
 
     private Integer studyId;

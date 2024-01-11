@@ -15,7 +15,6 @@ import java.util.List;
  *
  * @author Jonathan Ferland
  */
-@SuppressWarnings("nls")
 public enum RequestSpecimenState implements ItemState {
     AVAILABLE_STATE(0, "Available"),
     PULLED_STATE(1, "Pulled"),

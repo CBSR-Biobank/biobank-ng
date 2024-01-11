@@ -65,6 +65,7 @@ public class Factory {
 
     private EntityManager em;
 
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(Factory.class);
 
     private static final Random R = new Random();

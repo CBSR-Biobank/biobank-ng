@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 class StudyControllerTest extends ControllerTest {
 
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(StudyControllerTest.class);
 
     private final String ENDPOINT_INDEX_URL = "/studies";

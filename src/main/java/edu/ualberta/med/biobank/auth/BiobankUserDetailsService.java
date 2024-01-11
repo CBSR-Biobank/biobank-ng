@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.services.UserService;
 @Service
 public class BiobankUserDetailsService implements UserDetailsService {
 
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(BiobankUserDetailsService.class);
 
     private UserService userService;

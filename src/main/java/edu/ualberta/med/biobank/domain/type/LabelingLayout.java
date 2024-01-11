@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.domain.type;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +15,6 @@ import java.util.List;
  *
  * @author Nelson Loyola
  */
-@SuppressWarnings("nls")
 public enum LabelingLayout {
     VERTICAL(0, "Vertical"),
     HORIZONTAL(1, "Horizontal");

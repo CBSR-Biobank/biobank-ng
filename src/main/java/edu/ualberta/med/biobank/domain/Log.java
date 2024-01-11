@@ -18,7 +18,7 @@ public class Log implements ValueObject {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "id-generator")
     @GenericGenerator(
         name = "id-generator",
-        strategy = "edu.ualberta.med.biobank.domain.util.CustomIdGenerator",
+        type = edu.ualberta.med.biobank.domain.util.CustomIdGenerator.class,
         parameters = {
             @Parameter(name = "initial_value", value = "1"), @Parameter(name = "increment_size", value = "50")
         }
