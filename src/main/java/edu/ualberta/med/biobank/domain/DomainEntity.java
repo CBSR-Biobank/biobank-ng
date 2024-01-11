@@ -59,8 +59,8 @@ public abstract class DomainEntity implements ValueObject {
         if (that == this) return true;
         if (that == null) return false;
 
-        if (that instanceof ValueObject) {
-            Integer thatId = ((ValueObject) that).getId();
+        if (that instanceof ValueObject object) {
+            Integer thatId = object.getId();
             if (getId() != null && getId().equals(thatId)) return true;
         }
         return false;

@@ -41,16 +41,16 @@ public class EventAttrUtil {
         if (type == EventAttrTypeEnum.SELECT_SINGLE) {
             if (!permValuesSplit.contains(value)) {
                 throw new RuntimeException(
-                    String.format(INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE_ERRMSG,
-                        value, label, permissibleValues));
+                        INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE_ERRMSG.formatted(
+                                value, label, permissibleValues));
             }
         } else if (type == EventAttrTypeEnum.SELECT_MULTIPLE) {
             for (String singleVal : value.split(";")) {
                 if (!permValuesSplit.contains(singleVal)) {
                     throw new RuntimeException(
-                        String.format(
-                            INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE_ERRMSG,
-                            singleVal, value, label));
+                            
+                                    INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE_ERRMSG.formatted(
+                                    singleVal, value, label));
                 }
             }
         } else if (type == EventAttrTypeEnum.NUMBER) {
@@ -61,13 +61,13 @@ public class EventAttrUtil {
                 format.parse(value);
 
             } catch (ParseException e) {
-                throw new RuntimeException(String.format(CANNOT_PARSE_DATE_ERRMSG, value));
+                throw new RuntimeException(CANNOT_PARSE_DATE_ERRMSG.formatted(value));
             }
         } else if (type == EventAttrTypeEnum.TEXT) {
             // do nothing
         } else {
             throw new RuntimeException(
-                String.format(UNKNOWN_EVENT_ATTR_TYPE_ERRMSG, type.getName()));
+                    UNKNOWN_EVENT_ATTR_TYPE_ERRMSG.formatted(type.getName()));
         }
 
     }

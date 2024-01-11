@@ -63,8 +63,8 @@ public class Membership extends DomainEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "MEMBERSHIP_ROLE",
-        joinColumns = { @JoinColumn(name = "MEMBERSHIP_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "ROLE_ID", nullable = false, updatable = false) })
+        joinColumns = { @JoinColumn(name = "MEMBERSHIP_ID", nullable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "ROLE_ID", nullable = false) })
     private Set<Role> roles = new HashSet<Role>(0);
 
     @Column(name = "USER_MANAGER")

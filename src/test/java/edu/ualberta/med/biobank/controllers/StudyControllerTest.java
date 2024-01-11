@@ -13,6 +13,7 @@ import jakarta.persistence.PersistenceContext;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +38,14 @@ class StudyControllerTest extends ControllerTest {
     private Factory factory;
 
     @BeforeEach
-    public void setup() throws Exception {
+    public void setup(TestInfo testInfo) {
+        super.setup(testInfo);
         this.factory = new Factory(em);
     }
 
     @Test
     @WithMockUser
-    public void getPageWhenEmptyTableIsOkAndEmpty() throws Exception {
+    void getPageWhenEmptyTableIsOkAndEmpty() throws Exception {
         this.mvc.perform(get(ENDPOINT_INDEX_URL))
             .andExpect(status().isOk())
             .andDo(MockMvcResultHandlers.print())
@@ -54,7 +56,7 @@ class StudyControllerTest extends ControllerTest {
     }
 
     @Test
-    public void getWhenPresentAndUnauthorized() throws Exception {
+    void getWhenPresentAndUnauthorized() throws Exception {
         this.mvc.perform(get(ENDPOINT_INDEX_URL))
             .andExpect(status().isUnauthorized())
             .andDo(MockMvcResultHandlers.print());
@@ -62,7 +64,7 @@ class StudyControllerTest extends ControllerTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    public void getPageWhenPresentIsOk() throws Exception {
+    void getPageWhenPresentIsOk() throws Exception {
         factory.createStudy();
 
         this.mvc.perform(get(ENDPOINT_INDEX_URL))
@@ -76,7 +78,7 @@ class StudyControllerTest extends ControllerTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    public void getSinglePresentIsOk() throws Exception {
+    void getSinglePresentIsOk() throws Exception {
         var study = factory.createStudy();
 
         this.mvc.perform(get(endpointUrl(study.getNameShort())))
@@ -89,7 +91,7 @@ class StudyControllerTest extends ControllerTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    public void getSingleWhenNotExistIsNotFound() throws Exception {
+    void getSingleWhenNotExistIsNotFound() throws Exception {
         var badname = (new Faker()).lorem().fixedString(10);
 
         this.mvc.perform(get(endpointUrl(badname)))

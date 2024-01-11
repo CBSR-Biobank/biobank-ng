@@ -18,13 +18,13 @@ public class Domain extends DomainEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "DOMAIN_CENTER", joinColumns = {
-            @JoinColumn(name = "DOMAIN_ID", nullable = false, updatable = false) }, inverseJoinColumns = {
-                    @JoinColumn(name = "CENTER_ID", nullable = false, updatable = false) })
+            @JoinColumn(name = "DOMAIN_ID", nullable = false) }, inverseJoinColumns = {
+                    @JoinColumn(name = "CENTER_ID", nullable = false) })
     private Set<Center> centers = new HashSet<Center>(0);
 
     // FIXME: column should be named "STUDY_ID" and not "CENTER_ID"
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "DOMAIN_STUDY", joinColumns = @JoinColumn(name = "DOMAIN_ID", nullable = false, updatable = false), inverseJoinColumns = @JoinColumn(name = "CENTER_ID", nullable = false, updatable = false))
+    @JoinTable(name = "DOMAIN_STUDY", joinColumns = @JoinColumn(name = "DOMAIN_ID", nullable = false), inverseJoinColumns = @JoinColumn(name = "CENTER_ID", nullable = false))
     private Set<Study> studies = new HashSet<Study>(0);
 
     @Column(name = "ALL_CENTERS")

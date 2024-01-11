@@ -84,8 +84,8 @@ public class Specimen extends DomainEntity implements HasStatus, HasComments, Ha
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "SPECIMEN_COMMENT",
-    joinColumns = { @JoinColumn(name = "SPECIMEN_ID", nullable = false, updatable = false) },
-    inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
+    joinColumns = { @JoinColumn(name = "SPECIMEN_ID", nullable = false) },
+    inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false) })
     private Set<Comment> comments = new HashSet<Comment>(0);
 
     @OneToMany(fetch = FetchType.LAZY)

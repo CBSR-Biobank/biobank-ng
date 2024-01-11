@@ -55,8 +55,8 @@ public class Container extends DomainEntity implements HasComments, HasStatus {
 
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_COMMENT",
-        joinColumns = { @JoinColumn(name = "CONTAINER_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
+        joinColumns = { @JoinColumn(name = "CONTAINER_ID", nullable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false) })
     private Set<Comment> comments = new HashSet<Comment>(0);
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "parentContainer")

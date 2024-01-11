@@ -45,8 +45,8 @@ public class CollectionEvent extends DomainEntity implements HasStatus, HasComme
 
     @ManyToMany(cascade = jakarta.persistence.CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "COLLECTION_EVENT_COMMENT", joinColumns = {
-            @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false, updatable = false) }, inverseJoinColumns = {
-                    @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
+            @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false) }, inverseJoinColumns = {
+                    @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false) })
     private Set<Comment> comments = new HashSet<Comment>(0);
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "originalCollectionEvent")

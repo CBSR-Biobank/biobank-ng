@@ -165,9 +165,9 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
                 throw new IllegalArgumentException("position is invalid: " + rcp);
             }
 
-            return String.format("%02d", rcp.getRow() + totalRows * rcp.getCol() + 1);
+            return "%02d".formatted(rcp.getRow() + totalRows * rcp.getCol() + 1);
         }
-        return String.format("%02d", rcp.getCol() + totalCols * rcp.getRow() + 1);
+        return "%02d".formatted(rcp.getCol() + totalCols * rcp.getRow() + 1);
     }
 
     /**

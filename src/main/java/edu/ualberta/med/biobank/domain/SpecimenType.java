@@ -36,8 +36,8 @@ public class SpecimenType extends DomainEntity
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "SPECIMEN_TYPE_SPECIMEN_TYPE",
-        joinColumns = { @JoinColumn(name = "PARENT_SPECIMEN_TYPE_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "CHILD_SPECIMEN_TYPE_ID", nullable = false, updatable = false) })
+        joinColumns = { @JoinColumn(name = "PARENT_SPECIMEN_TYPE_ID", nullable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "CHILD_SPECIMEN_TYPE_ID", nullable = false) })
     private Set<SpecimenType> childSpecimenTypes = new HashSet<SpecimenType>(0);
 
     @Override

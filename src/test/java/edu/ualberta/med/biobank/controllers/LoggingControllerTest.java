@@ -30,20 +30,20 @@ class LoggingControllerTest extends ControllerTest {
     private Factory factory;
 
     @BeforeEach
-    public void setup() throws Exception {
+    void setup() throws Exception {
         this.factory = new Factory(em);
     }
 
     @Test
     @WithMockUser
-    public void getWhenEmptyTableIsOkAndEmpty() throws Exception {
+    void getWhenEmptyTableIsOkAndEmpty() throws Exception {
         this.mvc.perform(get(ENDPOINT_INDEX_URL))
             .andExpect(status().isOk())
             .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
-    public void getWhenPresentAndUnauthorized() throws Exception {
+    void getWhenPresentAndUnauthorized() throws Exception {
         this.mvc.perform(get(ENDPOINT_INDEX_URL))
             .andExpect(status().isUnauthorized())
             .andDo(MockMvcResultHandlers.print());

@@ -30,7 +30,7 @@ public class Group extends Principal
     private String description;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "GROUP_USER", joinColumns = @JoinColumn(name = "GROUP_ID", nullable = false, updatable = false), inverseJoinColumns = @JoinColumn(name = "USER_ID", nullable = false, updatable = false))
+    @JoinTable(name = "GROUP_USER", joinColumns = @JoinColumn(name = "GROUP_ID", nullable = false), inverseJoinColumns = @JoinColumn(name = "USER_ID", nullable = false))
     private Set<User> users = new HashSet<User>(0);
 
     @Override

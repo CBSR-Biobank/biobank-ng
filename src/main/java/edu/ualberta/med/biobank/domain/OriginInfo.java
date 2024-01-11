@@ -36,8 +36,8 @@ public class OriginInfo extends DomainEntity implements HasComments {
 
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "ORIGIN_INFO_COMMENT",
-        joinColumns = { @JoinColumn(name = "ORIGIN_INFO_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
+        joinColumns = { @JoinColumn(name = "ORIGIN_INFO_ID", nullable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false) })
     private Set<Comment> comments = new HashSet<Comment>(0);
 
     @Override

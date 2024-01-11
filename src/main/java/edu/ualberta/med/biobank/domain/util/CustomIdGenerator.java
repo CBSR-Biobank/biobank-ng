@@ -33,10 +33,10 @@ public class CustomIdGenerator implements IdentifierGenerator {
 
     @Override
     public Serializable generate(SharedSessionContractImplementor session, Object obj) throws HibernateException {
-        String query = String.format(
-            "select coalesce(max(%s) + 1) from %s",
-            session.getEntityPersister(obj.getClass().getName(), obj).getIdentifierPropertyName(),
-            obj.getClass().getSimpleName()
+        String query = 
+                "select coalesce(max(%s) + 1) from %s".formatted(
+                session.getEntityPersister(obj.getClass().getName(), obj).getIdentifierPropertyName(),
+                obj.getClass().getSimpleName()
         );
 
         logger.info(">>>>>>>>>>>>> generate: {}", query);

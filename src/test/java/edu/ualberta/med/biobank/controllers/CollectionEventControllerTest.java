@@ -5,17 +5,9 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import edu.ualberta.med.biobank.test.BaseTest;
-import edu.ualberta.med.biobank.test.Factory;
-import edu.ualberta.med.biobank.test.TestFixtures;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.TestInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +18,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import edu.ualberta.med.biobank.test.BaseTest;
+import edu.ualberta.med.biobank.test.Factory;
+import edu.ualberta.med.biobank.test.TestFixtures;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 
 @Testcontainers
 @Transactional
@@ -33,6 +31,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @AutoConfigureMockMvc
 class CollectionEventControllerTest extends BaseTest {
 
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(CollectionEventControllerTest.class);
 
     private final String ENDPOINT_URL = "/patients/{pnumber}/collection-events/{vnumber}";
@@ -43,22 +42,23 @@ class CollectionEventControllerTest extends BaseTest {
     @Autowired
     private MockMvc mvc;
 
-    @Rule
-    public TestName testname = new TestName();
+    
+    public String testname;
+
 
     private String name;
-
     private Factory factory;
 
     @BeforeEach
-    public void setup() throws Exception {
+    public void setup(TestInfo testInfo) {
+        super.setup(testInfo);
         name = getMethodNameR();
         this.factory = new Factory(em);
     }
 
     @Test
     @WithMockUser
-    public void getWhenEmptyTableIs404() throws Exception {
+    void getWhenEmptyTableIs404() throws Exception {
         var patient = factory.createPatient();
 
         this.mvc.perform(get(endpointUrl(patient.getPnumber(), 9999)))
@@ -67,7 +67,7 @@ class CollectionEventControllerTest extends BaseTest {
     }
 
     @Test
-    public void getWhenPresentAndUnauthorized() throws Exception {
+    void getWhenPresentAndUnauthorized() throws Exception {
         var patient = TestFixtures.patientFixture(factory);
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
 
@@ -78,7 +78,7 @@ class CollectionEventControllerTest extends BaseTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    public void getWhenPresentIsOk() throws Exception {
+    void getWhenPresentIsOk() throws Exception {
         var patient = TestFixtures.patientFixture(factory);
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
 
@@ -98,7 +98,7 @@ class CollectionEventControllerTest extends BaseTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    public void getWhenNotExistIsNotFound() throws Exception {
+    void getWhenNotExistIsNotFound() throws Exception {
         var patient = TestFixtures.patientFixture(factory);
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var badVisitNumber = collectionEvent.getVisitNumber() + 9999;

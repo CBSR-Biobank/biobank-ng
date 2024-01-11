@@ -59,7 +59,7 @@ public class ProcessingEvent extends DomainEntity implements HasCreatedAt, HasSt
     private Status activityStatus = Status.ACTIVE;
 
     @ManyToMany(cascade = jakarta.persistence.CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JoinTable(name = "PROCESSING_EVENT_COMMENT", joinColumns = @JoinColumn(name = "PROCESSING_EVENT_ID", nullable = false, updatable = false), inverseJoinColumns = @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false))
+    @JoinTable(name = "PROCESSING_EVENT_COMMENT", joinColumns = @JoinColumn(name = "PROCESSING_EVENT_ID", nullable = false), inverseJoinColumns = @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false))
     private Set<Comment> comments = new HashSet<Comment>(0);
 
     public String getWorksheet() {

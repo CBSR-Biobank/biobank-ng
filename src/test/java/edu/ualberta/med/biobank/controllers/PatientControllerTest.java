@@ -6,17 +6,13 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-
 import com.jayway.jsonpath.JsonPath;
-
 import org.exparity.hamcrest.date.InstantMatchers;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.TestInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +23,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
 import edu.ualberta.med.biobank.test.BaseTest;
 import edu.ualberta.med.biobank.test.Factory;
 import edu.ualberta.med.biobank.test.TestFixtures;
@@ -52,29 +47,27 @@ class PatientControllerTest extends BaseTest {
     @Autowired
     private MockMvc mvc;
 
-    @Rule
-    public TestName testname = new TestName();
-
     private String name;
 
     private Factory factory;
 
     @BeforeEach
-    public void setup() throws Exception {
+    public void setup(TestInfo testInfo) {
+        super.setup(testInfo);
         name = getMethodNameR();
         this.factory = new Factory(em);
     }
 
     @Test
     @WithMockUser
-    public void getWhenEmptyTableIs404() throws Exception {
+    void getWhenEmptyTableIs404() throws Exception {
         this.mvc.perform(get(endpointUrl(factory.getFaker().lorem().word())))
             .andExpect(status().isNotFound())
             .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
-    public void getWhenPresentAndUnauthorized() throws Exception {
+    void getWhenPresentAndUnauthorized() throws Exception {
         var patient = factory.createPatient();
 
         this.mvc.perform(get(endpointUrl(patient.getPnumber())))
@@ -84,7 +77,7 @@ class PatientControllerTest extends BaseTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    public void getWhenPresentIsOk() throws Exception {
+    void getWhenPresentIsOk() throws Exception {
         var patient = TestFixtures.patientFixture(factory);
 
         MvcResult result =
@@ -108,7 +101,7 @@ class PatientControllerTest extends BaseTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    public void getWhenNotExistIsNotFound() throws Exception {
+    void getWhenNotExistIsNotFound() throws Exception {
         var badname = (new Faker()).lorem().fixedString(10);
 
         this.mvc.perform(get(endpointUrl(badname)))

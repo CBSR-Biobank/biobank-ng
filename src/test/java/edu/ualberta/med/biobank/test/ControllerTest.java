@@ -1,17 +1,11 @@
 package edu.ualberta.med.biobank.test;
 
 import java.util.Date;
-import java.util.List;
-
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
 import edu.ualberta.med.biobank.domain.CSMUser;
 import edu.ualberta.med.biobank.domain.Membership;
 import edu.ualberta.med.biobank.domain.Status;
@@ -34,7 +28,8 @@ public class ControllerTest extends BaseTest {
     protected Factory factory;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setup(TestInfo testInfo) {
+        super.setup(testInfo);
         this.factory = new Factory(em);
     }
 

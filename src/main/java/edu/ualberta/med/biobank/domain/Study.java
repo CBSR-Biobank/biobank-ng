@@ -53,8 +53,8 @@ public class Study extends DomainEntity implements HasName, HasNameShort, HasSta
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "STUDY_CONTACT", joinColumns = {
-            @JoinColumn(name = "STUDY_ID", nullable = false, updatable = false) }, inverseJoinColumns = {
-                    @JoinColumn(name = "CONTACT_ID", nullable = false, updatable = false) })
+            @JoinColumn(name = "STUDY_ID", nullable = false) }, inverseJoinColumns = {
+                    @JoinColumn(name = "CONTACT_ID", nullable = false) })
     private Set<Contact> contacts = new HashSet<Contact>(0);
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "study")
@@ -62,8 +62,8 @@ public class Study extends DomainEntity implements HasName, HasNameShort, HasSta
 
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "STUDY_COMMENT", joinColumns = {
-            @JoinColumn(name = "STUDY_ID", nullable = false, updatable = false) }, inverseJoinColumns = {
-                    @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
+            @JoinColumn(name = "STUDY_ID", nullable = false) }, inverseJoinColumns = {
+                    @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false) })
     private Set<Comment> comments = new HashSet<Comment>(0);
 
     @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "study")

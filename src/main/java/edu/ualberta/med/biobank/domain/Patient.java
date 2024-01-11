@@ -50,8 +50,8 @@ public class Patient extends DomainEntity implements HasCreatedAt, HasComments {
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "PATIENT_COMMENT",
-        joinColumns = { @JoinColumn(name = "PATIENT_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
+        joinColumns = { @JoinColumn(name = "PATIENT_ID", nullable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false) })
     private Set<Comment> comments = new HashSet<Comment>(0);
 
     public String getPnumber() {

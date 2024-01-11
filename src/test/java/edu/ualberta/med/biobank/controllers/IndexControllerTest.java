@@ -26,13 +26,13 @@ class IndexControllerTest {
     }
 
     @Test
-    public void rootWithBasicStatusIsUnauthorized() throws Exception {
+    void rootWithBasicStatusIsUnauthorized() throws Exception {
         this.mvc.perform(get("/").with(httpBasic("testuser", "test"))).andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser
-    public void rootWithMockUserStatusIsOK() throws Exception {
+    void rootWithMockUserStatusIsOK() throws Exception {
         this.mvc.perform(get("/")).andExpect(status().isOk());
     }
 }

@@ -59,15 +59,15 @@ public class ContainerType extends DomainEntity implements HasName, HasNameShort
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_SPECIMEN_TYPE", joinColumns = {
-            @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) }, inverseJoinColumns = {
-                    @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false, updatable = false) })
+            @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false) }, inverseJoinColumns = {
+                    @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false) })
     private Set<SpecimenType> specimenTypes = new HashSet<SpecimenType>(0);
 
     @SQLInsert(sql = "INSERT INTO `CONTAINER_TYPE_CONTAINER_TYPE` (PARENT_CONTAINER_TYPE_ID, CHILD_CONTAINER_TYPE_ID, SITE_ID) SELECT ?, ID, SITE_ID FROM `CONTAINER_TYPE` WHERE ID = ?")
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_CONTAINER_TYPE", joinColumns = {
-            @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) }, inverseJoinColumns = {
-                    @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", nullable = false, updatable = false) })
+            @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false) }, inverseJoinColumns = {
+                    @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", nullable = false) })
     private Set<ContainerType> childContainerTypes = new HashSet<ContainerType>(0);
 
     @NotNull(message = "{edu.ualberta.med.biobank.domain.ContainerType.activityStatus.NotNull}")
@@ -77,8 +77,8 @@ public class ContainerType extends DomainEntity implements HasName, HasNameShort
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_COMMENT", joinColumns = {
-            @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) }, inverseJoinColumns = {
-                    @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
+            @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false) }, inverseJoinColumns = {
+                    @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false) })
     private Set<Comment> comments = new HashSet<Comment>(0);
 
     @Valid
