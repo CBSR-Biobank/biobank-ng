@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import edu.ualberta.med.biobank.applicationevents.BiobankEventPublisher;
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.dtos.CollectionEventDTO;
 import edu.ualberta.med.biobank.dtos.CommentDTO;
@@ -14,10 +15,13 @@ import edu.ualberta.med.biobank.dtos.EventAttributeDTO;
 import edu.ualberta.med.biobank.dtos.SourceSpecimenDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
+import edu.ualberta.med.biobank.errors.PermissionError;
 import edu.ualberta.med.biobank.permission.patient.CollectionEventReadPermission;
 import edu.ualberta.med.biobank.repositories.CollectionEventRepository;
 import io.jbock.util.Either;
 import jakarta.persistence.Tuple;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 public class CollectionEventService {
@@ -27,6 +31,16 @@ public class CollectionEventService {
 
     @Autowired
     CollectionEventRepository collectionEventRepository;
+
+    private BiobankEventPublisher eventPublisher;
+
+    public CollectionEventService(
+        CollectionEventRepository collectionEventRepository,
+        BiobankEventPublisher eventPublisher
+    ) {
+        this.collectionEventRepository = collectionEventRepository;
+        this.eventPublisher = eventPublisher;
+    }
 
     public Either<AppError, CollectionEvent> getByCollectionEventId(Integer id) {
         return collectionEventRepository
@@ -78,6 +92,18 @@ public class CollectionEventService {
                 new ArrayList<>(comments.values()),
                 new ArrayList<>(sourceSpecimens.values()));
         var permission = new CollectionEventReadPermission(cevent.studyId());
-        return permission.isAllowed().map(allowed -> cevent);
+        var allowedMaybe = permission.isAllowed();
+        return allowedMaybe
+            .flatMap(allowed -> {
+                if (!allowed) {
+                    return Either.left(new PermissionError("study"));
+                }
+                return Either.right(cevent);
+            })
+            .map(ce -> {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                eventPublisher.publishVisitRead(auth.getName(), cevent.patientNumber(), cevent.visitNumber());
+                return ce;
+            });
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.applicationevents.PatientReadEvent;
 import edu.ualberta.med.biobank.applicationevents.UserLoggedInEvent;
+import edu.ualberta.med.biobank.applicationevents.VisitReadEvent;
 import edu.ualberta.med.biobank.domain.Log;
 import edu.ualberta.med.biobank.dtos.LoggingDTO;
 import edu.ualberta.med.biobank.repositories.LoggingRepository;
@@ -60,6 +61,18 @@ public class LoggingService {
             .username(event.getUsername())
             .patientNumber(event.getPnumber())
             .type("Patient")
+            .build();
+        loggingRepository.save(logEvent);
+    }
+
+    @EventListener
+    void handleVisitReadEvent(VisitReadEvent event) {
+        Log logEvent = new Log.LogBuilder()
+            .action("select")
+            .username(event.getUsername())
+            .patientNumber(event.getPnumber())
+            .type("CollectionEvent")
+            .details("visit: %s".formatted(event.getVnumber()))
             .build();
         loggingRepository.save(logEvent);
     }
