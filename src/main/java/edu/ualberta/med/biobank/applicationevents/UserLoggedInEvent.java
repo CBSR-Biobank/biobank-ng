@@ -1,8 +1,10 @@
-package edu.ualberta.med.biobank.applicationEvents;
+package edu.ualberta.med.biobank.applicationevents;
 
 import org.springframework.context.ApplicationEvent;
 
 public class UserLoggedInEvent extends ApplicationEvent {
+
+    private static final long serialVersionUID = 1L;
 
     private String username;
 

@@ -74,19 +74,6 @@ public class Membership extends DomainEntity {
     public Membership() {
     }
 
-    public Membership(Membership m, Principal p) {
-        setPrincipal(p);
-        p.getMemberships().add(this);
-
-        setDomain(new Domain(m.getDomain()));
-
-        setUserManager(m.isUserManager());
-        setEveryPermission(m.isEveryPermission());
-
-        getPermissions().addAll(m.getPermissions());
-        getRoles().addAll(m.getRoles());
-    }
-
     public Domain getDomain() {
         return domain;
     }

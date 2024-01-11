@@ -9,25 +9,25 @@ public class PermissionException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     private final PermissionEnum permission;
-    private final Center center;
-    private final Study study;
+    private final String centerName;
+    private final String studyName;
 
     public PermissionException(PermissionEnum permission, Center center,
         Study study) {
         this.permission = permission;
-        this.center = center;
-        this.study = study;
+        this.centerName = center.getNameShort();
+        this.studyName = study.getNameShort();
     }
 
     public PermissionEnum getPermission() {
         return permission;
     }
 
-    public Center getCenter() {
-        return center;
+    public String getCenter() {
+        return centerName;
     }
 
-    public Study getStudy() {
-        return study;
+    public String getStudy() {
+        return studyName;
     }
 }

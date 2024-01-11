@@ -36,14 +36,6 @@ public class Domain extends DomainEntity {
     public Domain() {
     }
 
-    public Domain(Domain domain) {
-        getCenters().addAll(domain.getCenters());
-        getStudies().addAll(domain.getStudies());
-
-        setAllCenters(domain.isAllCenters());
-        setAllStudies(domain.isAllStudies());
-    }
-
     public Set<Center> getCenters() {
         return centers;
     }
@@ -66,8 +58,9 @@ public class Domain extends DomainEntity {
 
     public void setAllCenters(boolean allCenters) {
         this.allCenters = allCenters;
-        if (allCenters)
+        if (allCenters) {
             getCenters().clear();
+        }
     }
 
     public boolean isAllStudies() {
@@ -76,8 +69,9 @@ public class Domain extends DomainEntity {
 
     public void setAllStudies(boolean allStudies) {
         this.allStudies = allStudies;
-        if (allStudies)
+        if (allStudies) {
             getStudies().clear();
+        }
     }
 
     @Transient
@@ -97,24 +91,23 @@ public class Domain extends DomainEntity {
         return isAllCenters() || getCenters().contains(center);
     }
 
+    @Transient
+    public boolean contains(Study study) {
+        return isAllStudies() || getStudies().contains(study);
+    }
+
     /**
      * Done on a {@link Domain} instead of a set of {@link Center}-s because if
      * the given {@link Domain} returns true for {@link #isAllCenters()} but has
      * an empty set from {@link #getCenters()}, then that is very misleading.
      *
-     * @param domain
-     * @return
+     * @param that The other domain to compare against.
      */
     @Transient
     public boolean containsAllCenters(Domain that) {
         return isAllCenters()
                 || (!that.isAllCenters() && getCenters()
                         .containsAll(that.getCenters()));
-    }
-
-    @Transient
-    public boolean contains(Study study) {
-        return isAllStudies() || getStudies().contains(study);
     }
 
     @Transient

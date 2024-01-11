@@ -22,6 +22,7 @@ import jakarta.persistence.Tuple;
 @Service
 public class CollectionEventService {
 
+    @SuppressWarnings("unused")
     final Logger logger = LoggerFactory.getLogger(CollectionEventService.class);
 
     @Autowired

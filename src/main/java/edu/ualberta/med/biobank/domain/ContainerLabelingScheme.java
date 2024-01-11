@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.domain;
 
-import java.text.MessageFormat;
-
 import edu.ualberta.med.biobank.domain.type.LabelingLayout;
 import edu.ualberta.med.biobank.domain.util.RowColPos;
 import edu.ualberta.med.biobank.domain.util.SbsLabeling;
@@ -9,6 +7,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import java.text.MessageFormat;
 
 // TODO: should be an enum? Maybe make types that require java code, but put parameters and names
 // into the database?
@@ -116,15 +115,17 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
     }
 
     /**
-     * Convert a position in row*column to two letter (in the CBSR way)
+     * Convert a position in row*column to two letter (in the CBSR way).
      *
      * @throws Exception
-     *
-     * @throws BiobankCheckException
      */
-    public static String rowColToCbsrTwoChar(RowColPos rcp, int totalRows, int totalCols,
-        LabelingLayout labelingLayout) {
-        int pos1, pos2, index;
+    public static String rowColToCbsrTwoChar(
+        RowColPos rcp,
+        int totalRows,
+        int totalCols,
+        LabelingLayout labelingLayout
+    ) {
+        int index;
         int lettersLength = CBSR_2_CHAR_LABELLING_PATTERN.length();
         if (totalRows == 1) {
             index = rcp.getCol();
@@ -140,12 +141,14 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
             throw new IllegalArgumentException("position is invalid: " + rcp);
         }
 
-        pos1 = index / lettersLength;
-        pos2 = index % lettersLength;
+        var pos1 = index / lettersLength;
+        var pos2 = index % lettersLength;
 
         if (pos1 >= 0 && pos2 >= 0) {
-            return String.valueOf(CBSR_2_CHAR_LABELLING_PATTERN.charAt(pos1))
-                + String.valueOf(CBSR_2_CHAR_LABELLING_PATTERN.charAt(pos2));
+            return (
+                String.valueOf(CBSR_2_CHAR_LABELLING_PATTERN.charAt(pos1)) +
+                String.valueOf(CBSR_2_CHAR_LABELLING_PATTERN.charAt(pos2))
+            );
         }
         return null;
     }
@@ -153,8 +156,12 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
     /**
      * Convert a position in row*column to two char numeric.
      */
-    public static String rowColToTwoCharNumeric(RowColPos rcp, int totalRows, int totalCols,
-        LabelingLayout labelingLayout) {
+    public static String rowColToTwoCharNumeric(
+        RowColPos rcp,
+        int totalRows,
+        int totalCols,
+        LabelingLayout labelingLayout
+    ) {
         if (labelingLayout.equals(LabelingLayout.VERTICAL)) {
             int index = rcp.getCol() * totalRows + totalRows + 1;
 
@@ -217,16 +224,14 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
     }
 
     /**
-     * Convert a position in row*column to two letter (in the CBSR way)
+     * Convert a position in row*column to two letter (in the CBSR way).
      *
      * @throws Exception
-     *
-     * @throws BiobankCheckException
      */
-    public static String rowColToTwoChar(RowColPos rcp, int totalRows, int totalCols,
-        LabelingLayout labelingLayout) {
-        int pos1, pos2, index;
+    public static String rowColToTwoChar(RowColPos rcp, int totalRows, int totalCols, LabelingLayout labelingLayout) {
         int lettersLength = TWO_CHAR_LABELLING_PATTERN.length();
+
+        int index;
         if (totalRows == 1) {
             index = rcp.getCol();
         } else if (totalCols == 1) {
@@ -241,12 +246,14 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
             throw new IllegalArgumentException("position is invalid: " + rcp);
         }
 
-        pos1 = index / lettersLength;
-        pos2 = index % lettersLength;
+        var pos1 = index / lettersLength;
+        var pos2 = index % lettersLength;
 
         if (pos1 >= 0 && pos2 >= 0) {
-            return String.valueOf(TWO_CHAR_LABELLING_PATTERN.charAt(pos1))
-                + String.valueOf(TWO_CHAR_LABELLING_PATTERN.charAt(pos2));
+            return (
+                String.valueOf(TWO_CHAR_LABELLING_PATTERN.charAt(pos1)) +
+                String.valueOf(TWO_CHAR_LABELLING_PATTERN.charAt(pos2))
+            );
         }
         return null;
     }
@@ -256,66 +263,82 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
      *
      * @param labelingLayout
      */
-    public static String getPositionString(RowColPos rcp, Integer childLabelingSchemeId,
-        Integer rowCapacity, Integer colCapacity, LabelingLayout labelingLayout) {
+    public static String getPositionString(
+        RowColPos rcp,
+        Integer childLabelingSchemeId,
+        Integer rowCapacity,
+        Integer colCapacity,
+        LabelingLayout labelingLayout
+    ) {
         switch (childLabelingSchemeId) {
-        case 1:
-            // SBS standard
-            return SbsLabeling.fromRowCol(rcp);
-        case 2:
-            // CBSR 2 char alphabetic
-            return rowColToCbsrTwoChar(rcp, rowCapacity, colCapacity, labelingLayout);
-        case 3:
-            // 2 char numeric
-            return rowColToTwoCharNumeric(rcp, rowCapacity, colCapacity, labelingLayout);
-        case 4:
-            // dewar
-            return rowColToDewar(rcp, colCapacity);
-        case 5:
-            // CBSR SBS
-            return rowColtoCbsrSbs(rcp);
-        case 6:
-            // 2 char alphabetic
-            return rowColToTwoChar(rcp, rowCapacity, colCapacity, labelingLayout);
-        case 7:
-            //
-            return rowColToBox85by2(rcp);
+            case 1:
+                // SBS standard
+                return SbsLabeling.fromRowCol(rcp);
+            case 2:
+                // CBSR 2 char alphabetic
+                return rowColToCbsrTwoChar(rcp, rowCapacity, colCapacity, labelingLayout);
+            case 3:
+                // 2 char numeric
+                return rowColToTwoCharNumeric(rcp, rowCapacity, colCapacity, labelingLayout);
+            case 4:
+                // dewar
+                return rowColToDewar(rcp, colCapacity);
+            case 5:
+                // CBSR SBS
+                return rowColtoCbsrSbs(rcp);
+            case 6:
+                // 2 char alphabetic
+                return rowColToTwoChar(rcp, rowCapacity, colCapacity, labelingLayout);
+            case 7:
+                //
+                return rowColToBox85by2(rcp);
+            default:
+                return null;
         }
-        return null;
     }
 
     /**
      * get the RowColPos in the given container corresponding to the given label AB and will return
      * 1:0.
      */
-    public RowColPos cbsrTwoCharToRowCol(String label, int rowCap, int colCap,
-        String containerTypeName, LabelingLayout labelingLayout)
-        throws IllegalArgumentException {
+    public RowColPos cbsrTwoCharToRowCol(
+        String label,
+        int rowCap,
+        int colCap,
+        String containerTypeName,
+        LabelingLayout labelingLayout
+    ) throws IllegalArgumentException {
         int len = label.length();
         if ((len != getMinChars()) && (len != getMaxChars())) {
             throw new IllegalArgumentException(
-                MessageFormat.format("Label should be {0} characters: {1}.",
-                    getMinChars(), label));
+                MessageFormat.format("Label should be {0} characters: {1}.", getMinChars(), label)
+            );
         }
 
         int index1 = CBSR_2_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 2));
         int index2 = CBSR_2_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 1));
         if ((index1 < 0) || (index2 < 0)) {
-            throw new IllegalArgumentException(
-                "Invalid characters in label. Are they in upper case?");
+            throw new IllegalArgumentException("Invalid characters in label. Are they in upper case?");
         }
         int pos = index1 * CBSR_2_CHAR_LABELLING_PATTERN.length() + index2;
 
         if (pos >= rowCap * colCap) {
             String maxValue = rowColToCbsrTwoChar(
-                new RowColPos(rowCap - 1, colCap - 1), rowCap, colCap, labelingLayout);
+                new RowColPos(rowCap - 1, colCap - 1),
+                rowCap,
+                colCap,
+                labelingLayout
+            );
             String msgStart = MessageFormat.format("Label {0} does not exist in this scheme", label);
             if (containerTypeName != null) {
-                msgStart = MessageFormat.format("Label {0} does not exist in {1}",
-                    label, containerTypeName);
+                msgStart = MessageFormat.format("Label {0} does not exist in {1}", label, containerTypeName);
             }
-            String msgMax = MessageFormat.format("Max value is {0}. (Max row: {1}. Max col: {2}.)",
-                maxValue, rowCap, colCap);
+            String msgMax = MessageFormat.format(
+                "Max value is {0}. (Max row: {1}. Max col: {2}.)",
+                maxValue,
+                rowCap,
+                colCap
+            );
             throw new IllegalArgumentException(msgStart + " " + msgMax);
         }
 
@@ -334,11 +357,9 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
      * Get the RowColPos in the given container corresponding to the given label using the 2 char
      * numeric labelling.
      */
-    public RowColPos twoCharNumericToRowCol(String label, int totalRows, int totalCols,
-        LabelingLayout labelingLayout)
+    public RowColPos twoCharNumericToRowCol(String label, int totalRows, int totalCols, LabelingLayout labelingLayout)
         throws IllegalArgumentException {
-        String errorMsg = MessageFormat.format("Label {0} is incorrect: it should be 2 characters",
-            label);
+        String errorMsg = MessageFormat.format("Label {0} is incorrect: it should be 2 characters", label);
         int len = label.length();
 
         if ((len != getMinChars()) && (len != getMaxChars())) {
@@ -369,22 +390,17 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
      *
      * @throws Exception
      */
-    public RowColPos dewarToRowCol(String label, int totalCol)
-        throws IllegalArgumentException {
+    public RowColPos dewarToRowCol(String label, int totalCol) throws IllegalArgumentException {
         int len = label.length();
         if ((len != getMinChars()) && (len != getMaxChars())) {
-            throw new IllegalArgumentException(
-                MessageFormat.format("Label should be {0} characters.",
-                    getMinChars()));
+            throw new IllegalArgumentException(MessageFormat.format("Label should be {0} characters.", getMinChars()));
         }
 
         if (label.charAt(0) != label.charAt(1)) {
-            throw new IllegalArgumentException(
-                "Label should be double letter (BB).");
+            throw new IllegalArgumentException("Label should be double letter (BB).");
         }
         // letters are double (BB). need only one
-        int letterPosition =
-            DEWAR_ROW_LABELLING_PATTERN.indexOf(label.charAt(0));
+        int letterPosition = DEWAR_ROW_LABELLING_PATTERN.indexOf(label.charAt(0));
         Integer row = letterPosition / totalCol;
         Integer col = letterPosition % totalCol;
         return new RowColPos(row, col);
@@ -427,36 +443,37 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
         int rowCap,
         int colCap,
         String containerTypeName,
-        LabelingLayout labelingLayout) {
-
+        LabelingLayout labelingLayout
+    ) {
         int len = label.length();
         if ((len != getMinChars()) && (len != getMaxChars())) {
-            throw new IllegalArgumentException(MessageFormat.format("Label should be {0} characters.",
-                getMinChars()));
+            throw new IllegalArgumentException(MessageFormat.format("Label should be {0} characters.", getMinChars()));
         }
 
         int index1 = TWO_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 2));
         int index2 = TWO_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 1));
         if ((index1 < 0) || (index2 < 0)) {
-            throw new IllegalArgumentException(
-                "Invalid characters in label. Are they in upper case?");
+            throw new IllegalArgumentException("Invalid characters in label. Are they in upper case?");
         }
         int pos = index1 * TWO_CHAR_LABELLING_PATTERN.length() + index2;
 
         if (pos >= rowCap * colCap) {
             String maxValue = rowColToCbsrTwoChar(
-                new RowColPos(rowCap - 1, colCap - 1), rowCap, colCap, labelingLayout);
-            String msgStart =
-                MessageFormat
-                    .format("Label {0} does not exist in this scheme.", label);
-            if (containerTypeName != null)
-                msgStart =
-                    MessageFormat.format(
-                        "Label {0} does not exist in {1}", label,
-                        containerTypeName);
+                new RowColPos(rowCap - 1, colCap - 1),
+                rowCap,
+                colCap,
+                labelingLayout
+            );
+            String msgStart = MessageFormat.format("Label {0} does not exist in this scheme.", label);
+            if (containerTypeName != null) {
+                msgStart = MessageFormat.format("Label {0} does not exist in {1}", label, containerTypeName);
+            }
             String msgMax = MessageFormat.format(
-                "Max value is {0}. (Max row: {1}. Max col: {2}.)", maxValue,
-                rowCap, colCap);
+                "Max value is {0}. (Max row: {1}. Max col: {2}.)",
+                maxValue,
+                rowCap,
+                colCap
+            );
             throw new IllegalArgumentException(msgStart + " " + msgMax); //$NON-NLS-1$
         }
 
@@ -474,41 +491,44 @@ public class ContainerLabelingScheme extends DomainEntity implements HasName {
     /**
      * Get the RowColPos position corresponding to the string position given the container capacity
      */
-    public RowColPos getRowColFromPositionString(String position, Integer rowCapacity,
-        Integer colCapacity, LabelingLayout labelingLayout) throws Exception {
+    public RowColPos getRowColFromPositionString(
+        String position,
+        Integer rowCapacity,
+        Integer colCapacity,
+        LabelingLayout labelingLayout
+    ) throws Exception {
         switch (getId()) {
-        case 1:
-            // SBS standard
-            return SbsLabeling.toRowCol(position);
-        case 2:
-            // CBSR 2 char alphabetic
-            return cbsrTwoCharToRowCol(position, rowCapacity, colCapacity, null, labelingLayout);
-        case 3:
-            // 2 char numeric
-            return twoCharNumericToRowCol(position, rowCapacity, colCapacity, labelingLayout);
-        case 4:
-            // Dewar
-            return dewarToRowCol(position, colCapacity);
-        case 5:
-            // CBSR SBS
-            return cbsrSbsToRowCol(position);
-        case 6:
-            // 2 char alphabetic
-            return twoCharToRowCol(position, rowCapacity, colCapacity, null, labelingLayout);
-
-        case 7:
-            // Box 85 by 2
-            return box85by2ToRowCol(position);
+            case 1:
+                // SBS standard
+                return SbsLabeling.toRowCol(position);
+            case 2:
+                // CBSR 2 char alphabetic
+                return cbsrTwoCharToRowCol(position, rowCapacity, colCapacity, null, labelingLayout);
+            case 3:
+                // 2 char numeric
+                return twoCharNumericToRowCol(position, rowCapacity, colCapacity, labelingLayout);
+            case 4:
+                // Dewar
+                return dewarToRowCol(position, colCapacity);
+            case 5:
+                // CBSR SBS
+                return cbsrSbsToRowCol(position);
+            case 6:
+                // 2 char alphabetic
+                return twoCharToRowCol(position, rowCapacity, colCapacity, null, labelingLayout);
+            case 7:
+                // Box 85 by 2
+                return box85by2ToRowCol(position);
+            default:
+                return null;
         }
-        return null;
     }
 
     @Transient
     public boolean canLabel(Capacity capacity) {
         boolean canLabel = true;
 
-        if (capacity.getRowCapacity() == null
-            || capacity.getColCapacity() == null) {
+        if (capacity.getRowCapacity() == null || capacity.getColCapacity() == null) {
             return false;
         }
 

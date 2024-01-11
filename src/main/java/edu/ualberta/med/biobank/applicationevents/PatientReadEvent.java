@@ -1,8 +1,10 @@
-package edu.ualberta.med.biobank.applicationEvents;
+package edu.ualberta.med.biobank.applicationevents;
 
 import org.springframework.context.ApplicationEvent;
 
 public class PatientReadEvent extends ApplicationEvent {
+
+    private static final long serialVersionUID = 1L;
 
     private final String username;
     private final String pnumber;

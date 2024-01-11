@@ -22,6 +22,8 @@ import javax.crypto.spec.DESedeKeySpec;
  */
 public class StringEncrypter {
 
+    private static final long serialVersionUID = 1L;
+
     public static final String DESEDE_ENCRYPTION_SCHEME = "DESede";
     public static final String DES_ENCRYPTION_SCHEME = "DES";
     private static KeySpec keySpec;
@@ -30,6 +32,9 @@ public class StringEncrypter {
     private static final String UNICODE_FORMAT = "UTF-8";
 
     public class EncryptionException extends Exception {
+
+        private static final long serialVersionUID = 1L;
+
         public EncryptionException(Throwable cause) {
             super(cause);
         }

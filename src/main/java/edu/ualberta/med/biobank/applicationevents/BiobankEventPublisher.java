@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.applicationEvents;
+package edu.ualberta.med.biobank.applicationevents;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;

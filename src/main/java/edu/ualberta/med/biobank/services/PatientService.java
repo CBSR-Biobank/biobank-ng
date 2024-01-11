@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import edu.ualberta.med.biobank.applicationEvents.BiobankEventPublisher;
+import edu.ualberta.med.biobank.applicationevents.BiobankEventPublisher;
 import edu.ualberta.med.biobank.domain.Patient;
 import edu.ualberta.med.biobank.dtos.CollectionEventSummaryDTO;
 import edu.ualberta.med.biobank.dtos.PatientDTO;
