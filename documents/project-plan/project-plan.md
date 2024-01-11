@@ -1,15 +1,13 @@
+# Project Plan
+
 ```mermaid
 gantt
-    title       Biobank Web Client - Migration Plan
-    todayMarker off
-    weekday monday
+    title Biobank NG - Migration Plan
     dateFormat  YYYY-MM-DD
-    excludes    weekends
-    %% (`excludes` accepts specific dates in YYYY-MM-DD format, days of the week ("sunday") or "weekends", but not the word "weekdays".)
 
     section Spring Boot
-    Model                      :done,    des1, 2023-11-15,10d
-    REST API                   :done,    des1, 2023-12-01,10d
+    Model                      :done, 2023-11-15, 10d
+    REST API                   :done, 2023-12-01, 10d
 
     section Patient / Specimen View
     View                                           :done, 2024-01-08
