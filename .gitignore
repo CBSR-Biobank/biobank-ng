@@ -41,3 +41,4 @@ build/
 /frontend/.vite/
 /.sqls/
 *.svg
+/database.sql

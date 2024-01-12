@@ -26,9 +26,9 @@ public class SpecimenController {
     }
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    @GetMapping("/specimens/aliquots/{inventoryId}")
+    @GetMapping("/specimens/{inventoryId}/aliquots")
     public Collection<AliquotSpecimenDTO> get(@PathVariable String inventoryId) {
-        return specimenService.findByParentInventoryId(inventoryId).orElseThrow(err -> {
+        return specimenService.aliquotsForInventoryId(inventoryId).orElseThrow(err -> {
                 return new AppErrorException(err);
         });
     }

@@ -6,6 +6,9 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.enhanced.OptimizerFactory;
 import org.hibernate.id.enhanced.TableGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import jakarta.persistence.FlushModeType;
 
 /**
  * Inherits from {@link TableGenerator} with the following changes:
@@ -29,15 +32,21 @@ public class CustomIdGenerator implements IdentifierGenerator {
 
     private static final long serialVersionUID = 1L;
 
+    // private final Logger logger = LoggerFactory.getLogger(CustomIdGenerator.class);
+
     @Override
     public Serializable generate(SharedSessionContractImplementor session, Object obj) throws HibernateException {
-        String query =
+        String sql =
                 "select coalesce(max(%s) + 1) from %s".formatted(
                 session.getEntityPersister(obj.getClass().getName(), obj).getIdentifierPropertyName(),
                 obj.getClass().getSimpleName()
         );
 
-        Integer id = session.createQuery(query, Integer.class).getSingleResultOrNull();
+        // logger.info(">>>>>>>>>>>>> generate: {}", sql);
+
+        var query = session.createQuery(sql, Integer.class);
+        query.setFlushMode(FlushModeType.COMMIT);
+        Integer id = query.getSingleResultOrNull();
         if (id == null) {
             return 1;
         }

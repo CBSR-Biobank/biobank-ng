@@ -1,29 +1,40 @@
 package edu.ualberta.med.biobank.services;
 
+import edu.ualberta.med.biobank.applicationevents.BiobankEventPublisher;
+import edu.ualberta.med.biobank.domain.SourceSpecimen;
+import edu.ualberta.med.biobank.domain.Specimen;
+import edu.ualberta.med.biobank.dtos.AliquotSpecimenDTO;
+import edu.ualberta.med.biobank.dtos.SpecimenDTO;
+import edu.ualberta.med.biobank.errors.AppError;
+import edu.ualberta.med.biobank.errors.EntityNotFound;
+import edu.ualberta.med.biobank.errors.PermissionError;
+import edu.ualberta.med.biobank.permission.patient.SpecimenReadPermission;
+import edu.ualberta.med.biobank.repositories.SpecimenRepository;
+import edu.ualberta.med.biobank.util.LoggingUtils;
+import io.jbock.util.Either;
+import jakarta.persistence.Tuple;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import edu.ualberta.med.biobank.domain.Specimen;
-import edu.ualberta.med.biobank.dtos.AliquotSpecimenDTO;
-import edu.ualberta.med.biobank.errors.AppError;
-import edu.ualberta.med.biobank.errors.EntityNotFound;
-import edu.ualberta.med.biobank.permission.patient.SpecimenReadPermission;
-import edu.ualberta.med.biobank.repositories.SpecimenRepository;
-import io.jbock.util.Either;
-import jakarta.persistence.Tuple;
 
 @Service
 public class SpecimenService {
 
+    @SuppressWarnings("unused")
     final Logger logger = LoggerFactory.getLogger(SpecimenService.class);
 
-    SpecimenRepository specimenRepository;
+    private SpecimenRepository specimenRepository;
 
-    public SpecimenService(SpecimenRepository specimenRepository) {
+    private BiobankEventPublisher eventPublisher;
+
+    public SpecimenService(SpecimenRepository specimenRepository, BiobankEventPublisher eventPublisher) {
         this.specimenRepository = specimenRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     public Either<AppError, Specimen> getBySpecimenId(Integer id) {
@@ -33,18 +44,57 @@ public class SpecimenService {
             .orElseGet(() -> Either.left(new EntityNotFound("specimen")));
     }
 
-    public Either<AppError, Collection<AliquotSpecimenDTO>> findByParentInventoryId(String parentInventoryId) {
-        Map<Integer, AliquotSpecimenDTO> specimens = new HashMap<>();
+    public Either<AppError, SpecimenDTO> findByInventoryId(String inventoryId) {
+        Map<Integer, SpecimenDTO> specimens = new HashMap<>();
 
         specimenRepository
-            .findByParentInventoryId(parentInventoryId, Tuple.class)
+            .findByInventoryId(inventoryId, Tuple.class)
             .stream()
             .forEach(row -> {
                 var specimenId = row.get("specimenId", Integer.class);
-                specimens.computeIfAbsent(specimenId, id -> AliquotSpecimenDTO.fromTuple(row));
+                specimens.computeIfAbsent(specimenId, id -> SpecimenDTO.fromTuple(row));
             });
 
-        var permission = new SpecimenReadPermission(null);
-        return permission.isAllowed().map(allowed -> specimens.values());
+        if (specimens.isEmpty()) {
+            return Either.left(new EntityNotFound("invalid inventory ID"));
+        }
+
+        var specimen = specimens.values().iterator().next();
+        var permission = new SpecimenReadPermission(specimen.studyId());
+        return permission
+            .isAllowed()
+            .flatMap(allowed -> {
+                if (!allowed) {
+                    return Either.left(new PermissionError("study"));
+                }
+                return Either.right(specimen);
+            })
+            .map(aliquots -> {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                eventPublisher.publishSpecimenRead(auth.getName(), specimen.patientNumber(), inventoryId);
+                return specimen;
+            });
+    }
+
+    public Either<AppError, Collection<AliquotSpecimenDTO>> aliquotsForInventoryId(String parentInventoryId) {
+        return findByInventoryId(parentInventoryId)
+            .flatMap(specimen -> {
+                    logger.info("source specimen: {}", LoggingUtils.prettyPrintJson(specimen));
+
+                if (!specimen.isSourceSpecimen()) {
+                    return Either.left(new EntityNotFound("not a source specimen"));
+                }
+
+                Map<Integer, AliquotSpecimenDTO> specimens = new HashMap<>();
+                specimenRepository
+                    .findByParentInventoryId(parentInventoryId, Tuple.class)
+                    .stream()
+                    .forEach(row -> {
+                        var specimenId = row.get("specimenId", Integer.class);
+                        specimens.computeIfAbsent(specimenId, id -> AliquotSpecimenDTO.fromTuple(row));
+                    });
+
+                return Either.right(specimens.values());
+            });
     }
 }

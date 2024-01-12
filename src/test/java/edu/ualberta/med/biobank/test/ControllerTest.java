@@ -3,8 +3,10 @@ package edu.ualberta.med.biobank.test;
 import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import edu.ualberta.med.biobank.domain.CSMUser;
 import edu.ualberta.med.biobank.domain.Membership;
@@ -23,7 +25,10 @@ public class ControllerTest extends BaseTest {
     private static final String GLOBAL_ADMIN_LOGIN = "globaladmin";
 
     @PersistenceContext
-    private EntityManager em;
+    protected EntityManager em;
+
+    @Autowired
+    protected MockMvc mvc;
 
     protected Factory factory;
 

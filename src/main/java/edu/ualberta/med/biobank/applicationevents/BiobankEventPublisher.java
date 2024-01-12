@@ -25,4 +25,9 @@ public class BiobankEventPublisher {
         var event = new VisitReadEvent(this, username, pnumber, vnumber);
         applicationEventPublisher.publishEvent(event);
     }
+
+    public void publishSpecimenRead(final String username, final String pnumber, final String inventoryId) {
+        var event = new SpecimenReadEvent(this, username, pnumber, inventoryId);
+        applicationEventPublisher.publishEvent(event);
+    }
 }

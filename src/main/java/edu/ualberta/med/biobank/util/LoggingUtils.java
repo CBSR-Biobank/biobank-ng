@@ -20,6 +20,6 @@ public class LoggingUtils {
         } catch (JsonProcessingException e) {
             logger.error("exception in prettyPrintJson",  e);
         }
-        return ">>>> could not convert to JSON";
+        return "!!! ERROR: could not convert to JSON";
     }
 }

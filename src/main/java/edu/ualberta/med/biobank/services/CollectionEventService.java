@@ -29,8 +29,7 @@ public class CollectionEventService {
     @SuppressWarnings("unused")
     final Logger logger = LoggerFactory.getLogger(CollectionEventService.class);
 
-    @Autowired
-    CollectionEventRepository collectionEventRepository;
+    private CollectionEventRepository collectionEventRepository;
 
     private BiobankEventPublisher eventPublisher;
 

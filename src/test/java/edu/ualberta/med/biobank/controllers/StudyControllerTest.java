@@ -5,49 +5,25 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import edu.ualberta.med.biobank.test.ControllerTest;
-import edu.ualberta.med.biobank.test.Factory;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import net.datafaker.Faker;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import edu.ualberta.med.biobank.controllers.endpoints.StudiesListEndpoint;
+import edu.ualberta.med.biobank.controllers.endpoints.StudyEndpoint;
+import edu.ualberta.med.biobank.test.ControllerTest;
+import net.datafaker.Faker;
 
 class StudyControllerTest extends ControllerTest {
 
     @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(StudyControllerTest.class);
 
-    private final String ENDPOINT_INDEX_URL = "/studies";
-
-    private final String ENDPOINT_URL = ENDPOINT_INDEX_URL + "/{name}";
-
-    @PersistenceContext
-    private EntityManager em;
-
-    @Autowired
-    private MockMvc mvc;
-
-    private Factory factory;
-
-    @BeforeEach
-    public void setup(TestInfo testInfo) {
-        super.setup(testInfo);
-        this.factory = new Factory(em);
-    }
-
     @Test
     @WithMockUser
     void getPageWhenEmptyTableIsOkAndEmpty() throws Exception {
-        this.mvc.perform(get(ENDPOINT_INDEX_URL))
+        this.mvc.perform(get(new StudiesListEndpoint().url()))
             .andExpect(status().isOk())
             .andDo(MockMvcResultHandlers.print())
             .andExpect(jsonPath("$.content", hasSize(0)))
@@ -58,7 +34,7 @@ class StudyControllerTest extends ControllerTest {
 
     @Test
     void getWhenPresentAndUnauthorized() throws Exception {
-        this.mvc.perform(get(ENDPOINT_INDEX_URL))
+        this.mvc.perform(get(new StudiesListEndpoint().url()))
             .andExpect(status().isUnauthorized())
             .andDo(MockMvcResultHandlers.print());
     }
@@ -68,7 +44,7 @@ class StudyControllerTest extends ControllerTest {
     void getPageWhenPresentIsOk() throws Exception {
         factory.createStudy();
 
-        this.mvc.perform(get(ENDPOINT_INDEX_URL))
+        this.mvc.perform(get(new StudiesListEndpoint().url()))
             .andExpect(status().isOk())
             .andDo(MockMvcResultHandlers.print())
             .andExpect(jsonPath("$.content", hasSize(1)))
@@ -82,7 +58,7 @@ class StudyControllerTest extends ControllerTest {
     void getSinglePresentIsOk() throws Exception {
         var study = factory.createStudy();
 
-        this.mvc.perform(get(endpointUrl(study.getNameShort())))
+        this.mvc.perform(get(new StudyEndpoint(study.getNameShort()).url()))
             .andExpect(status().isOk())
             .andDo(MockMvcResultHandlers.print())
             .andExpect(jsonPath("$.name", is(study.getName())))
@@ -95,12 +71,8 @@ class StudyControllerTest extends ControllerTest {
     void getSingleWhenNotExistIsNotFound() throws Exception {
         var badname = (new Faker()).lorem().fixedString(10);
 
-        this.mvc.perform(get(endpointUrl(badname)))
+        this.mvc.perform(get(new StudyEndpoint(badname).url()))
             .andExpect(status().isNotFound())
             .andDo(MockMvcResultHandlers.print());
-    }
-
-    private String endpointUrl(String studyNameShort) {
-        return ENDPOINT_URL.replace("{name}", studyNameShort);
     }
 }

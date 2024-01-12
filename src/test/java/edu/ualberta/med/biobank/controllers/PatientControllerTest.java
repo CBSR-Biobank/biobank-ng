@@ -10,24 +10,18 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import com.jayway.jsonpath.JsonPath;
 import org.exparity.hamcrest.date.InstantMatchers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import edu.ualberta.med.biobank.test.BaseTest;
-import edu.ualberta.med.biobank.test.Factory;
+import edu.ualberta.med.biobank.controllers.endpoints.PatientNumberEndpoint;
+import edu.ualberta.med.biobank.test.ControllerTest;
 import edu.ualberta.med.biobank.test.TestFixtures;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import net.datafaker.Faker;
 
@@ -35,34 +29,15 @@ import net.datafaker.Faker;
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-class PatientControllerTest extends BaseTest {
+class PatientControllerTest extends ControllerTest {
 
     @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(PatientControllerTest.class);
 
-    private final String ENDPOINT_URL = "/patients/{pnumber}";
-
-    @PersistenceContext
-    private EntityManager em;
-
-    @Autowired
-    private MockMvc mvc;
-
-    private String name;
-
-    private Factory factory;
-
-    @BeforeEach
-    public void setup(TestInfo testInfo) {
-        super.setup(testInfo);
-        name = getMethodNameR();
-        this.factory = new Factory(em);
-    }
-
     @Test
     @WithMockUser
     void getWhenEmptyTableIs404() throws Exception {
-        this.mvc.perform(get(endpointUrl(factory.getFaker().lorem().word())))
+        this.mvc.perform(get(new PatientNumberEndpoint(factory.getFaker().lorem().word()).url()))
             .andExpect(status().isNotFound())
             .andDo(MockMvcResultHandlers.print());
     }
@@ -70,8 +45,7 @@ class PatientControllerTest extends BaseTest {
     @Test
     void getWhenPresentAndUnauthorized() throws Exception {
         var patient = factory.createPatient();
-
-        this.mvc.perform(get(endpointUrl(patient.getPnumber())))
+        this.mvc.perform(get(new PatientNumberEndpoint(patient.getPnumber()).url()))
             .andExpect(status().isUnauthorized())
             .andDo(MockMvcResultHandlers.print());
     }
@@ -82,7 +56,7 @@ class PatientControllerTest extends BaseTest {
         var patient = TestFixtures.patientFixture(factory);
 
         MvcResult result =
-            this.mvc.perform(get(endpointUrl(patient.getPnumber())))
+            this.mvc.perform(get(new PatientNumberEndpoint(patient.getPnumber()).url()))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.pnumber", is(patient.getPnumber())))
@@ -103,14 +77,10 @@ class PatientControllerTest extends BaseTest {
     @Test
     @WithMockUser(value = "testuser")
     void getWhenNotExistIsNotFound() throws Exception {
-        var badname = (new Faker()).lorem().fixedString(10);
+        var badname = new Faker().lorem().fixedString(10);
 
-        this.mvc.perform(get(endpointUrl(badname)))
+        this.mvc.perform(get(new PatientNumberEndpoint(badname).url()))
             .andExpect(status().isNotFound())
             .andDo(MockMvcResultHandlers.print());
-    }
-
-    private String endpointUrl(String pnumber) {
-        return ENDPOINT_URL.replace("{pnumber}", pnumber);
     }
 }
