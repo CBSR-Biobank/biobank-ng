@@ -7,19 +7,19 @@ import java.util.Date;
 public record CollectionEventSummaryDTO(
     Integer id,
     Integer visitNumber,
-    Long specimenCount,
-    Long aliquotCount,
     Date createdAt,
-    String status
+    String status,
+    Long specimenCount,
+    Long aliquotCount
 ) {
     public static CollectionEventSummaryDTO fromTuple(Tuple data) {
         return new CollectionEventSummaryDTO(
             data.get("id", Integer.class),
             data.get("visitNumber", Integer.class),
-            data.get("specimenCount", Long.class),
-            data.get("aliquotCount", Long.class),
             data.get("createdAt", Date.class),
-            Status.fromId(data.get("ACTIVITY_STATUS_ID", Integer.class)).getName()
+            Status.fromId(data.get("ACTIVITY_STATUS_ID", Integer.class)).getName(),
+            data.get("specimenCount", Long.class),
+            data.get("aliquotCount", Long.class)
         );
     }
 }

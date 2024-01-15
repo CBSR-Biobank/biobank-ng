@@ -4,7 +4,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.ualberta.med.biobank.controllers.endpoints.AliquotsEndpoint;
+import edu.ualberta.med.biobank.controllers.endpoints.VisitNumberEndpoint;
+import edu.ualberta.med.biobank.dtos.AliquotSpecimenDTO;
+import edu.ualberta.med.biobank.matchers.AliquotMatcher;
+import edu.ualberta.med.biobank.test.ControllerTest;
+import edu.ualberta.med.biobank.test.TestFixtures;
+import jakarta.transaction.Transactional;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -15,13 +26,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import edu.ualberta.med.biobank.controllers.endpoints.AliquotsEndpoint;
-import edu.ualberta.med.biobank.controllers.endpoints.VisitNumberEndpoint;
-import edu.ualberta.med.biobank.dtos.AliquotSpecimenDTO;
-import edu.ualberta.med.biobank.matchers.AliquotMatcher;
-import edu.ualberta.med.biobank.test.ControllerTest;
-import edu.ualberta.med.biobank.test.TestFixtures;
-import jakarta.transaction.Transactional;
 
 @Testcontainers
 @Transactional
@@ -74,10 +78,12 @@ class SpecimenControllerTest extends ControllerTest {
                 .andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
-        AliquotSpecimenDTO[] results = mapper.readValue(result.getResponse().getContentAsString(), AliquotSpecimenDTO[].class);
+        List<AliquotSpecimenDTO> dtos = List.of(mapper.readValue(
+            result.getResponse().getContentAsString(),
+            AliquotSpecimenDTO[].class
+        ));
 
-        assertThat(results, arrayWithSize(1));
-        assertThat(results[0], AliquotMatcher.matchesAliquot(aliquot));
+        assertThat(dtos, AliquotMatcher.containsAll(List.of(aliquot)));
     }
 
     @Test

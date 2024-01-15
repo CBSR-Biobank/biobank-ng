@@ -1,129 +1,154 @@
 package edu.ualberta.med.biobank.matchers;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hobsoft.hamcrest.compose.ComposeMatchers.compose;
+import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
+
 import edu.ualberta.med.biobank.domain.Specimen;
 import edu.ualberta.med.biobank.dtos.AliquotSpecimenDTO;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeDiagnosingMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.exparity.hamcrest.date.DateMatchers;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 
-public class AliquotMatcher extends TypeSafeDiagnosingMatcher<AliquotSpecimenDTO> {
+public class AliquotMatcher {
 
-    @SuppressWarnings("unused")
-    private final Logger logger = LoggerFactory.getLogger(AliquotMatcher.class);
-
-    private final Specimen specimen;
-
-    public AliquotMatcher(final Specimen specimen) {
-        this.specimen = specimen;
+    private AliquotMatcher() {
+        throw new AssertionError();
     }
 
-    @Override
-    public void describeTo(final Description description) {
-        description.appendText("matches specimen with inventory ID=`" + specimen.getInventoryId() + "`");
+    public static Matcher<AliquotSpecimenDTO> matches(Specimen expected) {
+        return compose("an aliquot with", hasFeature("id", AliquotSpecimenDTO::id, equalTo(expected.getId())))
+            .and(
+                hasFeature(
+                    "parentId",
+                    AliquotSpecimenDTO::parentId,
+                    equalTo(expected.getParentSpecimen() != null ? expected.getParentSpecimen().getId() : null)
+                )
+            )
+            .and(hasFeature("inventoryId", AliquotSpecimenDTO::inventoryId, equalTo(expected.getInventoryId())))
+            .and(
+                hasFeature(
+                    "specimenTypeId",
+                    AliquotSpecimenDTO::specimenTypeId,
+                    equalTo(expected.getSpecimenType().getId())
+                )
+            )
+            .and(
+                hasFeature(
+                    "specimenTypeName",
+                    AliquotSpecimenDTO::specimenTypeNameShort,
+                    equalTo(expected.getSpecimenType().getNameShort())
+                )
+            )
+            .and(
+                hasFeature(
+                    "createdAt",
+                    AliquotSpecimenDTO::createdAt,
+                    DateMatchers.within(1, ChronoUnit.SECONDS, expected.getCreatedAt())
+                )
+            )
+            .and(hasFeature("quantity", AliquotSpecimenDTO::quantity, Matchers.comparesEqualTo(expected.getQuantity())))
+            .and(hasFeature("status", AliquotSpecimenDTO::status, equalTo(expected.getActivityStatus().toString())))
+            .and(
+                hasFeature(
+                    "originCenterId",
+                    AliquotSpecimenDTO::originCenterId,
+                    equalTo(expected.getOriginInfo().getCenter().getId())
+                )
+            )
+            .and(
+                hasFeature(
+                    "originCenterNameShort",
+                    AliquotSpecimenDTO::originCenterNameShort,
+                    equalTo(expected.getOriginInfo().getCenter().getNameShort())
+                )
+            )
+            .and(
+                hasFeature(
+                    "currentCenterId",
+                    AliquotSpecimenDTO::currentCenterId,
+                    equalTo(expected.getCurrentCenter().getId())
+                )
+            )
+            .and(
+                hasFeature(
+                    "currentCenterShort",
+                    AliquotSpecimenDTO::currentCenterNameShort,
+                    equalTo(expected.getCurrentCenter().getNameShort())
+                )
+            )
+            .and(
+                hasFeature(
+                    "has comments",
+                    AliquotSpecimenDTO::hasComments,
+                    Matchers.not(equalTo(expected.getComments().isEmpty()))
+                )
+            )
+            .and(
+                hasFeature(
+                    "position",
+                    AliquotSpecimenDTO::position,
+                    equalTo(
+                        expected.getSpecimenPosition() != null
+                            ? expected.getSpecimenPosition().getPositionString()
+                            : null
+                    )
+                )
+            )
+            .and(
+                hasFeature(
+                    "patientNumber",
+                    AliquotSpecimenDTO::patientNumber,
+                    equalTo(expected.getCollectionEvent().getPatient().getPnumber())
+                )
+            )
+            .and(
+                hasFeature(
+                    "studyId",
+                    AliquotSpecimenDTO::studyId,
+                    equalTo(expected.getCollectionEvent().getPatient().getStudy().getId())
+                )
+            )
+            .and(
+                hasFeature(
+                    "studyNameShort",
+                    AliquotSpecimenDTO::studyNameShort,
+                    equalTo(expected.getCollectionEvent().getPatient().getStudy().getNameShort())
+                )
+            )
+            .and(
+                hasFeature(
+                    "processingEventId",
+                    AliquotSpecimenDTO::processingEventId,
+                    equalTo(
+                        expected.getParentSpecimen() != null
+                            ? expected.getParentSpecimen().getProcessingEvent().getId()
+                            : null
+                    )
+                )
+            )
+            .and(
+                hasFeature(
+                    "worksheet",
+                    AliquotSpecimenDTO::worksheet,
+                    equalTo(
+                        expected.getParentSpecimen().getProcessingEvent() != null
+                            ? expected.getParentSpecimen().getProcessingEvent().getWorksheet()
+                            : null
+                    )
+                )
+            );
     }
 
-    @Override
-    public boolean matchesSafely(final AliquotSpecimenDTO dto, Description mismatchDescription) {
-        List<String> errors = new ArrayList<>();
-        if (dto.id() != specimen.getId()) {
-            errors.add("IDs don't match: %d".formatted(dto.id()));
+    // see https://stackoverflow.com/a/27590279
+    public static Matcher<Iterable<? extends AliquotSpecimenDTO>> containsAll(List<Specimen> items) {
+        List<Matcher<? super AliquotSpecimenDTO>> matchers = new ArrayList<Matcher<? super AliquotSpecimenDTO>>();
+        for (Specimen item : items) {
+            matchers.add(matches(item));
         }
-
-        if (!dto.inventoryId().matches(specimen.getInventoryId())) {
-            errors.add("inventory IDs don't match: %s".formatted(dto.inventoryId()));
-        }
-
-        if (specimen.getCreatedAt().toInstant().until(dto.createdAt().toInstant(), ChronoUnit.SECONDS) > 0) {
-            errors.add("created at difference more than a second: %s".formatted(dto.createdAt()));
-        }
-
-        if (specimen.getParentSpecimen() != null) {
-            var parent = specimen.getParentSpecimen();
-            if (dto.parentId() != parent.getId()) {
-                errors.add("parent IDs don't match: %s".formatted(dto.parentId()));
-            }
-
-            if (dto.processingEventId() != parent.getProcessingEvent().getId()) {
-                errors.add("processing event IDs don't match: %s".formatted(dto.processingEventId()));
-            }
-
-            if (!dto.worksheet().equals(parent.getProcessingEvent().getWorksheet())) {
-                errors.add("worksheets don't match: %s".formatted(dto.worksheet()));
-            }
-        } else {
-            if (dto.parentId() != null) {
-                errors.add("parent IDs don't match: %s".formatted(dto.parentId()));
-            }
-
-            if (dto.processingEventId() != null) {
-                errors.add("processing event IDs don't match: %s".formatted(dto.processingEventId()));
-            }
-
-            if (!dto.worksheet().isBlank()) {
-                errors.add("worksheets don't match: %s".formatted(dto.worksheet()));
-            }
-        }
-
-        if (specimen.getQuantity() != null) {
-            if (dto.quantity().compareTo(specimen.getQuantity()) != 0) {
-                errors.add("quantities don't match: %s".formatted(dto.quantity()));
-            }
-        }
-
-        if (!dto.status().equals(specimen.getActivityStatus().toString())) {
-            errors.add("status don't match: %s".formatted(dto.status()));
-        }
-
-        if (dto.specimenTypeId() != specimen.getSpecimenType().getId()) {
-            errors.add("specimen type IDs don't match: %s".formatted(dto.specimenTypeId()));
-        }
-
-        if (!dto.specimenTypeNameShort().equals(specimen.getSpecimenType().getNameShort())) {
-            errors.add("status don't match: %s".formatted(dto.specimenTypeNameShort()));
-        }
-
-        if (dto.originCenterId() != specimen.getOriginInfo().getCenter().getId()) {
-            errors.add("origin center IDs don't match: %s".formatted(dto.originCenterId()));
-        }
-
-        if (!dto.originCenterNameShort().equals(specimen.getOriginInfo().getCenter().getNameShort())) {
-            errors.add("origin center names don't match: %s".formatted(dto.originCenterNameShort()));
-        }
-
-        if (dto.currentCenterId() != specimen.getCurrentCenter().getId()) {
-            errors.add("current center IDs don't match: %s".formatted(dto.currentCenterId()));
-        }
-
-        if (!dto.currentCenterNameShort().equals(specimen.getCurrentCenter().getNameShort())) {
-            errors.add("current center names don't match: %s".formatted(dto.currentCenterNameShort()));
-        }
-
-        if (dto.hasComments().booleanValue() == specimen.getComments().isEmpty()) {
-            errors.add("has comments don't match: %s".formatted(dto.hasComments()));
-        }
-
-        if (!dto.patientNumber().equals(specimen.getCollectionEvent().getPatient().getPnumber())) {
-            errors.add("patient numbers don't match: %s".formatted(dto.patientNumber()));
-        }
-
-        if (dto.studyId() != specimen.getCollectionEvent().getPatient().getStudy().getId()) {
-            errors.add("study IDs don't match: %s".formatted(dto.studyId()));
-        }
-
-        if (!dto.studyNameShort().equals(specimen.getCollectionEvent().getPatient().getStudy().getNameShort())) {
-            errors.add("study IDs don't match: %s".formatted(dto.studyNameShort()));
-        }
-
-        mismatchDescription.appendText(errors.stream().collect(Collectors.joining(" and ")));
-        return errors.isEmpty();
-    }
-
-    public static AliquotMatcher matchesAliquot(final Specimen specimen) {
-        return new AliquotMatcher(specimen);
+        return Matchers.contains(matchers);
     }
 }

@@ -1,22 +1,27 @@
 package edu.ualberta.med.biobank.controllers;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.ualberta.med.biobank.controllers.endpoints.VisitNumberEndpoint;
+import edu.ualberta.med.biobank.dtos.CollectionEventDTO;
+import edu.ualberta.med.biobank.matchers.CollectionEventMatcher;
+import edu.ualberta.med.biobank.test.ControllerTest;
+import edu.ualberta.med.biobank.test.TestFixtures;
+import edu.ualberta.med.biobank.util.LoggingUtils;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import edu.ualberta.med.biobank.controllers.endpoints.VisitNumberEndpoint;
-import edu.ualberta.med.biobank.test.ControllerTest;
-import edu.ualberta.med.biobank.test.TestFixtures;
-import jakarta.transaction.Transactional;
+import ch.qos.logback.classic.util.LoggerNameUtil;
 
 @Testcontainers
 @Transactional
@@ -53,18 +58,15 @@ class CollectionEventControllerTest extends ControllerTest {
         var patient = TestFixtures.patientFixture(factory);
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
 
-        this.mvc.perform(get(new VisitNumberEndpoint(patient.getPnumber(), collectionEvent.getVisitNumber()).url()))
-            .andExpect(status().isOk())
-            .andDo(MockMvcResultHandlers.print())
-            .andExpect(jsonPath("$.id", is(collectionEvent.getId())))
-            .andExpect(jsonPath("$.visitNumber", is(collectionEvent.getVisitNumber())))
-            .andExpect(jsonPath("$.patientId", is(patient.getId())))
-            .andExpect(jsonPath("$.patientNumber", is(patient.getPnumber())))
-            .andExpect(jsonPath("$.studyId", is(patient.getStudy().getId())))
-            .andExpect(jsonPath("$.studyNameShort", is(patient.getStudy().getNameShort())))
-            .andExpect(jsonPath("$.sourceSpecimens", hasSize(collectionEvent.getOriginalSpecimens().size())))
-            .andExpect(jsonPath("$.status", is(collectionEvent.getActivityStatus().getName())))
-            .andReturn();
+        MvcResult result =
+            this.mvc.perform(get(new VisitNumberEndpoint(patient.getPnumber(), collectionEvent.getVisitNumber()).url()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+        CollectionEventDTO dto = mapper.readValue(result.getResponse().getContentAsString(), CollectionEventDTO.class);
+        logger.info("HTTP response: {}", LoggingUtils.prettyPrintJson(dto));
+        assertThat(dto, CollectionEventMatcher.matches(collectionEvent));
     }
 
     @Test

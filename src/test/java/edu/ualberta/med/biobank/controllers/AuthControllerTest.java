@@ -33,6 +33,7 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
+        // FIXME: compare using a matcher
         assertThat(result.getResponse().getContentAsString()).isNotEmpty();
     }
 }

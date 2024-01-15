@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.dtos;
 
+import edu.ualberta.med.biobank.domain.Specimen;
 import edu.ualberta.med.biobank.domain.Status;
 import jakarta.persistence.Tuple;
 import java.math.BigDecimal;
@@ -39,6 +40,26 @@ public record SourceSpecimenDTO(
             data.get("position", String.class),
             data.get("processingEventId", Integer.class),
             data.get("worksheet", String.class)
+        );
+    }
+
+    public static SourceSpecimenDTO fromSpecimen(Specimen specimen) {
+        return new SourceSpecimenDTO(
+            specimen.getId(),
+            specimen.getInventoryId(),
+            specimen.getSpecimenType().getId(),
+            specimen.getSpecimenType().getNameShort(),
+            specimen.getCreatedAt(),
+            specimen.getQuantity(),
+            specimen.getActivityStatus().toString(),
+            specimen.getOriginInfo().getCenter().getId(),
+            specimen.getOriginInfo().getCenter().getNameShort(),
+            specimen.getCurrentCenter().getId(),
+            specimen.getCurrentCenter().getNameShort(),
+            !specimen.getComments().isEmpty(),
+            specimen.getSpecimenPosition() != null ? specimen.getSpecimenPosition().getPositionString() : null,
+            specimen.getProcessingEvent().getId(),
+            specimen.getProcessingEvent().getWorksheet()
         );
     }
 }
