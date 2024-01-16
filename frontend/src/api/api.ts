@@ -42,7 +42,7 @@ type CollectionEventGet = {
 
 type AliquotsGet = {
   method: 'GET';
-  path: ['specimens', 'aliquots', string];
+  path: ['specimens', string, 'aliquots'];
   query: undefined;
 };
 

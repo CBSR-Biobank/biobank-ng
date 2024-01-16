@@ -10,7 +10,7 @@ export class SpecimenApi {
 
     const response = await httpClient({
       method: 'GET',
-      path: ['specimens', 'aliquots', inventoryId],
+      path: ['specimens', inventoryId, 'aliquots'],
       query: undefined
     });
     const result = await response.json();
