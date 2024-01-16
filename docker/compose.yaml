@@ -11,6 +11,7 @@
 version: '3.9'
 services:
     db:
+        user: ${uid}:${gid}
         image: mariadb:11.0.3-jammy
         command: --default-authentication-plugin=mariadb_native_password --lower-case-table-names=1
         volumes:
