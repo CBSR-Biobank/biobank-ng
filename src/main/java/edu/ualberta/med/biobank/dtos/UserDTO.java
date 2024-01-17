@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.dtos;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import edu.ualberta.med.biobank.domain.PermissionEnum;
 import edu.ualberta.med.biobank.domain.Status;
 import jakarta.persistence.Tuple;
@@ -42,5 +44,47 @@ public record UserDTO(
             if (m.isAllowed(permission, centerId, studyId)) return true;
         }
         return false;
+    }
+
+    public boolean hasAllStudies() {
+        for (MembershipDTO m : this.memberships.values()) {
+            for (DomainDTO d : m.domains().values()) {
+                if (d.allStudies()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public Set<Integer> studyIds() {
+        Set<Integer> results = new HashSet<>();
+        for (MembershipDTO m : this.memberships.values()) {
+            for (DomainDTO d : m.domains().values()) {
+                results.addAll(d.studyIds());
+            }
+        }
+        return results;
+    }
+
+    public boolean hasAllCenters() {
+        for (MembershipDTO m : this.memberships.values()) {
+            for (DomainDTO d : m.domains().values()) {
+                if (d.allCenters()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public Set<Integer> centerIds() {
+        Set<Integer> results = new HashSet<>();
+        for (MembershipDTO m : this.memberships.values()) {
+            for (DomainDTO d : m.domains().values()) {
+                results.addAll(d.centerIds());
+            }
+        }
+        return results;
     }
 }

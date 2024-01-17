@@ -4,6 +4,9 @@ import { domainEntitySchema } from './domain-entity';
 import { sourceSpecimenSchema } from './specimen';
 import { Status } from './status';
 
+/**
+ *
+ */
 export const eventAttributeSchema = z.object({
   name: z.string(),
   value: z.string()

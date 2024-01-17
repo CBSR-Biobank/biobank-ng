@@ -1,5 +1,10 @@
 package edu.ualberta.med.biobank.domain;
 
+import edu.ualberta.med.biobank.errors.AppError;
+import edu.ualberta.med.biobank.errors.ValidationError;
+import edu.ualberta.med.biobank.exception.AppErrorException;
+import io.jbock.util.Either;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -26,8 +31,7 @@ public enum Status {
     // separate?
     FLAGGED(4, "Flagged");
 
-    private static final List<Status> VALUES_LIST = Collections
-        .unmodifiableList(Arrays.asList(values()));
+    private static final List<Status> VALUES_LIST = Collections.unmodifiableList(Arrays.asList(values()));
 
     public static List<Status> valuesList() {
         return VALUES_LIST;
@@ -36,6 +40,13 @@ public enum Status {
     public static Status fromId(Integer id) {
         for (Status item : values()) {
             if (item.id.equals(id)) return item;
+        }
+        return null;
+    }
+
+    public static Status fromName(String name) {
+        for (Status item : values()) {
+            if (item.name.toLowerCase().equals(name.toLowerCase())) return item;
         }
         return null;
     }
@@ -59,5 +70,19 @@ public enum Status {
     @Override
     public String toString() {
         return getName();
+    }
+
+    public static Either<AppError, List<Status>> fromStrings(String[] status) {
+        List<Status> statusList = new ArrayList<>();
+        try {
+            if (status != null) {
+                for (String s : status) {
+                    statusList.add(Status.valueOf(s.toUpperCase()));
+                }
+            }
+            return Either.right(statusList);
+        } catch (IllegalArgumentException err) {
+            return Either.left(new ValidationError("invalid status(es): %s".formatted(String.join(", ", status))));
+        }
     }
 }

@@ -3,15 +3,7 @@ package edu.ualberta.med.biobank.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.ualberta.med.biobank.controllers.endpoints.VisitNumberEndpoint;
-import edu.ualberta.med.biobank.dtos.CollectionEventDTO;
-import edu.ualberta.med.biobank.matchers.CollectionEventMatcher;
-import edu.ualberta.med.biobank.test.ControllerTest;
-import edu.ualberta.med.biobank.test.TestFixtures;
-import edu.ualberta.med.biobank.util.LoggingUtils;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +13,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import ch.qos.logback.classic.util.LoggerNameUtil;
+import edu.ualberta.med.biobank.controllers.endpoints.VisitNumberEndpoint;
+import edu.ualberta.med.biobank.dtos.CollectionEventDTO;
+import edu.ualberta.med.biobank.matchers.CollectionEventMatcher;
+import edu.ualberta.med.biobank.test.ControllerTest;
+import edu.ualberta.med.biobank.test.TestFixtures;
+import edu.ualberta.med.biobank.util.LoggingUtils;
+import jakarta.transaction.Transactional;
 
 @Testcontainers
 @Transactional

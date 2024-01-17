@@ -42,7 +42,7 @@ public class UserService {
         }
 
         var user = users.stream().findFirst().get();
-        logger.info("user: {}", LoggingUtils.prettyPrintJson(user));
+        logger.debug("user: {}", LoggingUtils.prettyPrintJson(user));
         return Either.right(user);
     }
 

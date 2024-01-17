@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.repositories;
 
 import java.util.Collection;
+import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -53,5 +54,33 @@ public interface StudyRepository extends JpaRepository<Study, Integer>{
         nativeQuery = true
     )
     <T> Page<T> findAll(Pageable pageable, Class<T> type);
+
+    @Query(
+        value = """
+                select
+                    s.id,
+                    s.name,
+                    s.name_short nameShort,
+                    s.activity_status_id activityStatusId,
+                    s.version
+                from study s
+                where s.id in :studyIds
+                """,
+        nativeQuery = true
+    )
+    <T> Page<T> findByIds(Pageable pageable, Set<Integer> studyIds, Class<T> type);
+
+    @Query(
+        value = """
+                select
+                    s.id,
+                    s.name name,
+                    s.name_short nameShort
+                from study s
+                where s.activity_status_id in :statusValues
+                """,
+        nativeQuery = true
+    )
+    <T> Collection<T> getNames(Set<Integer> statusValues, Class<T> type);
 
 }
