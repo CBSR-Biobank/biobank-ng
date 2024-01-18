@@ -1,13 +1,15 @@
 package edu.ualberta.med.biobank.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
-import java.util.List;
+
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import edu.ualberta.med.biobank.auth.BiobankPasswordEncoder;
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -29,7 +31,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import edu.ualberta.med.biobank.auth.BiobankPasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
@@ -45,11 +46,24 @@ public class SecurityConfiguration {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-            .securityMatchers(m -> m.requestMatchers("/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"))
+            .securityMatchers(m ->
+                m.requestMatchers("/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+            )
             .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
             .httpBasic(withDefaults())
             .formLogin(withDefaults())
             .logout(logout -> logout.permitAll())
+            .build();
+    }
+
+    @Bean
+    SecurityFilterChain actuatorFilterChain(HttpSecurity http) throws Exception {
+        return http
+            .securityMatchers(m ->
+                m.requestMatchers("/actuator/**")
+            )
+            .authorizeHttpRequests(auth -> auth.anyRequest().hasRole("ADMIN"))
+            .httpBasic(withDefaults())
             .build();
     }
 
@@ -90,7 +104,6 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowedMethods(List.of("*"));
         configuration.setExposedHeaders(List.of("*"));

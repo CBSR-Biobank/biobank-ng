@@ -37,7 +37,7 @@ build/
 /src/main/resources/certs/*.pem
 /docker/nginx-selfsigned.crt
 /docker/nginx-selfsigned.key
-/logs/nginx/
+logs/
 /frontend/.vite/
 /.sqls/
 *.svg
