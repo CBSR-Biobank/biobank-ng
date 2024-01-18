@@ -6,7 +6,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
-  const proxyTarget = `http://${env.BACKEND_SERVER}`;
+  const proxyTarget = env.BACKEND_SERVER;
   console.log('proxy target', proxyTarget);
 
   return {

@@ -52,7 +52,7 @@ services:
             - ../frontend:/opt/biobank/frontend
         command: sh -c "npm install && npm run dev"
         environment:
-            - BACKEND_SERVER=host.docker.internal:9000
+            - BACKEND_SERVER=http://host.docker.internal:9000
         ports:
             - 3000:3000
         restart: unless-stopped
