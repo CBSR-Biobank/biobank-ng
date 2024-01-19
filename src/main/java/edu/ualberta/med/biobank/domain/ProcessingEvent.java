@@ -3,15 +3,13 @@ package edu.ualberta.med.biobank.domain;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
 import edu.ualberta.med.biobank.domain.type.Person;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -55,7 +53,7 @@ public class ProcessingEvent extends DomainEntity implements HasCreatedAt, HasSt
 
     @NotNull(message = "{edu.ualberta.med.biobank.domain.ProcessingEvent.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Convert(converter = StatusConverter.class)
     private Status activityStatus = Status.ACTIVE;
 
     @ManyToMany(cascade = jakarta.persistence.CascadeType.REMOVE, fetch = FetchType.LAZY)

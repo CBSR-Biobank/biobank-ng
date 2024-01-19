@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -22,6 +23,7 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.SQLInsert;
 
 import edu.ualberta.med.biobank.domain.type.LabelingLayout;
+import edu.ualberta.med.biobank.domain.type.LabelingLayoutConverter;
 import edu.ualberta.med.biobank.domain.util.RowColPos;
 
 /**
@@ -71,7 +73,7 @@ public class ContainerType extends DomainEntity implements HasName, HasNameShort
 
     @NotNull(message = "{edu.ualberta.med.biobank.domain.ContainerType.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Convert(converter = StatusConverter.class)
     private Status activityStatus = Status.ACTIVE;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -99,7 +101,7 @@ public class ContainerType extends DomainEntity implements HasName, HasNameShort
     private Set<ContainerType> parentContainerTypes = new HashSet<ContainerType>(0);
 
     @Column(name = "LABELING_LAYOUT")
-    @Enumerated(EnumType.ORDINAL)
+    @Convert(converter = LabelingLayoutConverter.class)
     private LabelingLayout labelingLayout;
 
     @Override

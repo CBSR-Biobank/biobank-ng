@@ -7,6 +7,7 @@ import java.util.Set;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -31,7 +32,7 @@ public class Role extends DomainEntity {
     @ElementCollection(targetClass = PermissionEnum.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "ROLE_PERMISSION", joinColumns = @JoinColumn(name = "ID"))
     @Column(name = "PERMISSION_ID", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Convert(converter = PermissionEnumConverter.class)
     private Set<PermissionEnum> permissions = new HashSet<PermissionEnum>(0);
 
     public String getName() {

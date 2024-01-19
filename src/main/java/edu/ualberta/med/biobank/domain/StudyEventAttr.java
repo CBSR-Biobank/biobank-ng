@@ -1,9 +1,8 @@
 package edu.ualberta.med.biobank.domain;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -33,7 +32,7 @@ public class StudyEventAttr extends DomainEntity implements HasStatus {
 
     @NotNull(message = "{edu.ualberta.med.biobank.domain.StudyEventAttr.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Convert(converter = StatusConverter.class)
     private Status status = Status.ACTIVE;
 
     public String getPermissible() {

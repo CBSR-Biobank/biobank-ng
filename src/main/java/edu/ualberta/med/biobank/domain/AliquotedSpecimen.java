@@ -1,11 +1,9 @@
 package edu.ualberta.med.biobank.domain;
 
 import java.math.BigDecimal;
-
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -44,7 +42,7 @@ public class AliquotedSpecimen extends DomainEntity
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Convert(converter = StatusConverter.class)
     private Status activityStatus = Status.ACTIVE;
 
     /**

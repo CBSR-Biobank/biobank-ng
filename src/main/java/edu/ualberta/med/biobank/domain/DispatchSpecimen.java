@@ -2,12 +2,12 @@ package edu.ualberta.med.biobank.domain;
 
 import java.util.HashSet;
 import java.util.Set;
-
+import edu.ualberta.med.biobank.domain.type.DispatchSpecimenState;
+import edu.ualberta.med.biobank.domain.type.DispatchSpecimenStateConverter;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -17,8 +17,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 
-import edu.ualberta.med.biobank.domain.type.DispatchSpecimenState;
-
 @Entity
 @Table(name = "DISPATCH_SPECIMEN",
 uniqueConstraints = {
@@ -27,7 +25,7 @@ public class DispatchSpecimen extends DomainEntity implements HasComments {
 
     @NotNull(message = "{edu.ualberta.med.biobank.domain.DispatchSpecimen.state.NotNull}")
     @Column(name = "STATE")
-    @Enumerated(EnumType.ORDINAL)
+    @Convert(converter = DispatchSpecimenStateConverter.class)
     private DispatchSpecimenState state = DispatchSpecimenState.NONE;
 
     @NotNull(message = "{edu.ualberta.med.biobank.domain.DispatchSpecimen.dispatch.NotNull}")

@@ -2,14 +2,12 @@ package edu.ualberta.med.biobank.domain;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
@@ -30,7 +28,7 @@ public class Principal extends DomainEntity implements HasStatus {
 
     @NotNull(message = "{edu.ualberta.med.biobank.domain.Principal.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Convert(converter = StatusConverter.class)
     private Status status = Status.ACTIVE;
 
     // Require at least one membership on creation so there is some loose

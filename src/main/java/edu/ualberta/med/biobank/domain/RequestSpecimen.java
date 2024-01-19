@@ -1,15 +1,14 @@
 package edu.ualberta.med.biobank.domain;
 
+import edu.ualberta.med.biobank.domain.type.RequestSpecimenState;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import edu.ualberta.med.biobank.domain.type.RequestSpecimenState;
 
 @Entity
 @Table(name = "REQUEST_SPECIMEN")
@@ -17,7 +16,7 @@ public class RequestSpecimen extends DomainEntity {
 
     @NotNull(message = "{edu.ualberta.med.biobank.domain.RequestSpecimen.state.NotNull}")
     @Column(name = "STATE", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Convert(converter = StatusConverter.class)
     private RequestSpecimenState state = RequestSpecimenState.AVAILABLE_STATE;
 
     @Column(name = "CLAIMED_BY", length = 50)

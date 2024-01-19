@@ -5,6 +5,7 @@ import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -77,7 +78,7 @@ public class Container extends DomainEntity implements HasComments, HasStatus {
 
     @NotNull(message = "{edu.ualberta.med.biobank.domain.Container.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Convert(converter = StatusConverter.class)
     private Status activityStatus = Status.ACTIVE;
 
     @NotNull(message = "{edu.ualberta.med.biobank.domain.Container.containerType.NotNull}")

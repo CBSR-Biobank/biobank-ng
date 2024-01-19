@@ -2,12 +2,10 @@ package edu.ualberta.med.biobank.domain;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -40,7 +38,7 @@ public class Study extends DomainEntity implements HasName, HasNameShort, HasSta
 
     @NotNull(message = "{edu.ualberta.med.biobank.domain.Study.activityStatus.NotEmpty}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Convert(converter = StatusConverter.class)
     private Status activityStatus = Status.ACTIVE;
 
     @OneToMany(mappedBy = "study")

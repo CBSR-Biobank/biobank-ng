@@ -2,13 +2,12 @@ package edu.ualberta.med.biobank.domain;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import edu.ualberta.med.biobank.domain.type.DispatchState;
+import edu.ualberta.med.biobank.domain.type.DispatchStateConverter;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -29,7 +28,7 @@ public class Dispatch extends DomainEntity implements HasComments {
 
     @NotNull(message = "{edu.ualberta.med.biobank.domain.Dispatch.state.NotNull}")
     @Column(name = "STATE")
-    @Enumerated(EnumType.ORDINAL)
+    @Convert(converter = DispatchStateConverter.class)
     private DispatchState state = DispatchState.CREATION;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "dispatch", orphanRemoval = true)
