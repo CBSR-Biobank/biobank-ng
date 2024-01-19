@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import edu.ualberta.med.biobank.controllers.endpoints.LoggingLatestEndpoint;
 import edu.ualberta.med.biobank.test.ControllerTest;
 
@@ -21,14 +20,12 @@ class LoggingControllerTest extends ControllerTest {
     @WithMockUser
     void getWhenEmptyTableIsOkAndEmpty() throws Exception {
         this.mvc.perform(get(new LoggingLatestEndpoint().url()))
-            .andExpect(status().isOk())
-            .andDo(MockMvcResultHandlers.print());
+            .andExpect(status().isOk());
     }
 
     @Test
     void getWhenPresentAndUnauthorized() throws Exception {
         this.mvc.perform(get(new LoggingLatestEndpoint().url()))
-            .andExpect(status().isUnauthorized())
-            .andDo(MockMvcResultHandlers.print());
+            .andExpect(status().isUnauthorized());
     }
 }

@@ -17,12 +17,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import edu.ualberta.med.biobank.controllers.endpoints.StudiesListEndpoint;
 import edu.ualberta.med.biobank.controllers.endpoints.StudyEndpoint;
 import edu.ualberta.med.biobank.controllers.endpoints.StudyNamesEndpoint;
 import edu.ualberta.med.biobank.domain.Status;
-import edu.ualberta.med.biobank.domain.User;
 import edu.ualberta.med.biobank.dtos.StudyDTO;
 import edu.ualberta.med.biobank.dtos.StudyNameDTO;
 import edu.ualberta.med.biobank.matchers.StudyMatcher;
@@ -48,15 +46,13 @@ class StudyControllerTest extends ControllerTest {
     @WithMockUser(value = "testuser")
     void getPageWhenEmptyTableIsOkAndEmpty() throws Exception {
         this.mvc.perform(get(new StudiesListEndpoint().url()))
-            .andExpectAll(paginationMatchers(0, 0, 0))
-            .andDo(MockMvcResultHandlers.print());
+            .andExpectAll(paginationMatchers(0, 0, 0));
     }
 
     @Test
     void getWhenPresentAndUnauthorized() throws Exception {
         this.mvc.perform(get(new StudiesListEndpoint().url()))
-            .andExpect(status().isUnauthorized())
-            .andDo(MockMvcResultHandlers.print());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -65,8 +61,7 @@ class StudyControllerTest extends ControllerTest {
         factory.createStudy();
 
         this.mvc.perform(get(new StudiesListEndpoint().url()))
-            .andExpectAll(paginationMatchers(1, 1, 1))
-            .andDo(MockMvcResultHandlers.print());
+            .andExpectAll(paginationMatchers(1, 1, 1));
     }
 
     @Test
@@ -76,8 +71,7 @@ class StudyControllerTest extends ControllerTest {
         factory.createStudy();
 
         this.mvc.perform(get(new StudiesListEndpoint().url()))
-            .andExpectAll(paginationMatchers(1, 1, 1))
-            .andDo(MockMvcResultHandlers.print());
+            .andExpectAll(paginationMatchers(1, 1, 1));
     }
 
     @Test
@@ -99,8 +93,7 @@ class StudyControllerTest extends ControllerTest {
         var badname = new Faker().lorem().fixedString(10);
 
         this.mvc.perform(get(new StudyEndpoint(badname).url()))
-            .andExpect(status().isNotFound())
-            .andDo(MockMvcResultHandlers.print());
+            .andExpect(status().isNotFound());
     }
 
     @ParameterizedTest

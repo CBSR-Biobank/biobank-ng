@@ -68,7 +68,7 @@ class CollectionEventControllerTest extends ControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         CollectionEventDTO dto = mapper.readValue(result.getResponse().getContentAsString(), CollectionEventDTO.class);
-        logger.info("HTTP response: {}", LoggingUtils.prettyPrintJson(dto));
+        logger.debug("HTTP response: {}", LoggingUtils.prettyPrintJson(dto));
         assertThat(dto, CollectionEventMatcher.matches(collectionEvent));
     }
 

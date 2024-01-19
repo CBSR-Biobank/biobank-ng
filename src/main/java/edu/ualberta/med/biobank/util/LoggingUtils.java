@@ -1,9 +1,12 @@
 package edu.ualberta.med.biobank.util;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,8 +21,11 @@ public class LoggingUtils {
 
 
     public static <T> String prettyPrintJson(T object) {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm a z");
         try {
             ObjectMapper mapper = new ObjectMapper();
+            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            mapper.setDateFormat(new StdDateFormat().withColonInTimeZone(true));
             mapper.setSerializationInclusion(Include.NON_NULL);
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
         } catch (JsonProcessingException e) {

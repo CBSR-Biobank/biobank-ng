@@ -81,14 +81,14 @@ public class StudyService {
                     ? PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, sort)
                     : PageRequest.of(pageNumber, pageSize);
 
-                logger.info("studyPagination: user: {}", auth.getName());
+                logger.debug("studyPagination: user: {}", auth.getName());
                 Page<Tuple> studyData;
 
                 if (user.hasAllStudies()) {
                     studyData = studyRepository.findAll(pageable, Tuple.class);
                 } else {
                     var userStudyIds = user.studyIds();
-                    logger.info("studyPagination: ids: {}", LoggingUtils.prettyPrintJson(userStudyIds));
+                    logger.debug("studyPagination: ids: {}", LoggingUtils.prettyPrintJson(userStudyIds));
                     studyData = studyRepository.findByIds(pageable, userStudyIds, Tuple.class);
                 }
 
@@ -132,7 +132,7 @@ public class StudyService {
                 }
 
                 var result = dtos.toList();
-                logger.info("studyNames: user: {}, num_studies: {}", auth.getName(), result.size());
+                logger.debug("studyNames: user: {}, num_studies: {}", auth.getName(), result.size());
                 return Either.right(result);
             });
     }

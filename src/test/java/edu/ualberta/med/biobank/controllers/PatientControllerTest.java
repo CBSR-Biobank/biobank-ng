@@ -28,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
@@ -65,7 +66,7 @@ class PatientControllerTest extends ControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         PatientDTO dto = mapper.readValue(result.getResponse().getContentAsString(), PatientDTO.class);
-        logger.info("result: {}", LoggingUtils.prettyPrintJson(dto));
+        logger.debug("result: {}", LoggingUtils.prettyPrintJson(dto));
         assertThat(dto, PatientMatcher.matches(patient));
     }
 
@@ -93,12 +94,20 @@ class PatientControllerTest extends ControllerTest {
         Study study = factory.createStudy();
         var dto = newPatient(study.getNameShort());
 
-        this.mvc.perform(
+        MvcResult result =
+            this.mvc.perform(
                 post(new PatientCreateEndpoint().url())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(JsonUtil.asJsonString(dto))
             )
-            .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+
+        PatientDTO resultDto = objectMapper().readValue(result.getResponse().getContentAsString(), PatientDTO.class);
+        logger.debug("HTTP Response: {}", LoggingUtils.prettyPrintJson(resultDto));
+
+        //assertThat(resultDto, PatientMatcher.matches(patient));
     }
 
     @Test

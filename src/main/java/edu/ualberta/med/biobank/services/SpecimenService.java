@@ -80,7 +80,7 @@ public class SpecimenService {
     public Either<AppError, Collection<AliquotSpecimenDTO>> aliquotsForInventoryId(String parentInventoryId) {
         return findByInventoryId(parentInventoryId)
             .flatMap(specimen -> {
-                    logger.info("source specimen: {}", LoggingUtils.prettyPrintJson(specimen));
+                logger.debug("source specimen: {}", LoggingUtils.prettyPrintJson(specimen));
 
                 if (!specimen.isSourceSpecimen()) {
                     return Either.left(new ValidationError("not a source specimen"));
