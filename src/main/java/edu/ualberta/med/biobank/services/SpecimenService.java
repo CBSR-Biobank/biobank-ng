@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.dtos.SpecimenDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.errors.PermissionError;
+import edu.ualberta.med.biobank.errors.ValidationError;
 import edu.ualberta.med.biobank.permission.patient.SpecimenReadPermission;
 import edu.ualberta.med.biobank.repositories.SpecimenRepository;
 import edu.ualberta.med.biobank.util.LoggingUtils;
@@ -82,7 +83,7 @@ public class SpecimenService {
                     logger.info("source specimen: {}", LoggingUtils.prettyPrintJson(specimen));
 
                 if (!specimen.isSourceSpecimen()) {
-                    return Either.left(new EntityNotFound("not a source specimen"));
+                    return Either.left(new ValidationError("not a source specimen"));
                 }
 
                 Map<Integer, AliquotSpecimenDTO> specimens = new HashMap<>();

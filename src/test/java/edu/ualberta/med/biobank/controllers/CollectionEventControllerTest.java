@@ -11,7 +11,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import edu.ualberta.med.biobank.controllers.endpoints.VisitNumberEndpoint;
 import edu.ualberta.med.biobank.dtos.CollectionEventDTO;
@@ -36,8 +35,7 @@ class CollectionEventControllerTest extends ControllerTest {
         var patient = factory.createPatient();
 
         this.mvc.perform(get(new VisitNumberEndpoint(patient.getPnumber(), 9999).url()))
-            .andExpect(status().isNotFound())
-            .andDo(MockMvcResultHandlers.print());
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -48,8 +46,7 @@ class CollectionEventControllerTest extends ControllerTest {
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
 
         this.mvc.perform(get(new VisitNumberEndpoint(patient.getPnumber(), collectionEvent.getVisitNumber()).url()))
-            .andExpect(status().isUnauthorized())
-            .andDo(MockMvcResultHandlers.print());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -76,6 +73,24 @@ class CollectionEventControllerTest extends ControllerTest {
     }
 
     @Test
+    @WithMockUser(value = "non_member_user")
+    void getWhenPresentAndNotmemberIsBadRequest() throws Exception {
+        createSingleStudyUser("non_member_user");
+
+        var patient = new TestFixtures.PatientFixtureBuilder()
+            .numCollectionEvents(1)
+            .numComments(1)
+            .numSpecimens(1)
+            .numAliquots(1)
+            .build(factory);
+
+        var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
+
+        this.mvc.perform(get(new VisitNumberEndpoint(patient.getPnumber(), collectionEvent.getVisitNumber()).url()))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @WithMockUser(value = "testuser")
     void getWhenNotExistIsNotFound() throws Exception {
         var patient = new TestFixtures.PatientFixtureBuilder()
@@ -85,7 +100,6 @@ class CollectionEventControllerTest extends ControllerTest {
         var badVisitNumber = collectionEvent.getVisitNumber() + 9999;
 
         this.mvc.perform(get(new VisitNumberEndpoint(patient.getPnumber(), badVisitNumber).url()))
-            .andExpect(status().isNotFound())
-            .andDo(MockMvcResultHandlers.print());
+            .andExpect(status().isNotFound());
     }
 }

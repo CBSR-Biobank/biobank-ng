@@ -1,21 +1,10 @@
 package edu.ualberta.med.biobank.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayWithSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.ualberta.med.biobank.controllers.endpoints.AliquotsEndpoint;
-import edu.ualberta.med.biobank.controllers.endpoints.VisitNumberEndpoint;
-import edu.ualberta.med.biobank.dtos.AliquotSpecimenDTO;
-import edu.ualberta.med.biobank.matchers.AliquotMatcher;
-import edu.ualberta.med.biobank.test.ControllerTest;
-import edu.ualberta.med.biobank.test.TestFixtures;
-import jakarta.transaction.Transactional;
-import java.util.Arrays;
 import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -24,8 +13,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import edu.ualberta.med.biobank.controllers.endpoints.AliquotsEndpoint;
+import edu.ualberta.med.biobank.controllers.endpoints.VisitNumberEndpoint;
+import edu.ualberta.med.biobank.dtos.AliquotSpecimenDTO;
+import edu.ualberta.med.biobank.matchers.AliquotMatcher;
+import edu.ualberta.med.biobank.test.ControllerTest;
+import edu.ualberta.med.biobank.test.TestFixtures;
+import jakarta.transaction.Transactional;
 
 @Testcontainers
 @Transactional
@@ -42,8 +37,7 @@ class SpecimenControllerTest extends ControllerTest {
         var patient = factory.createPatient();
 
         this.mvc.perform(get(new VisitNumberEndpoint(patient.getPnumber(), 9999).url()))
-            .andExpect(status().isNotFound())
-            .andDo(MockMvcResultHandlers.print());
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -56,8 +50,7 @@ class SpecimenControllerTest extends ControllerTest {
         var specimen = collectionEvent.getOriginalSpecimens().stream().findFirst().get();
 
         this.mvc.perform(get(new AliquotsEndpoint(specimen.getInventoryId()).url()))
-            .andExpect(status().isUnauthorized())
-            .andDo(MockMvcResultHandlers.print());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -82,7 +75,6 @@ class SpecimenControllerTest extends ControllerTest {
         MvcResult result =
             this.mvc.perform(get(new AliquotsEndpoint(specimen.getInventoryId()).url()))
                 .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
                 .andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -92,6 +84,47 @@ class SpecimenControllerTest extends ControllerTest {
         ));
 
         assertThat(dtos, AliquotMatcher.containsAll(List.of(aliquot)));
+    }
+
+    @Test
+    @WithMockUser(value = "non_member_user")
+    @DisplayName("When source specimen is present returns OK")
+    void getWhenPresentAndNotMemberIsBadRequest() throws Exception {
+        createSingleStudyUser("non_member_user");
+
+        var patient = new TestFixtures.PatientFixtureBuilder()
+            .numCollectionEvents(1)
+            .numSpecimens(1)
+            .numAliquots(1)
+            .build(factory);
+
+        var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
+        var specimen = collectionEvent.getOriginalSpecimens().stream().findFirst().get();
+
+        this.mvc.perform(get(new AliquotsEndpoint(specimen.getInventoryId()).url()))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(value = "testuser")
+    void getWhenNotSourceSpecimenIsBadRequest() throws Exception {
+        var patient = new TestFixtures.PatientFixtureBuilder()
+            .numCollectionEvents(1)
+            .numSpecimens(1)
+            .numAliquots(1)
+            .build(factory);
+
+        var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
+        var aliquot = collectionEvent
+            .getAllSpecimens()
+            .stream()
+            .filter(s -> s.getParentSpecimen() != null)
+            .findFirst()
+            .get();
+
+        this.mvc.perform(get(new AliquotsEndpoint(aliquot.getInventoryId()).url()))
+            .andExpect(status().isBadRequest())
+            .andReturn();
     }
 
     @Test
@@ -108,7 +141,6 @@ class SpecimenControllerTest extends ControllerTest {
         var badInventoryId = specimen.getInventoryId() + "_bad";
 
         this.mvc.perform(get(new AliquotsEndpoint(badInventoryId).url()))
-            .andExpect(status().isNotFound())
-            .andDo(MockMvcResultHandlers.print());
+            .andExpect(status().isNotFound());
     }
 }
