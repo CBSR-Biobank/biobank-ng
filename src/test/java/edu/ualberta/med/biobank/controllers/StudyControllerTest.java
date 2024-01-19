@@ -96,7 +96,7 @@ class StudyControllerTest extends ControllerTest {
     @Test
     @WithMockUser(value = "testuser")
     void getSingleWhenNotExistIsNotFound() throws Exception {
-        var badname = (new Faker()).lorem().fixedString(10);
+        var badname = new Faker().lorem().fixedString(10);
 
         this.mvc.perform(get(new StudyEndpoint(badname).url()))
             .andExpect(status().isNotFound())
@@ -177,14 +177,5 @@ class StudyControllerTest extends ControllerTest {
         Status.valuesList().stream().forEach(s -> results.add(List.of(s.toString().toLowerCase())));
         results.add(Status.valuesList().stream().map(s -> s.toString().toLowerCase()).toList());
         return results;
-    }
-
-    private User createSingleStudyUser(String username) {
-        User user = factory.createUser();
-        user.setLogin(username);
-        em.persist(user);
-        em.flush();
-        factory.buildMembership().setStudy().create();
-        return user;
     }
 }

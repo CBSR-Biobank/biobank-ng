@@ -48,7 +48,10 @@ class SpecimenControllerTest extends ControllerTest {
 
     @Test
     void getWhenPresentAndUnauthorized() throws Exception {
-        var patient = TestFixtures.patientFixture(factory);
+        var patient = new TestFixtures.PatientFixtureBuilder()
+            .numCollectionEvents(1)
+            .numSpecimens(1)
+            .build(factory);
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var specimen = collectionEvent.getOriginalSpecimens().stream().findFirst().get();
 
@@ -61,7 +64,12 @@ class SpecimenControllerTest extends ControllerTest {
     @WithMockUser(value = "testuser")
     @DisplayName("When source specimen is present returns OK")
     void getWhenPresentIsOk() throws Exception {
-        var patient = TestFixtures.patientFixture(factory);
+        var patient = new TestFixtures.PatientFixtureBuilder()
+            .numCollectionEvents(1)
+            .numSpecimens(1)
+            .numAliquots(1)
+            .build(factory);
+
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var specimen = collectionEvent.getOriginalSpecimens().stream().findFirst().get();
         var aliquot = collectionEvent
@@ -90,7 +98,11 @@ class SpecimenControllerTest extends ControllerTest {
     @WithMockUser(value = "testuser")
     @DisplayName("When source specimen inventory ID is invalid returns 404")
     void getWhenNotPresentIsNotFound() throws Exception {
-        var patient = TestFixtures.patientFixture(factory, 1, 1, 0);
+        var patient = new TestFixtures.PatientFixtureBuilder()
+            .numCollectionEvents(1)
+            .numSpecimens(1)
+            .build(factory);
+
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var specimen = collectionEvent.getOriginalSpecimens().stream().findFirst().get();
         var badInventoryId = specimen.getInventoryId() + "_bad";

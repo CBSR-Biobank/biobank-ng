@@ -30,7 +30,10 @@ public class CollectionEventMatcher {
     }
 
     public static Matcher<CollectionEventDTO> matches(CollectionEvent expected) {
-        return compose("a collection-event with", hasFeature("id", CollectionEventDTO::id, equalTo(expected.getId())))
+        var matchers = compose(
+            "a collection-event with",
+            hasFeature("id", CollectionEventDTO::id, equalTo(expected.getId()))
+        )
             .and(hasFeature("visitNumber", CollectionEventDTO::visitNumber, equalTo(expected.getVisitNumber())))
             .and(hasFeature("status", CollectionEventDTO::status, equalTo(expected.getActivityStatus().toString())))
             .and(hasFeature("patientId", CollectionEventDTO::patientId, equalTo(expected.getPatient().getId())))
@@ -52,32 +55,33 @@ public class CollectionEventMatcher {
             .and(hasFeature("studyId", CollectionEventDTO::studyId, equalTo(expected.getPatient().getStudy().getId())))
             .and(
                 hasFeature("attributes size", CollectionEventDTO::attributes, hasSize(expected.getEventAttrs().size()))
-            )
-            .and(
+            );
+
+        if (!expected.getComments().isEmpty()) {
+            matchers.and(
                 hasFeature("comments", CollectionEventDTO::comments, CommentMatcher.containsAll(expected.getComments()))
-            )
-            .and(
+            );
+        }
+
+        if (!sourceSpecimens(expected).isEmpty()) {
+            matchers.and(
                 hasFeature(
                     "sourceSpecimens",
                     CollectionEventDTO::sourceSpecimens,
                     SourceSpecimenMatcher.containsAll(sourceSpecimens(expected))
                 )
             );
+        }
+
+        return matchers;
     }
 
     public static Matcher<CollectionEventSummaryDTO> matchesSummary(CollectionEvent expected) {
-        return compose(
+        var matchers = compose(
             "a collection-event with",
             hasFeature("id", CollectionEventSummaryDTO::id, equalTo(expected.getId()))
         )
             .and(hasFeature("visitNumber", CollectionEventSummaryDTO::visitNumber, equalTo(expected.getVisitNumber())))
-            .and(
-                hasFeature(
-                    "createdAt",
-                    CollectionEventSummaryDTO::createdAt,
-                    DateMatchers.within(1, ChronoUnit.SECONDS, createdAt(expected))
-                )
-            )
             .and(
                 hasFeature(
                     "status",
@@ -91,14 +95,29 @@ public class CollectionEventMatcher {
                     CollectionEventSummaryDTO::specimenCount,
                     equalTo(Long.valueOf(sourceSpecimens(expected).size()))
                 )
-            )
-            .and(
+            );
+
+        if (!sourceSpecimens(expected).isEmpty()) {
+            matchers.and(
+                hasFeature(
+                    "createdAt",
+                    CollectionEventSummaryDTO::createdAt,
+                    DateMatchers.within(1, ChronoUnit.SECONDS, createdAt(expected))
+                )
+            );
+        }
+
+        if (!aliquots(expected).isEmpty()) {
+            matchers.and(
                 hasFeature(
                     "aliquotCount",
                     CollectionEventSummaryDTO::aliquotCount,
                     equalTo(Long.valueOf(aliquots(expected).size()))
                 )
             );
+        }
+
+        return matchers;
     }
 
     private static List<Specimen> sourceSpecimens(CollectionEvent collectionEvent) {
@@ -132,8 +151,12 @@ public class CollectionEventMatcher {
     }
 
     // see https://stackoverflow.com/a/27590279
-    public static Matcher<Iterable<? extends CollectionEventSummaryDTO>> containsAllSummaries(Set<CollectionEvent> items) {
-        List<Matcher<? super CollectionEventSummaryDTO>> matchers = new ArrayList<Matcher<? super CollectionEventSummaryDTO>>();
+    public static Matcher<Iterable<? extends CollectionEventSummaryDTO>> containsAllSummaries(
+        Set<CollectionEvent> items
+    ) {
+        List<Matcher<? super CollectionEventSummaryDTO>> matchers = new ArrayList<
+            Matcher<? super CollectionEventSummaryDTO>
+        >();
         for (CollectionEvent item : items) {
             matchers.add(matchesSummary(item));
         }

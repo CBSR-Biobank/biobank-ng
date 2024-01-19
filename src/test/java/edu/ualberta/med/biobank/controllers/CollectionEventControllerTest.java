@@ -42,7 +42,9 @@ class CollectionEventControllerTest extends ControllerTest {
 
     @Test
     void getWhenPresentAndUnauthorized() throws Exception {
-        var patient = TestFixtures.patientFixture(factory);
+        var patient = new TestFixtures.PatientFixtureBuilder()
+            .numCollectionEvents(1)
+            .build(factory);
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
 
         this.mvc.perform(get(new VisitNumberEndpoint(patient.getPnumber(), collectionEvent.getVisitNumber()).url()))
@@ -53,7 +55,13 @@ class CollectionEventControllerTest extends ControllerTest {
     @Test
     @WithMockUser(value = "testuser")
     void getWhenPresentIsOk() throws Exception {
-        var patient = TestFixtures.patientFixture(factory);
+        var patient = new TestFixtures.PatientFixtureBuilder()
+            .numCollectionEvents(1)
+            .numComments(1)
+            .numSpecimens(1)
+            .numAliquots(1)
+            .build(factory);
+
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
 
         MvcResult result =
@@ -70,7 +78,9 @@ class CollectionEventControllerTest extends ControllerTest {
     @Test
     @WithMockUser(value = "testuser")
     void getWhenNotExistIsNotFound() throws Exception {
-        var patient = TestFixtures.patientFixture(factory);
+        var patient = new TestFixtures.PatientFixtureBuilder()
+            .numCollectionEvents(1)
+            .build(factory);
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var badVisitNumber = collectionEvent.getVisitNumber() + 9999;
 

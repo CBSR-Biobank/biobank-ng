@@ -9,7 +9,12 @@ import org.slf4j.LoggerFactory;
 
 public class LoggingUtils {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = LoggerFactory.getLogger(LoggingUtils.class);
+
+    private LoggingUtils() {
+        throw new AssertionError();
+    }
 
 
     public static <T> String prettyPrintJson(T object) {

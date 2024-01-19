@@ -6,6 +6,10 @@ import java.util.Iterator;
 public class StringUtil {
     public static final String EMPTY_STRING = "";
 
+    private StringUtil() {
+        throw new AssertionError();
+    }
+
     /**
      * Returns a concatenation of the {@link String} form of each element in the
      * given {@code Collection}, delimited by the given delimiter. Rolled our

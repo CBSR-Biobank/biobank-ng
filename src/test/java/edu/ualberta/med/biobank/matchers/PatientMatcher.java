@@ -20,7 +20,7 @@ public class PatientMatcher {
     }
 
     public static Matcher<PatientDTO> matches(Patient expected) {
-        return compose("a patient with", hasFeature("id", PatientDTO::id, equalTo(expected.getId())))
+        var matchers = compose("a patient with", hasFeature("id", PatientDTO::id, equalTo(expected.getId())))
             .and(hasFeature("pnumber", PatientDTO::pnumber, equalTo(expected.getPnumber())))
             .and(
                 hasFeature(
@@ -32,14 +32,19 @@ public class PatientMatcher {
             .and(hasFeature("specimenCount", PatientDTO::specimenCount, equalTo(Long.valueOf(sourceSpecimens(expected).size()))))
             .and(hasFeature("aliquotCount", PatientDTO::aliquotCount, equalTo(Long.valueOf(aliquots(expected).size()))))
             .and(hasFeature("studyId", PatientDTO::studyId, equalTo(expected.getStudy().getId())))
-            .and(hasFeature("studyNameShort", PatientDTO::studyNameShort, equalTo(expected.getStudy().getNameShort())))
-            .and(
+            .and(hasFeature("studyNameShort", PatientDTO::studyNameShort, equalTo(expected.getStudy().getNameShort())));
+
+        if (!expected.getCollectionEvents().isEmpty()) {
+            matchers.and(
                 hasFeature(
                     "collectionEvents",
                     PatientDTO::collectionEvents,
                     CollectionEventMatcher.containsAllSummaries(expected.getCollectionEvents())
                 )
             );
+        }
+
+        return matchers;
     }
 
     private static Set<Specimen> sourceSpecimens(Patient patient) {

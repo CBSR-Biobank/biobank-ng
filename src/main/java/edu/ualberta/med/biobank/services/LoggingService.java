@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import edu.ualberta.med.biobank.applicationevents.PatientCreatedEvent;
 import edu.ualberta.med.biobank.applicationevents.PatientReadEvent;
 import edu.ualberta.med.biobank.applicationevents.SpecimenReadEvent;
 import edu.ualberta.med.biobank.applicationevents.UserLoggedInEvent;
@@ -17,11 +18,13 @@ import edu.ualberta.med.biobank.applicationevents.VisitReadEvent;
 import edu.ualberta.med.biobank.domain.Log;
 import edu.ualberta.med.biobank.dtos.LoggingDTO;
 import edu.ualberta.med.biobank.repositories.LoggingRepository;
+import edu.ualberta.med.biobank.util.LoggingUtils;
 import jakarta.persistence.Tuple;
 
 @Service
 public class LoggingService {
 
+    @SuppressWarnings("unused")
     final Logger logger = LoggerFactory.getLogger(LoggingService.class);
 
     private LoggingRepository loggingRepository;
@@ -59,6 +62,17 @@ public class LoggingService {
     void handlePatientReadEvent(PatientReadEvent event) {
         Log logEvent = new Log.LogBuilder()
             .action("select")
+            .username(event.getUsername())
+            .patientNumber(event.getPnumber())
+            .type("Patient")
+            .build();
+        loggingRepository.save(logEvent);
+    }
+
+    @EventListener
+    void handlePatientCreatedEvent(PatientCreatedEvent event) {
+        Log logEvent = new Log.LogBuilder()
+            .action("insert")
             .username(event.getUsername())
             .patientNumber(event.getPnumber())
             .type("Patient")

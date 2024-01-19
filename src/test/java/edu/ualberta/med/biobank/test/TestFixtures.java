@@ -1,52 +1,76 @@
 package edu.ualberta.med.biobank.test;
 
-import java.util.Optional;
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.domain.Comment;
 import edu.ualberta.med.biobank.domain.Patient;
 
 public class TestFixtures {
 
-    public static Patient patientFixture(Factory factory) {
-        return patientFixture(factory, Optional.empty(), Optional.empty(), Optional.empty());
-    }
+    public static final class PatientFixtureBuilder {
 
-    public static Patient patientFixture(Factory factory, int numPatients, int numSpecimens, int numAliquots) {
-        return patientFixture(factory, Optional.of(numPatients), Optional.of(numPatients), Optional.of(numAliquots));
-    }
+        private int numCollectionEvents;
+        private int numSpecimens;
+        private int numAliquots;
+        private int numComments;
 
-    public static Patient patientFixture(
-        Factory factory,
-        Optional<Integer> numCollectionEvents,
-        Optional<Integer> numSpecimens,
-        Optional<Integer> numAliquots
-    ) {
-        factory.createAliquotedSpecimen();
-        Patient patient = factory.createPatient();
-
-        Comment comment = factory.createComment();
-        comment.setMessage(factory.getFaker().lorem().sentence());
-        patient.getComments().add(comment);
-
-        var ceCount = numCollectionEvents.orElse(1);
-        var spcCount = numSpecimens.orElse(1);
-        var alqCount = numAliquots.orElse(1);
-
-        for (int j = 0; j < ceCount; ++j) {
-            CollectionEvent cevent = factory.createCollectionEvent();
-            comment = factory.createComment();
-            comment.setMessage(factory.getFaker().lorem().sentence());
-            cevent.getComments().add(comment);
-
-            for (int k = 0; k < spcCount; ++k) {
-                factory.createParentSpecimen();
-
-                for (int l = 0; l < alqCount; ++l) {
-                    factory.createChildSpecimen();
-                }
-            }
+        public PatientFixtureBuilder() {
+            this.numCollectionEvents = 0;
+            this.numSpecimens = 0;
+            this.numAliquots = 0;
+            this.numComments = 0;
         }
 
-        return patient;
+        public PatientFixtureBuilder numCollectionEvents(int num) {
+            this.numCollectionEvents = num;
+            return this;
+        }
+
+        public PatientFixtureBuilder numSpecimens(int num) {
+            if (numCollectionEvents <= 0) {
+                this.numCollectionEvents = 1;
+            }
+            this.numSpecimens = num;
+            return this;
+        }
+
+        public PatientFixtureBuilder numAliquots(int num) {
+            if (numSpecimens <= 0) {
+                this.numSpecimens = 1;
+            }
+            this.numAliquots = num;
+            return this;
+        }
+
+        public PatientFixtureBuilder numComments(int num) {
+            this.numComments = num;
+            return this;
+        }
+
+        public Patient build(Factory factory) {
+            Patient patient = factory.createPatient();
+
+            for (int j = 0; j < numComments; ++j) {
+                Comment comment = factory.createComment();
+                comment.setMessage(factory.getFaker().lorem().sentence());
+                patient.getComments().add(comment);
+            }
+
+            for (int j = 0; j < numCollectionEvents; ++j) {
+                CollectionEvent cevent = factory.createCollectionEvent();
+                Comment comment = factory.createComment();
+                comment.setMessage(factory.getFaker().lorem().sentence());
+                cevent.getComments().add(comment);
+
+                for (int k = 0; k < numSpecimens; ++k) {
+                    factory.createParentSpecimen();
+
+                    for (int l = 0; l < numAliquots; ++l) {
+                        factory.createChildSpecimen();
+                    }
+                }
+            }
+
+            return patient;
+        }
     }
 }

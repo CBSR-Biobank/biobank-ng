@@ -83,4 +83,13 @@ public class ControllerTest extends BaseTest {
 
         return globalAdmin;
     }
+
+    protected User createSingleStudyUser(String username) {
+        User user = factory.createUser();
+        user.setLogin(username);
+        em.persist(user);
+        em.flush();
+        factory.buildMembership().setStudy().create();
+        return user;
+    }
 }
