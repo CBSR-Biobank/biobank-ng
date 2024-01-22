@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.errors.PermissionError;
+import edu.ualberta.med.biobank.errors.ValidationError;
 import edu.ualberta.med.biobank.permission.patient.PatientCreatePermission;
 import edu.ualberta.med.biobank.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.repositories.CollectionEventRepository;
@@ -24,6 +25,8 @@ import io.jbock.util.Either;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 
 @Service
 public class PatientService {
@@ -33,31 +36,45 @@ public class PatientService {
     @PersistenceContext
     protected EntityManager entityManager;
 
-    PatientRepository patientRepository;
+    private PatientRepository patientRepository;
 
-    CollectionEventRepository collectionEventRepository;
+    private CollectionEventRepository collectionEventRepository;
 
     private BiobankEventPublisher eventPublisher;
 
     private StudyRepository studyRepository;
 
-    UserService userService;
+    private UserService userService;
+
+    private Validator validator;
 
     public PatientService(
         PatientRepository patientRepository,
         CollectionEventRepository collectionEventRepository,
         StudyRepository studyRepository,
         UserService userService,
+        Validator validator,
         BiobankEventPublisher eventPublisher
     ) {
         this.patientRepository = patientRepository;
         this.collectionEventRepository = collectionEventRepository;
         this.studyRepository = studyRepository;
         this.userService = userService;
+        this.validator = validator;
         this.eventPublisher = eventPublisher;
     }
 
     public Either<AppError, PatientDTO> save(PatientCreateDTO dto) {
+        var violations = validator.validate(dto);
+
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (ConstraintViolation<PatientCreateDTO> constraintViolation : violations) {
+                sb.append(constraintViolation.getMessage());
+            }
+            return Either.left(new ValidationError(sb.toString()));
+        }
+
         var found = studyRepository.findByNameShort(dto.studyNameShort(), Tuple.class).stream().findFirst();
 
         if (found.isEmpty()) {

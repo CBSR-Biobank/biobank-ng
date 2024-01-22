@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.util;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +19,6 @@ public class LoggingUtils {
 
 
     public static <T> String prettyPrintJson(T object) {
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm a z");
         try {
             ObjectMapper mapper = new ObjectMapper();
             mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);

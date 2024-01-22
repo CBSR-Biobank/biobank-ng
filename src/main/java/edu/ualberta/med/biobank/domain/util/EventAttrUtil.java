@@ -1,10 +1,10 @@
 package edu.ualberta.med.biobank.domain.util;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import edu.ualberta.med.biobank.util.DateUtil;
 
 public class EventAttrUtil {
 
@@ -48,7 +48,6 @@ public class EventAttrUtil {
             for (String singleVal : value.split(";")) {
                 if (!permValuesSplit.contains(singleVal)) {
                     throw new RuntimeException(
-                            
                                     INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE_ERRMSG.formatted(
                                     singleVal, value, label));
                 }
@@ -57,9 +56,7 @@ public class EventAttrUtil {
             Double.parseDouble(value);
         } else if (type == EventAttrTypeEnum.DATE_TIME) {
             try {
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                format.parse(value);
-
+                DateUtil.parseDate(value);
             } catch (ParseException e) {
                 throw new RuntimeException(CANNOT_PARSE_DATE_ERRMSG.formatted(value));
             }
