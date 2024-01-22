@@ -1,12 +1,10 @@
-import { Alert, AlertDescription } from '@app/components/alert';
 import { CircularProgress } from '@app/components/circular-progress';
+import { InfoCard } from '@app/components/info-card';
 import { ShowError } from '@app/components/show-error';
 import { StatusChip } from '@app/components/status-chip';
 import { TableCell, TableRow } from '@app/components/ui/table';
 import { useAliquots } from '@app/hooks/use-specimen';
 import { SourceSpecimen } from '@app/models/specimen';
-import { faWarning } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import format from 'date-fns/format';
 import { forwardRef } from 'react';
 
@@ -42,10 +40,12 @@ export const AliquotsTable = forwardRef<HTMLTableElement, AliquotsTableProps>(({
     return (
       <TableRow>
         <TableCell colSpan={10}>
-          <Alert className="border-amber-500 bg-amber-200 text-slate-600" ref={forwardedRef}>
-            <FontAwesomeIcon icon={faWarning} />
-            <AlertDescription>No aliquots for this source specimen yet.</AlertDescription>
-          </Alert>
+          <InfoCard
+            ref={forwardedRef}
+            className="pl-8"
+            title="No Aliquots"
+            message="This source specimen has no aliquots on record."
+          />
         </TableCell>
       </TableRow>
     );
@@ -56,7 +56,7 @@ export const AliquotsTable = forwardRef<HTMLTableElement, AliquotsTableProps>(({
       {specimens.map((specimen) => (
         <TableRow key={specimen.id}>
           <TableCell className="text-sm font-normal leading-normal text-slate-700">
-            <p className="pl-10">{specimen.inventoryId}</p>
+            <p className="pl-8">{specimen.inventoryId}</p>
           </TableCell>
           <TableCell className=" text-sm font-normal leading-normal text-slate-700">{specimen.quantity}</TableCell>
           <TableCell className=" text-sm font-normal leading-normal text-slate-700">
