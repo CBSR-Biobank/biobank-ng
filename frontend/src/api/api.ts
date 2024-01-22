@@ -1,3 +1,4 @@
+import { Status } from '@app/models/status';
 import { userSchema } from '@app/models/user';
 import { useUserStore } from '@app/store';
 
@@ -8,52 +9,75 @@ type Auth = {
   method: 'GET';
   path: ['auth'];
   query: undefined;
+  body: undefined;
 };
 
 type Logging = {
   method: 'GET';
   path: ['logging'];
   query: undefined;
+  body: undefined;
 };
 
 type LoggingLatest = {
   method: 'GET';
   path: ['logging', 'latest'];
   query: undefined;
+  body: undefined;
+};
+
+type PatientCreate = {
+  method: 'POST';
+  path: ['patients'];
+  query: undefined;
+  body: string;
 };
 
 type PatientGet = {
   method: 'GET';
   path: ['patients', string];
   query: undefined;
+  body: undefined;
 };
 
 type CollectionEventsGet = {
   method: 'GET';
   path: ['patients', string, 'collection-events'];
   query: undefined;
+  body: undefined;
 };
 
 type CollectionEventGet = {
   method: 'GET';
   path: ['patients', string, 'collection-events', number];
   query: undefined;
+  body: undefined;
 };
 
 type AliquotsGet = {
   method: 'GET';
   path: ['specimens', string, 'aliquots'];
   query: undefined;
+  body: undefined;
+};
+
+type StudyNames = {
+  method: 'GET';
+  path: ['studies', 'names'];
+  query: { status?: Status | undefined };
+  body: undefined;
 };
 
 export type Endpoint =
   | Auth
   | Logging
   | LoggingLatest
+  | PatientCreate
   | PatientGet
   | CollectionEventsGet
   | CollectionEventGet
-  | AliquotsGet;
+  | AliquotsGet
+  | StudyNames;
 
 export type ApiError = {
   status: number;
@@ -63,6 +87,7 @@ export type ApiError = {
 export async function httpClient(endpoint: Endpoint) {
   const method = endpoint.method;
   const path = endpoint.path.join('/');
+  const body = endpoint.body ?? null;
   const headers = {
     Authorization: 'Bearer ' + useUserStore.getState().userToken,
     credentials: 'include',
@@ -77,7 +102,7 @@ export async function httpClient(endpoint: Endpoint) {
     }
   }
 
-  const response = await fetch(url, { method, headers });
+  const response = await fetch(url, { method, headers, body });
   return handleServerResponse(response);
 }
 
@@ -113,6 +138,7 @@ export async function fetchAuthenticated() {
   const response = await httpClient({
     method: 'GET',
     path: ['auth'],
+    body: undefined,
     query: undefined
   });
 

@@ -1,13 +1,12 @@
 package edu.ualberta.med.biobank.domain;
 
-import edu.ualberta.med.biobank.errors.AppError;
-import edu.ualberta.med.biobank.errors.ValidationError;
-import edu.ualberta.med.biobank.exception.AppErrorException;
-import io.jbock.util.Either;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import edu.ualberta.med.biobank.errors.AppError;
+import edu.ualberta.med.biobank.errors.ValidationError;
+import io.jbock.util.Either;
 
 /**
  * The id of these enumerations are saved in the database. Therefore, DO NOT

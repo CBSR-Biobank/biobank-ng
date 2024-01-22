@@ -11,6 +11,7 @@ export class SpecimenApi {
     const response = await httpClient({
       method: 'GET',
       path: ['specimens', inventoryId, 'aliquots'],
+      body: undefined,
       query: undefined
     });
     const result = await response.json();

@@ -1,12 +1,13 @@
 import { Login } from '@app/components/login';
 import { HomePage } from '@app/pages/homepage';
-import { Link, RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { Link, RouterProvider, createBrowserRouter, useRouteError } from 'react-router-dom';
 import { BasicPage } from './pages/basic-page';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <BasicPage />,
+    errorElement: <ErrorBoundary />,
     children: [
       {
         index: true,
@@ -37,8 +38,8 @@ const router = createBrowserRouter([
           {
             path: 'add',
             async lazy() {
-              let { PatientAdd } = await import('@app/pages/patients/patient-add');
-              return { Component: PatientAdd };
+              let { PatientAddPage } = await import('@app/pages/patients/patient-add');
+              return { Component: PatientAddPage };
             }
           },
           {
@@ -78,7 +79,8 @@ const router = createBrowserRouter([
   },
   {
     path: '*',
-    element: <NoMatch />
+    element: <NoMatch />,
+    errorElement: <ErrorBoundary />
   }
 ]);
 
@@ -91,6 +93,12 @@ function NoMatch() {
       </p>
     </div>
   );
+}
+
+function ErrorBoundary() {
+  let error = useRouteError();
+  console.error(error);
+  return <div>Error!</div>;
 }
 
 export function App() {

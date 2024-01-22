@@ -6,6 +6,7 @@ export class CollectionEventApi {
     const response = await httpClient({
       method: 'GET',
       path: ['patients', pnumber, 'collection-events'],
+      body: undefined,
       query: undefined
     });
 

@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.services;
 
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +33,6 @@ public class PatientService {
 
     Logger logger = LoggerFactory.getLogger(PatientService.class);
 
-    @PersistenceContext
-    protected EntityManager entityManager;
-
     private PatientRepository patientRepository;
 
     private CollectionEventRepository collectionEventRepository;
@@ -43,8 +40,6 @@ public class PatientService {
     private BiobankEventPublisher eventPublisher;
 
     private StudyRepository studyRepository;
-
-    private UserService userService;
 
     private Validator validator;
 
@@ -59,7 +54,6 @@ public class PatientService {
         this.patientRepository = patientRepository;
         this.collectionEventRepository = collectionEventRepository;
         this.studyRepository = studyRepository;
-        this.userService = userService;
         this.validator = validator;
         this.eventPublisher = eventPublisher;
     }
@@ -68,20 +62,25 @@ public class PatientService {
         var violations = validator.validate(dto);
 
         if (!violations.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
+            List<String> errors = new ArrayList<>();
             for (ConstraintViolation<PatientCreateDTO> constraintViolation : violations) {
-                sb.append(constraintViolation.getMessage());
+                errors.add(constraintViolation.getMessage());
             }
-            return Either.left(new ValidationError(sb.toString()));
+            return Either.left(new ValidationError(String.join(", ", errors)));
         }
 
-        var found = studyRepository.findByNameShort(dto.studyNameShort(), Tuple.class).stream().findFirst();
+        // does this patient alredy exist?
+        var found = patientRepository.findByPnumber(dto.pnumber(), Tuple.class);
+        if (!found.isEmpty()) {
+            return Either.left(new ValidationError("patient already exists"));
+        }
 
-        if (found.isEmpty()) {
+        var studyFound = studyRepository.findByNameShort(dto.studyNameShort(), Tuple.class).stream().findFirst();
+        if (studyFound.isEmpty()) {
             return Either.left(new EntityNotFound("study with short name not found: %s".formatted(dto.studyNameShort())));
         }
 
-        var studyId = found.get().get("id", Integer.class);
+        var studyId = studyFound.get().get("id", Integer.class);
         var permission = new PatientCreatePermission(studyId);
         var allowedMaybe = permission.isAllowed();
         return allowedMaybe
@@ -100,7 +99,6 @@ public class PatientService {
                 patient.setCreatedAt(dto.createdAt());
                 patient.setStudy(study);
                 Patient savedPatient = patientRepository.save(patient);
-                entityManager.flush();
 
                 Authentication auth = SecurityContextHolder.getContext().getAuthentication();
                 eventPublisher.publishPatientCreated(auth.getName(), dto.pnumber());

@@ -8,9 +8,9 @@ public record PatientCreateDTO(
     @NotBlank(message = "patient number cannot be blank")
     String pnumber,
 
-    @NotNull
+    @NotNull(message = "created-at cannot be null")
     Date createdAt,
 
-    @NotBlank(message = "study short name cannot be blank")
+    @NotNull(message = "study short name cannot be blank")
     String studyNameShort
 ) {}

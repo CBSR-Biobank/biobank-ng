@@ -3,11 +3,13 @@ package edu.ualberta.med.biobank.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -47,13 +49,13 @@ class PatientControllerTest extends ControllerTest {
 
     @Test
     @WithMockUser
-    void getWhenEmptyTableIs404() throws Exception {
+    void get_when_empty_table_is404() throws Exception {
         this.mvc.perform(get(new PatientNumberEndpoint(factory.getFaker().lorem().word()).url()))
             .andExpect(status().isNotFound());
     }
 
     @Test
-    void getWhenPresentAndUnauthorized() throws Exception {
+    void get_when_present_and_unauthorized() throws Exception {
         var patient = factory.createPatient();
         this.mvc.perform(get(new PatientNumberEndpoint(patient.getPnumber()).url()))
             .andExpect(status().isUnauthorized());
@@ -61,7 +63,7 @@ class PatientControllerTest extends ControllerTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    void getWhenPresentIsOk() throws Exception {
+    void get_when_present_is_ok() throws Exception {
         var patient = new TestFixtures.PatientFixtureBuilder().numCollectionEvents(1).numSpecimens(1).build(factory);
 
         MvcResult result =
@@ -77,7 +79,7 @@ class PatientControllerTest extends ControllerTest {
 
     @Test
     @WithMockUser(value = "non_member_user")
-    void getWhenPresentAndNotMemberIsBadRequest() throws Exception {
+    void get_when_present_and_not_member_is_bad_request() throws Exception {
         createSingleStudyUser("non_member_user");
 
         var patient = new TestFixtures.PatientFixtureBuilder().build(factory);
@@ -87,7 +89,7 @@ class PatientControllerTest extends ControllerTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    void getWhenNotExistIsNotFound() throws Exception {
+    void get_when_not_exist_is_not_found() throws Exception {
         var badname = new Faker().lorem().fixedString(10);
 
         this.mvc.perform(get(new PatientNumberEndpoint(badname).url())).andExpect(status().isNotFound());
@@ -95,7 +97,7 @@ class PatientControllerTest extends ControllerTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    void postSucceeds() throws Exception {
+    void post_succeeds() throws Exception {
         Study study = factory.createStudy();
         var dto = newPatient(study.getNameShort());
 
@@ -117,7 +119,7 @@ class PatientControllerTest extends ControllerTest {
     @ParameterizedTest
     @MethodSource("provideInvalidPatient")
     @WithMockUser(value = "testuser")
-    void post_fails_with_empty_pnumber(String pnumber, String createdAt, boolean hasStudy) throws Exception {
+    void post_fails_with_empty_pnumber(String pnumber, String createdAt, boolean hasStudy, String errMessage) throws Exception {
         Study study = factory.createStudy();
         var data = new JSONObject();
         data.put("pnumber", pnumber);
@@ -126,20 +128,35 @@ class PatientControllerTest extends ControllerTest {
             data.put("studyNameShort", study.getNameShort());
         }
 
-        createSingleStudyUser("non_member_user");
-
         this.mvc.perform(
                 post(new PatientCreateEndpoint().url())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(data.toString())
             )
             .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message", Matchers.matchesRegex(errMessage)))
             .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
     @WithMockUser(value = "testuser")
-    void postFailsWithBadStudy() throws Exception {
+    void post_fails_when_patient_already_exists() throws Exception {
+        var patient = factory.createPatient();
+        var dto = new PatientCreateDTO(patient.getPnumber(), patient.getCreatedAt(), patient.getStudy().getNameShort());
+
+        this.mvc.perform(
+                post(new PatientCreateEndpoint().url())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(JsonUtil.asJsonString(dto))
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message", Matchers.matchesRegex("patient.*exists")))
+            .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    @WithMockUser(value = "testuser")
+    void post_fails_with_bad_study() throws Exception {
         createSingleStudyUser("non_member_user");
         var dto = newPatient(getMethodNameR());
 
@@ -153,7 +170,7 @@ class PatientControllerTest extends ControllerTest {
 
     @Test
     @WithMockUser(value = "non_member_user")
-    void postFailsWhenNotMember() throws Exception {
+    void post_fails_when_not_member() throws Exception {
         createSingleStudyUser("non_member_user");
         Study study = factory.createStudy();
         var dto = newPatient(study.getNameShort());
@@ -176,11 +193,11 @@ class PatientControllerTest extends ControllerTest {
         var faker = new Faker();
         var createdAt = DateUtil.datetimeToString(faker.date().past(1, TimeUnit.DAYS));
         return Stream.of(
-            Arguments.of(null, createdAt, true),
-            Arguments.of("", createdAt, true),
-            Arguments.of(faker.internet().username(), null, true),
-            Arguments.of(faker.internet().username(), "abc", true),
-            Arguments.of(faker.internet().username(), createdAt, false)
+            Arguments.of(null, createdAt, true, "patient number.*blank"),
+            Arguments.of("", createdAt, true, "patient number.*blank"),
+            Arguments.of(faker.internet().username(), null, true, "created.*null"),
+            Arguments.of(faker.internet().username(), "abc", true, ".*malformed.*"),
+            Arguments.of(faker.internet().username(), createdAt, false, "study.*name.*blank")
         );
     }
 }

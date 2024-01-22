@@ -7,6 +7,7 @@ export class LoggingApi {
     const response = await await httpClient({
       method: 'GET',
       path: ['logging', 'latest'],
+      body: undefined,
       query: undefined
     });
     const result = await response.json();
