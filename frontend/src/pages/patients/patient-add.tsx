@@ -13,7 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { AdminPage } from '../admin-page';
 
@@ -27,6 +27,8 @@ export function PatientAddPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { setPatient } = usePatientStore();
+  const [searchParams, _setSearchParams] = useSearchParams({ pnumber: '' });
+
   const now = new Date();
   now.setUTCHours(0, 0, 0, 0);
 
@@ -41,7 +43,7 @@ export function PatientAddPage() {
     reValidateMode: 'onChange',
     resolver: zodResolver(schema),
     defaultValues: {
-      pnumber: '',
+      pnumber: searchParams.get('pnumber'),
       createdAt: now.toISOString().substring(0, 16),
       studyNameShort: ''
     }
@@ -103,9 +105,11 @@ export function PatientAddPage() {
               required
             />
             <StudySelect control={control} name="studyNameShort" studies={studyNamesQry.data} />
-            <Button className="flex w-1/3 gap-3" disabled={!isValid} type="submit" icon={faPaperPlane}>
-              Submit
-            </Button>
+            <div className="flex gap-4">
+              <Button disabled={!isValid} type="submit" icon={faPaperPlane}>
+                Submit
+              </Button>
+            </div>
           </div>
         </form>
       </AdminPage>

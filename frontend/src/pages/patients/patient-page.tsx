@@ -25,7 +25,7 @@ export function PatientPage() {
     return <ShowError message="pnumber is invalid" />;
   }
 
-  if (patientQry.isError) {
+  if (patientQry.isError && patientQry.error.status !== 404) {
     const error: any = patientQry.error.error;
     if (error.message) {
       if (error.message.includes('permission')) {

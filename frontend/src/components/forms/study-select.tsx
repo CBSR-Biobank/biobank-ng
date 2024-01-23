@@ -9,7 +9,7 @@ import { ScrollArea } from '../ui/scroll-area';
 import { FormLabel } from './form-label';
 
 const classes =
-  'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-50 border-2 border-slate-400 bg-white';
+  'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-50 border-2 border-slate-400';
 
 export interface StudySelectProps<T extends FieldValues, U extends FieldPathByValue<T, string>> {
   control?: Control<T>;
@@ -30,8 +30,6 @@ export function StudySelect<T extends FieldValues, U extends FieldPathByValue<T,
   const { field } = useController({ control, name });
   const [popoverOpen, setPopoverOpen] = useState(false);
   const findStudy = (nameShort: String) => studies.find((study) => study.nameShort === nameShort);
-
-  //  console.log(field.value, findStudy(field.value));
 
   return (
     <div className="grid grid-cols-1 gap-2">
