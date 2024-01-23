@@ -9,7 +9,6 @@ import { Patient, PatientAdd } from '@app/models/patient';
 import { Status } from '@app/models/status';
 import { usePatientStore } from '@app/store';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
@@ -104,9 +103,8 @@ export function PatientAddPage() {
               required
             />
             <StudySelect control={control} name="studyNameShort" studies={studyNamesQry.data} />
-            <Button className="flex w-1/3 gap-3 bg-sky-500 hover:bg-sky-400" disabled={!isValid} type="submit">
+            <Button className="flex w-1/3 gap-3" disabled={!isValid} type="submit" icon={faPaperPlane}>
               Submit
-              <FontAwesomeIcon icon={faPaperPlane} />
             </Button>
           </div>
         </form>

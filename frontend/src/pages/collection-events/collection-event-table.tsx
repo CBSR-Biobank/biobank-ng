@@ -68,13 +68,7 @@ export const CollectionEventTable: React.FC<{ collectionEvents: CollectionEventB
               </td>
               <td className="border-b border-gray-200 p-3">
                 <Link to={`${cevent.visitNumber}`} className="place-self-end">
-                  <Button
-                    className={cn(
-                      buttonClass,
-                      'h-6 bg-sky-200 py-1 text-xs font-semibold text-sky-500 hover:bg-sky-300'
-                    )}
-                    size="sm"
-                  >
+                  <Button className={cn(buttonClass, 'h-6 py-1 text-xs uppercase')} size="sm">
                     View
                   </Button>
                 </Link>

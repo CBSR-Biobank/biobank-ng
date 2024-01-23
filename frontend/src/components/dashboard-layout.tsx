@@ -43,11 +43,7 @@ export const DashboardLayout: React.FC<{ children?: ReactNode }> = ({ children }
     <div className="relative">
       <div className={cn('absolute flex h-16 w-full grid-cols-2 items-center justify-between text-slate-200', bgColor)}>
         <div className="flex items-center gap-4 px-2">
-          {!checkingAuth && loggedIn && (
-            <Button className={cn(logoClasses)} onClick={toggleDrawer}>
-              <FontAwesomeIcon icon={faBars} size="2x" />
-            </Button>
-          )}
+          {!checkingAuth && loggedIn && <Button className={cn(logoClasses)} icon={faBars} onClick={toggleDrawer} />}
           <Link to="/" className="flex items-center gap-2 px-4">
             <span className="text-md font-sans font-semibold tracking-tight">CBSR Biobank</span>
           </Link>

@@ -95,7 +95,7 @@ export function CollectionEventView() {
                   <Button variant="ghost" size="sm" className="w-9 p-0">
                     <FontAwesomeIcon
                       icon={faChevronRight}
-                      className={cn('text-sky-600 duration-300 ease-in-out', { 'rotate-90': isOpen })}
+                      className={cn('duration-300 ease-in-out', { 'rotate-90': isOpen })}
                     />
                     <span className="sr-only">Toggle</span>
                   </Button>

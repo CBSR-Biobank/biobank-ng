@@ -3,11 +3,15 @@ import { EntityProperty } from '@app/components/entity-property';
 import { AdminPage } from '@app/pages/admin-page';
 import { CollectionEventTable } from '@app/pages/collection-events/collection-event-table';
 import { usePatientStore } from '@app/store';
+import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import format from 'date-fns/format';
 import { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { BackButton } from '../back-button';
+import { Button } from '../ui/button';
 
 export function PatientDetails() {
+  const navigate = useNavigate();
   const { patient, setCollectionEvent } = usePatientStore();
 
   useEffect(() => {
@@ -17,6 +21,10 @@ export function PatientDetails() {
   const handlePropChange = (_propertyName: string) => {
     // setPropertyToUpdate(propertyName);
     // setOpen(true);
+  };
+
+  const backClicked = () => {
+    navigate('/patients');
   };
 
   if (!patient) {
@@ -57,6 +65,12 @@ export function PatientDetails() {
 
         <CollectionEventTable collectionEvents={patient.collectionEvents} />
         <Outlet />
+      </div>
+      <div className="flex gap-4 pt-8">
+        <BackButton onClick={backClicked} />
+        <Button variant="secondary" icon={faPlusCircle}>
+          Add Visit
+        </Button>
       </div>
     </AdminPage>
   );

@@ -12,6 +12,7 @@ export function PatientPage() {
   const { setPatient } = usePatientStore();
   const patientQry = usePatient(params.pnumber);
   const { data: patient } = patientQry;
+
   const doesNotExist = patientQry.isError && patientQry.error.status === 404;
 
   useEffect(() => {

@@ -3,7 +3,6 @@ import { Button } from '@app/components/ui/button';
 import { Input } from '@app/components/ui/input';
 import { usePatientStore } from '@app/store';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminPage } from '../admin-page';
@@ -49,9 +48,8 @@ export function PatientSelect() {
             onChange={handleInputChange}
             onKeyUp={handleInputKeyUp}
           />
-          <Button type="submit" className="flex gap-2 bg-sky-500 hover:bg-sky-400">
+          <Button type="submit" icon={faPaperPlane}>
             Submit
-            <FontAwesomeIcon icon={faPaperPlane} />
           </Button>
         </form>
       </AdminPage>

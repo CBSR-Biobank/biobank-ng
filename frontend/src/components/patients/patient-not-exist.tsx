@@ -1,9 +1,9 @@
 import { Alert, AlertDescription } from '@app/components/alert';
-import { BiobankButton } from '@app/components/biobank-button';
 import { AdminPage } from '@app/pages/admin-page';
 import { faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
+import { Button } from '../ui/button';
 
 export const PatientNotExist: React.FC<{ pnumber: string }> = ({ pnumber }) => {
   return (
@@ -20,10 +20,10 @@ export const PatientNotExist: React.FC<{ pnumber: string }> = ({ pnumber }) => {
         </Alert>
         <div className="flex gap-8">
           <Link to="/patients">
-            <BiobankButton>Back</BiobankButton>
+            <Button>Back</Button>
           </Link>
           <Link to="/patients/add">
-            <BiobankButton className="w-[10rem] whitespace-nowrap">Add Patient</BiobankButton>
+            <Button className="w-[10rem] whitespace-nowrap">Add Patient</Button>
           </Link>
         </div>
       </div>
