@@ -3,19 +3,7 @@ import { VariantProps, cva } from 'class-variance-authority';
 import { cn } from '@app/utils';
 
 const tooltipVariants = cva(
-  [
-    'absolute',
-    'text-basic-600',
-    'bg-secondary-200',
-    'text-xs',
-    'p-2',
-    'rounded',
-    'scale-0',
-    'transition-all',
-    'group-hover:scale-100',
-    'whitespace-nowrap',
-    'font-semibold'
-  ],
+  'absolute text-white bg-sky-400 text-xs p-2 rounded scale-0 transition-all group-hover:scale-100 whitespace-nowrap font-semibold',
   {
     variants: {
       orientation: {

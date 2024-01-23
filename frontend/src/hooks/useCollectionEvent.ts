@@ -1,5 +1,5 @@
 import { ApiError } from '@app/api/api';
-import { PatientApi } from '@app/api/patients-api';
+import { PatientApi } from '@app/api/patient-api';
 import { useQuery } from '@tanstack/react-query';
 
 export function useCollectionEvent(pnumber?: string, vnumber?: number) {

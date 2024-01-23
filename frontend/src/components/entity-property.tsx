@@ -12,7 +12,7 @@ export const EntityProperty: React.FC<
     label: string;
     icon?: IconProp;
     tooltip?: string;
-    allowChanges: boolean;
+    allowChanges?: boolean;
     handleChange?: (propertyName: string) => void;
   }>
 > = ({ className, propName, label, icon = faPen, tooltip = 'Update', allowChanges, handleChange, children }) => {

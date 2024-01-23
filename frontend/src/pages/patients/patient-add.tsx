@@ -1,4 +1,4 @@
-import { PatientApi } from '@app/api/patients-api';
+import { PatientApi } from '@app/api/patient-api';
 import { StudyApi } from '@app/api/study-api';
 import { PatientBreadcrumbs } from '@app/components/breadcrumbs/patients-breadcrubms';
 import { CircularProgress } from '@app/components/circular-progress';
@@ -43,7 +43,7 @@ export function PatientAddPage() {
     reValidateMode: 'onChange',
     resolver: zodResolver(schema),
     defaultValues: {
-      pnumber: searchParams.get('pnumber'),
+      pnumber: searchParams.get('pnumber') ?? '',
       createdAt: now.toISOString().substring(0, 16),
       studyNameShort: ''
     }

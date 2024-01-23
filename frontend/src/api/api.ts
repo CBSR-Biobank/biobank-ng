@@ -33,6 +33,13 @@ type PatientCreate = {
   body: string;
 };
 
+type PatientUpdate = {
+  method: 'PUT';
+  path: ['patients', string];
+  query: undefined;
+  body: string;
+};
+
 type PatientGet = {
   method: 'GET';
   path: ['patients', string];
@@ -73,6 +80,7 @@ export type Endpoint =
   | Logging
   | LoggingLatest
   | PatientCreate
+  | PatientUpdate
   | PatientGet
   | CollectionEventsGet
   | CollectionEventGet

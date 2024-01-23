@@ -1,5 +1,5 @@
 import { collectionEventSchema } from '@app/models/collection-event';
-import { PatientAdd, patientSchema } from '@app/models/patient';
+import { PatientAdd, PatientUpdate, patientSchema } from '@app/models/patient';
 import { httpClient } from './api';
 
 export class PatientApi {
@@ -40,6 +40,22 @@ export class PatientApi {
       method: 'POST',
       path: ['patients'],
       body: JSON.stringify(patient),
+      query: undefined
+    });
+    const result = await response.json();
+    return patientSchema.parse(result);
+  }
+
+  static async update(patient: PatientUpdate) {
+    const data = {
+      pnumber: patient.pnumber,
+      createdAt: patient.createdAt,
+      studyNameShort: patient.studyNameShort
+    };
+    const response = await httpClient({
+      method: 'PUT',
+      path: ['patients', patient.pnumber],
+      body: JSON.stringify(data),
       query: undefined
     });
     const result = await response.json();
