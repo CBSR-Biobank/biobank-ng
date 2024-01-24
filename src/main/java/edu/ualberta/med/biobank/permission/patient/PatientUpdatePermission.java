@@ -13,16 +13,16 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-public class CollectionEventReadPermission implements Permission {
+public class PatientUpdatePermission implements Permission {
 
     @SuppressWarnings("unused")
-    private final Logger logger = LoggerFactory.getLogger(CollectionEventReadPermission.class);
+    private final Logger logger = LoggerFactory.getLogger(PatientUpdatePermission.class);
 
-    private static final PermissionEnum PERMISSION = PermissionEnum.COLLECTION_EVENT_READ;
+    private static final PermissionEnum PERMISSION = PermissionEnum.PATIENT_UPDATE;
 
     private Integer studyId;
 
-    public CollectionEventReadPermission(Integer studyId) {
+    public PatientUpdatePermission(Integer studyId) {
         this.studyId = studyId;
     }
 
@@ -32,7 +32,6 @@ public class CollectionEventReadPermission implements Permission {
         ApplicationContext applicationContext = ApplicationContextProvider.getApplicationContext();
 
         var userService = applicationContext.getBean(UserService.class);
-
         return userService
             .findOneWithMemberships(auth.getName())
             .flatMap(user -> {

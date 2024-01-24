@@ -18,6 +18,8 @@ public class SpecimenReadPermission implements Permission {
     @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(SpecimenReadPermission.class);
 
+    private static final PermissionEnum PERMISSION = PermissionEnum.SPECIMEN_READ;
+
     private Integer studyId;
 
     public SpecimenReadPermission(Integer studyId) {
@@ -35,13 +37,13 @@ public class SpecimenReadPermission implements Permission {
             .findOneWithMemberships(auth.getName())
             .flatMap(user -> {
                 if (studyId == null) {
-                    return Either.right(user.hasPermission(PermissionEnum.SPECIMEN_READ, null, null));
+                    return Either.right(user.hasPermission(PERMISSION, null, null));
                 }
 
                 var studyService = applicationContext.getBean(StudyService.class);
                 return studyService
                     .getByStudyId(studyId)
-                    .flatMap(study -> Either.right(user.hasPermission(PermissionEnum.SPECIMEN_READ, null, studyId)));
+                    .flatMap(study -> Either.right(user.hasPermission(PERMISSION, null, studyId)));
             });
     }
 }

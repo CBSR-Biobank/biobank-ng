@@ -59,7 +59,7 @@ export const PatientPropertyChanger: React.FC<{
       );
 
     case 'createdAt':
-      return <PropertyChangerDate {...commonProps} label="Created Date" value={patient.createdAt} required={true} />;
+      return <PropertyChangerDate {...commonProps} label="Date Added" value={patient.createdAt} required={true} />;
 
     case 'study':
       return <PropertyChangerStudy {...commonProps} label="Study" value={patient.studyNameShort} required={true} />;

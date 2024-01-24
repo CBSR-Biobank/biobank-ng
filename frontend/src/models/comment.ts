@@ -8,3 +8,5 @@ export const commentSchema = z.object({
 });
 
 export type Comment = z.infer<typeof commentSchema>;
+
+export type CommentAdd = Pick<Comment, 'message'>;

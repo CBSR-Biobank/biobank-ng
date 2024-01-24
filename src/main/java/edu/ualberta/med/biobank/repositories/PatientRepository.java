@@ -48,12 +48,13 @@ public interface PatientRepository extends JpaRepository<Patient, Integer> {
             c.id commentId,
             c.message commentMessage,
             pr.login commentUser,
-	c.created_at commentCreatedAt
+            c.created_at commentCreatedAt
         from comment c
         left join patient_comment pc on pc.COMMENT_ID = c.ID
         left join patient p on p.id=pc.PATIENT_ID
-        left join principal pr on pr.CSM_USER_ID = c.USER_ID
+        left join principal pr on pr.ID = c.USER_ID
         where p.pnumber = :pnumber
+        order by c.created_at asc
         """,
         nativeQuery = true
     )

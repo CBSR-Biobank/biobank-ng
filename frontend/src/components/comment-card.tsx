@@ -1,4 +1,4 @@
-import { Comment } from '@app/models/comments';
+import { Comment } from '@app/models/comment';
 import { format } from 'date-fns';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 

@@ -98,7 +98,7 @@ export function PatientAddPage() {
             <LabelledInput
               id="createdAt"
               type="datetime-local"
-              label="Created Date"
+              label="Date Added"
               errorMessage={errors?.createdAt?.message}
               {...register('createdAt')}
               defaultValue={new Date().toISOString().substring(0, 16)}

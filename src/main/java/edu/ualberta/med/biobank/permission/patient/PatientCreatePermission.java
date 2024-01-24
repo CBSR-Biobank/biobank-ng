@@ -18,6 +18,8 @@ public class PatientCreatePermission implements Permission {
     @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(PatientReadPermission.class);
 
+    private static final PermissionEnum PERMISSION = PermissionEnum.PATIENT_CREATE;
+
     private Integer studyId;
 
     public PatientCreatePermission(Integer studyId) {
@@ -34,14 +36,13 @@ public class PatientCreatePermission implements Permission {
             .findOneWithMemberships(auth.getName())
             .flatMap(user -> {
                 if (studyId == null) {
-                    return Either.right(user.hasPermission(PermissionEnum.PATIENT_READ, null, null));
+                    return Either.right(user.hasPermission(PERMISSION, null, null));
                 }
 
                 var studyService = applicationContext.getBean(StudyService.class);
-
                 return studyService
                     .getByStudyId(studyId)
-                    .flatMap(study -> Either.right(user.hasPermission(PermissionEnum.PATIENT_READ, null, studyId)));
+                    .flatMap(study -> Either.right(user.hasPermission(PERMISSION, null, studyId)));
             });
     }
 }

@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import edu.ualberta.med.biobank.dtos.CommentAddDTO;
 import edu.ualberta.med.biobank.dtos.CommentDTO;
-import edu.ualberta.med.biobank.dtos.PatientCreateDTO;
+import edu.ualberta.med.biobank.dtos.PatientAddDTO;
 import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.exception.AppErrorException;
 import edu.ualberta.med.biobank.services.PatientService;
@@ -39,9 +40,17 @@ public class PatientController {
         return patientService.patientComments(pnumber).orElseThrow(err -> new AppErrorException(err));
     }
 
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @PostMapping(consumes="application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    public PatientDTO postPatient(@RequestBody PatientCreateDTO patient) {
+    public PatientDTO postPatient(@RequestBody PatientAddDTO patient) {
         return patientService.save(patient).orElseThrow(err -> new AppErrorException(err));
+    }
+
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @PostMapping(path = "/{pnumber}/comments", consumes="application/json")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDTO postPatientComment(@PathVariable String pnumber, @RequestBody CommentAddDTO comment) {
+        return patientService.addPatientComment(pnumber, comment).orElseThrow(err -> new AppErrorException(err));
     }
 }

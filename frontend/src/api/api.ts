@@ -54,6 +54,13 @@ type PatientGet = {
   body: undefined;
 };
 
+type PatientAddComment = {
+  method: 'POST';
+  path: ['patients', string, 'comments'];
+  query: undefined;
+  body: string;
+};
+
 type CollectionEventsGet = {
   method: 'GET';
   path: ['patients', string, 'collection-events'];
@@ -90,6 +97,7 @@ export type Endpoint =
   | PatientUpdate
   | PatientComments
   | PatientGet
+  | PatientAddComment
   | CollectionEventsGet
   | CollectionEventGet
   | AliquotsGet

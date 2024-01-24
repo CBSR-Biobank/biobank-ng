@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.domain.PermissionEnum;
+import edu.ualberta.med.biobank.domain.User;
 import edu.ualberta.med.biobank.dtos.DomainDTO;
 import edu.ualberta.med.biobank.dtos.GroupDTO;
 import edu.ualberta.med.biobank.dtos.MembershipDTO;
@@ -33,6 +34,10 @@ public class UserService {
 
     UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    public User getById(int id) {
+        return userRepository.getReferenceById(id);
     }
 
     public Either<AppError, UserDTO> findByLogin(String login) {

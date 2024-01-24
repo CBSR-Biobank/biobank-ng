@@ -1,8 +1,8 @@
 import { collectionEventSchema } from '@app/models/collection-event';
-import { PatientAdd, PatientUpdate, patientSchema } from '@app/models/patient';
-import { httpClient } from './api';
-import { commentSchema } from '@app/models/comments';
+import { CommentAdd, commentSchema } from '@app/models/comment';
+import { Patient, PatientAdd, PatientUpdate, patientSchema } from '@app/models/patient';
 import { z } from 'zod';
+import { httpClient } from './api';
 
 export class PatientApi {
   static async getByPnumber(pnumber?: string) {
@@ -78,5 +78,21 @@ export class PatientApi {
     });
     const result = await response.json();
     return patientSchema.parse(result);
+  }
+
+  // parameters are required to be optional due to TypeScript and useQuery
+  static async addComment(patient?: Patient, comment?: CommentAdd) {
+    if (!patient || !comment) {
+      return null;
+    }
+
+    const response = await httpClient({
+      method: 'POST',
+      path: ['patients', patient.pnumber, 'comments'],
+      body: JSON.stringify(comment),
+      query: undefined
+    });
+    const result = await response.json();
+    return commentSchema.parse(result);
   }
 }

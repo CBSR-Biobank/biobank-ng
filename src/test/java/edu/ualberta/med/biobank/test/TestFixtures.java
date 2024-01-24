@@ -1,8 +1,11 @@
 package edu.ualberta.med.biobank.test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.domain.Comment;
 import edu.ualberta.med.biobank.domain.Patient;
+import edu.ualberta.med.biobank.domain.User;
 
 public class TestFixtures {
 
@@ -12,12 +15,14 @@ public class TestFixtures {
         private int numSpecimens;
         private int numAliquots;
         private int numComments;
+        private User commentUser;
 
         public PatientFixtureBuilder() {
             this.numCollectionEvents = 0;
             this.numSpecimens = 0;
             this.numAliquots = 0;
             this.numComments = 0;
+            this.commentUser = null;
         }
 
         public PatientFixtureBuilder numCollectionEvents(int num) {
@@ -46,12 +51,20 @@ public class TestFixtures {
             return this;
         }
 
+        public PatientFixtureBuilder commentUsername(User user) {
+            this.commentUser = user;
+            return this;
+        }
+
         public Patient build(Factory factory) {
             Patient patient = factory.createPatient();
 
             for (int j = 0; j < numComments; ++j) {
                 Comment comment = factory.createComment();
                 comment.setMessage(factory.getFaker().lorem().sentence());
+                if (commentUser != null) {
+                    comment.setUser(commentUser);
+                }
                 patient.getComments().add(comment);
             }
 

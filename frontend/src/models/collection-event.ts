@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { commentSchema } from './comments';
+import { commentSchema } from './comment';
 import { domainEntitySchema } from './domain-entity';
 import { sourceSpecimenSchema } from './specimen';
 import { Status } from './status';

@@ -26,6 +26,11 @@ public class BiobankEventPublisher {
         applicationEventPublisher.publishEvent(event);
     }
 
+    public void publishPatientUpdated(final String username, final String pnumber) {
+        PatientUpdatedEvent event = new PatientUpdatedEvent(this, username, pnumber);
+        applicationEventPublisher.publishEvent(event);
+    }
+
     public void publishVisitRead(final String username, final String pnumber, final Integer vnumber) {
         var event = new VisitReadEvent(this, username, pnumber, vnumber);
         applicationEventPublisher.publishEvent(event);

@@ -1,16 +1,19 @@
+import { PatientApi } from '@app/api/patient-api';
 import { CircularProgress } from '@app/components/circular-progress';
 import { EntityProperty } from '@app/components/entity-property';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@app/components/ui/collapsible';
+import { CommentAdd } from '@app/models/comment';
 import { AdminPage } from '@app/pages/admin-page';
 import { CollectionEventTable } from '@app/pages/collection-events/collection-event-table';
 import { usePatientStore } from '@app/store';
 import { cn } from '@app/utils';
-import { faChevronRight, faComment, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import format from 'date-fns/format';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BackButton } from '../back-button';
+import { CommentAddDialog } from '../comment-add-dialog';
 import { Button } from '../ui/button';
 import { PatientComments } from './patient-comments';
 import { PatientPropertyChanger } from './patient-property-changer';
@@ -18,9 +21,25 @@ import { PatientPropertyChanger } from './patient-property-changer';
 export function PatientDetails() {
   const navigate = useNavigate();
   const { patient, setCollectionEvent } = usePatientStore();
-  const [open, setOpen] = useState(false);
   const [propertyToUpdate, setPropertyToUpdate] = useState<string | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
+  const [propertyChangerOpen, setPropertyChangerOpen] = useState(false);
+  const [commentsSectionIsOpen, setCommentsSectionIsOpen] = useState(false);
+
+  const queryClient = useQueryClient();
+  const addComment = useMutation(
+    (newComment: CommentAdd) => {
+      if (!patient) {
+        return Promise.reject();
+      }
+
+      return PatientApi.addComment(patient, newComment);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['patients', patient?.pnumber]);
+      }
+    }
+  );
 
   useEffect(() => {
     setCollectionEvent(undefined);
@@ -28,15 +47,19 @@ export function PatientDetails() {
 
   const handlePropChange = (propertyName: string) => {
     setPropertyToUpdate(propertyName);
-    setOpen(true);
+    setPropertyChangerOpen(true);
   };
 
   const handleUpdate = () => {
-    setOpen(false);
+    setPropertyChangerOpen(false);
   };
 
   const backClicked = () => {
     navigate('/patients');
+  };
+
+  const handleCommentAdded = (newComment: string) => {
+    addComment.mutate({ message: newComment });
   };
 
   if (!patient) {
@@ -51,17 +74,13 @@ export function PatientDetails() {
       </AdminPage.Title>
 
       <div className="bg-basic-100 border-top flex flex-col gap-8 rounded-md drop-shadow-md">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <EntityProperty propName="pnumber" label="Patient Number" allowChanges handleChange={handlePropChange}>
             {patient.pnumber}
           </EntityProperty>
 
           <EntityProperty propName="study" label="Study" allowChanges handleChange={handlePropChange}>
             {patient.studyNameShort}
-          </EntityProperty>
-
-          <EntityProperty propName="createdAt" label="Created" allowChanges handleChange={handlePropChange}>
-            {format(patient.createdAt, 'yyyy-MM-dd')}
           </EntityProperty>
         </div>
 
@@ -75,14 +94,18 @@ export function PatientDetails() {
           </EntityProperty>
         </div>
 
-        <Collapsible open={isOpen} onOpenChange={setIsOpen} className="rounded-md border-2 border-solid">
+        <Collapsible
+          open={commentsSectionIsOpen}
+          onOpenChange={setCommentsSectionIsOpen}
+          className="rounded-md border-2 border-solid"
+        >
           <div className="flex items-center justify-between bg-gray-300/50 px-4 py-2">
             <h4 className="text-sm text-slate-700">Comments: {patient.commentCount}</h4>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm" className="w-9 p-0">
                 <FontAwesomeIcon
                   icon={faChevronRight}
-                  className={cn('duration-300 ease-in-out', { 'rotate-90': isOpen })}
+                  className={cn('duration-300 ease-in-out', { 'rotate-90': commentsSectionIsOpen })}
                 />
                 <span className="sr-only">Toggle</span>
               </Button>
@@ -100,12 +123,10 @@ export function PatientDetails() {
         <Button variant="secondary" icon={faPlusCircle}>
           Add Visit
         </Button>
-        <Button variant="secondary" icon={faComment}>
-          Add Comment
-        </Button>
+        <CommentAddDialog onSubmit={handleCommentAdded} />
       </div>
 
-      {open && propertyToUpdate && (
+      {propertyChangerOpen && propertyToUpdate && (
         <PatientPropertyChanger patient={patient} propertyToUpdate={propertyToUpdate} onClose={handleUpdate} />
       )}
     </AdminPage>
