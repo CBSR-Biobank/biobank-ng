@@ -1,6 +1,8 @@
 import { collectionEventSchema } from '@app/models/collection-event';
 import { PatientAdd, PatientUpdate, patientSchema } from '@app/models/patient';
 import { httpClient } from './api';
+import { commentSchema } from '@app/models/comments';
+import { z } from 'zod';
 
 export class PatientApi {
   static async getByPnumber(pnumber?: string) {
@@ -17,6 +19,22 @@ export class PatientApi {
     const result = await response.json();
     const patient = patientSchema.parse(result);
     return patient;
+  }
+
+  static async getPatientComments(pnumber?: string) {
+    if (!pnumber) {
+      return null;
+    }
+
+    const response = await httpClient({
+      method: 'GET',
+      path: ['patients', pnumber, 'comments'],
+      body: undefined,
+      query: undefined
+    });
+    const result = await response.json();
+    const cevent = z.array(commentSchema).parse(result);
+    return cevent;
   }
 
   static async getPatientCollectionEvent(pnumber?: string, vnumber?: number) {

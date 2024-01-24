@@ -1,14 +1,18 @@
 import { CircularProgress } from '@app/components/circular-progress';
 import { EntityProperty } from '@app/components/entity-property';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@app/components/ui/collapsible';
 import { AdminPage } from '@app/pages/admin-page';
 import { CollectionEventTable } from '@app/pages/collection-events/collection-event-table';
 import { usePatientStore } from '@app/store';
-import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { cn } from '@app/utils';
+import { faChevronRight, faComment, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import format from 'date-fns/format';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BackButton } from '../back-button';
 import { Button } from '../ui/button';
+import { PatientComments } from './patient-comments';
 import { PatientPropertyChanger } from './patient-property-changer';
 
 export function PatientDetails() {
@@ -71,11 +75,23 @@ export function PatientDetails() {
           </EntityProperty>
         </div>
 
-        {/*
-         * TODO: collapsible comments table - always shown, comments fetched on expand
-         *
-         * See AliquotsTable
-         */}
+        <Collapsible open={isOpen} onOpenChange={setIsOpen} className="rounded-md border-2 border-solid">
+          <div className="flex items-center justify-between bg-gray-300/50 px-4 py-2">
+            <h4 className="text-sm text-slate-700">Comments: {patient.commentCount}</h4>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="w-9 p-0">
+                <FontAwesomeIcon
+                  icon={faChevronRight}
+                  className={cn('duration-300 ease-in-out', { 'rotate-90': isOpen })}
+                />
+                <span className="sr-only">Toggle</span>
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+          <CollapsibleContent className="space-y-2">
+            <PatientComments pnumber={patient.pnumber} />
+          </CollapsibleContent>
+        </Collapsible>
 
         <CollectionEventTable collectionEvents={patient.collectionEvents} />
       </div>
@@ -83,6 +99,9 @@ export function PatientDetails() {
         <BackButton onClick={backClicked} />
         <Button variant="secondary" icon={faPlusCircle}>
           Add Visit
+        </Button>
+        <Button variant="secondary" icon={faComment}>
+          Add Comment
         </Button>
       </div>
 

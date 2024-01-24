@@ -5,7 +5,7 @@ import { ShowError } from '@app/components/show-error';
 import { StatusChip } from '@app/components/status-chip';
 import { Button } from '@app/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@app/components/ui/collapsible';
-import { useCollectionEvent } from '@app/hooks/useCollectionEvent';
+import { useCollectionEvent } from '@app/hooks/use-collection-event';
 import { usePatientStore } from '@app/store';
 import { cn } from '@app/utils';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
@@ -13,7 +13,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AdminPage } from '../admin-page';
-import { SourceSpecimenTable } from '../specimens/source-specimens-table';
+import { SourceSpecimenTable } from '@app/components/specimens/source-specimens-table';
 
 export function CollectionEventView() {
   const { patient, setCollectionEvent } = usePatientStore();

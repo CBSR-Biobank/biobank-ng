@@ -20,23 +20,42 @@ public interface PatientRepository extends JpaRepository<Patient, Integer> {
 
     @Query(
         value = """
-                select
-                    p.id,
-                    p.pnumber,
-                    p.CREATED_AT as createdAt,
-                    study.id as studyId,
-                    study.name_short as studyNameShort,
-                    COUNT(distinct ospc.id) as specimenCount,
-                    COUNT(distinct aspc.id) - COUNT(distinct ospc.id) as aliquotCount
-                from patient p
-                join study on study.ID = p.STUDY_ID
-                left join collection_event ce on ce.PATIENT_ID = p.ID
-                left join specimen ospc on ospc.ORIGINAL_COLLECTION_EVENT_ID = ce.ID
-                left join specimen aspc on aspc.COLLECTION_EVENT_ID = ce.ID
-                where p.pnumber = :pnumber
-                group by p.id;
-                """,
+        select
+            p.id,
+            p.pnumber,
+            p.CREATED_AT as createdAt,
+            study.id as studyId,
+            study.name_short as studyNameShort,
+            COUNT(distinct ospc.id) as specimenCount,
+            COUNT(distinct aspc.id) - COUNT(distinct ospc.id) as aliquotCount,
+            COUNT(distinct pc.COMMENT_ID) as commentCount
+        from patient p
+        join study on study.ID = p.STUDY_ID
+        left join collection_event ce on ce.PATIENT_ID = p.ID
+        left join specimen ospc on ospc.ORIGINAL_COLLECTION_EVENT_ID = ce.ID
+        left join specimen aspc on aspc.COLLECTION_EVENT_ID = ce.ID
+        left join patient_comment pc ON pc.patient_id=p.id
+        where p.pnumber = :pnumber
+        group by p.id
+        """,
         nativeQuery = true
     )
     <T> Collection<T> findByPnumber(String pnumber, Class<T> type);
+
+    @Query(
+        value = """
+        select
+            c.id commentId,
+            c.message commentMessage,
+            pr.login commentUser,
+	c.created_at commentCreatedAt
+        from comment c
+        left join patient_comment pc on pc.COMMENT_ID = c.ID
+        left join patient p on p.id=pc.PATIENT_ID
+        left join principal pr on pr.CSM_USER_ID = c.USER_ID
+        where p.pnumber = :pnumber
+        """,
+        nativeQuery = true
+    )
+    <T> Collection<T> patientComments(String pnumber, Class<T> type);
 }

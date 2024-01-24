@@ -7,12 +7,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import edu.ualberta.med.biobank.dtos.CommentDTO;
 import edu.ualberta.med.biobank.dtos.PatientCreateDTO;
 import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.exception.AppErrorException;
 import edu.ualberta.med.biobank.services.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import java.util.Collection;
 import org.springframework.http.HttpStatus;
 
 @RestController
@@ -29,6 +31,12 @@ public class PatientController {
     @GetMapping("/{pnumber}")
     public PatientDTO getPatient(@PathVariable String pnumber) {
         return patientService.findByPnumber(pnumber).orElseThrow(err -> new AppErrorException(err));
+    }
+
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @GetMapping("/{pnumber}/comments")
+    public Collection<CommentDTO> getPatientComments(@PathVariable String pnumber) {
+        return patientService.patientComments(pnumber).orElseThrow(err -> new AppErrorException(err));
     }
 
     @PostMapping(consumes="application/json")

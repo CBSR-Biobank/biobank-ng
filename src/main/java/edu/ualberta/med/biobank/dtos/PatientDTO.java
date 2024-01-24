@@ -11,6 +11,7 @@ public record PatientDTO(
     Date createdAt,
     Long specimenCount,
     Long aliquotCount,
+    Long commentCount,
     Integer studyId,
     String studyNameShort,
     List<CollectionEventSummaryDTO> collectionEvents
@@ -22,6 +23,7 @@ public record PatientDTO(
             createdAt,
             specimenCount,
             aliquotCount,
+            commentCount,
             studyId,
             studyNameShort,
             collectionEvents
@@ -35,6 +37,7 @@ public record PatientDTO(
             patient.getCreatedAt(),
             0L,
             0L,
+            Long.valueOf(patient.getComments().size()),
             patient.getStudy().getId(),
             patient.getStudy().getNameShort(),
             List.of()
@@ -48,6 +51,7 @@ public record PatientDTO(
             data.get("createdAt", Date.class),
             data.get("specimenCount", Long.class),
             data.get("aliquotCount", Long.class),
+            data.get("commentCount", Long.class),
             data.get("studyId", Integer.class),
             data.get("studyNameShort", String.class),
             List.of()

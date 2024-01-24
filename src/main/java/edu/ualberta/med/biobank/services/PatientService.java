@@ -1,7 +1,10 @@
 package edu.ualberta.med.biobank.services;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.applicationevents.BiobankEventPublisher;
 import edu.ualberta.med.biobank.domain.Patient;
 import edu.ualberta.med.biobank.dtos.CollectionEventSummaryDTO;
+import edu.ualberta.med.biobank.dtos.CommentDTO;
 import edu.ualberta.med.biobank.dtos.PatientCreateDTO;
 import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.errors.AppError;
@@ -143,6 +147,41 @@ public class PatientService {
                     .toList();
 
                 return p.withCollectionEvents(ceSummary);
+            });
+    }
+
+    public Either<AppError, Collection<CommentDTO>> patientComments(String pnumber) {
+        var found = patientRepository.findByPnumber(pnumber, Tuple.class).stream().findFirst();
+
+        if (found.isEmpty()) {
+            return Either.left(new EntityNotFound("patient not found"));
+        }
+
+        var patient = PatientDTO.fromTuple(found.get());
+
+        Map<Integer, CommentDTO> comments = new HashMap<>();
+
+        patientRepository.patientComments(pnumber, Tuple.class)
+            .stream()
+            .forEach(row -> {
+                var commentId = row.get("commentId", Integer.class);
+                if (commentId != null) {
+                    comments.computeIfAbsent(commentId, id -> CommentDTO.fromTuple(row));
+                }
+            });
+
+        var permission = new PatientReadPermission(patient.studyId());
+        return permission.isAllowed()
+            .flatMap(allowed -> {
+                if (!allowed) {
+                    return Either.left(new PermissionError("study"));
+                }
+                return Either.right(comments);
+            })
+            .map(c -> {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                eventPublisher.publishPatientRead(auth.getName(), patient.pnumber());
+                return comments.values();
             });
     }
 }

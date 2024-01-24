@@ -8,6 +8,7 @@ export const patientSchema = domainEntitySchema.extend({
   pnumber: z.string(),
   specimenCount: z.number(),
   aliquotCount: z.number(),
+  commentCount: z.number(),
   studyId: z.number(),
   studyNameShort: z.string(),
   collectionEvents: z.array(collectionEventBriefSchema)

@@ -62,7 +62,10 @@ export function StudySelect<T extends FieldValues, U extends FieldPathByValue<T,
                     <Check
                       className={cn('mr-2 h-4 w-4', field.value === option.nameShort ? 'opacity-100' : 'opacity-0')}
                     />
-                    {option.nameShort} - {option.name}
+                    <div className="flex flex-col items-start">
+                      <p>{option.nameShort}</p>
+                      <p className="text-sm text-muted-foreground">{option.name}</p>
+                    </div>
                   </CommandItem>
                 ))}
               </CommandGroup>

@@ -40,6 +40,13 @@ type PatientUpdate = {
   body: string;
 };
 
+type PatientComments = {
+  method: 'GET';
+  path: ['patients', string, 'comments'];
+  query: undefined;
+  body: undefined;
+};
+
 type PatientGet = {
   method: 'GET';
   path: ['patients', string];
@@ -81,6 +88,7 @@ export type Endpoint =
   | LoggingLatest
   | PatientCreate
   | PatientUpdate
+  | PatientComments
   | PatientGet
   | CollectionEventsGet
   | CollectionEventGet

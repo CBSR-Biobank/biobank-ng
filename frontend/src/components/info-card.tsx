@@ -18,7 +18,7 @@ export const InfoCard = forwardRef<
       <Alert className="border-sky-500 bg-sky-200 text-slate-500">
         <FontAwesomeIcon icon={icon ?? faCircleInfo} />
         <AlertTitle>{title}</AlertTitle>
-        <AlertDescription>{message}</AlertDescription>
+        <AlertDescription className="text-sm text-muted-foreground">{message}</AlertDescription>
       </Alert>
     </div>
   );
