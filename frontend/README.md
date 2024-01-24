@@ -1,7 +1,8 @@
 # Biobank-ng Frontend Project
 
-This project contains the source code for **Biobank-ng**'s web-client. It is a React application written in
-TypeScript that uses React Functional Components.
+This project contains the source code for **Biobank-ng**'s web-client. It is a [React](https://reactjs.org/)
+application written in [TypeScript](https://www.typescriptlang.org/). It uses [Vite](https://vitejs.dev/) as a
+build environment.
 
 This project has the following dependencies:
 
@@ -55,3 +56,57 @@ This project has the following dependencies:
 
     Vite (French word for "quick", pronounced /vit/￼, like "veet") is a build tool that aims to provide a
     faster and leaner development experience for modern web projects.
+
+## Development
+
+### Install
+
+Make sure you have the following packages / apps installed:
+
+* [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [Node](https://nodejs.org/en/download/package-manager/)
+
+1. Use the following command to clone the project:
+
+    ```sh
+    git clone https://github.com/CBSR-Biobank/biobank-ng.git
+    ```
+
+    This command must be used inside the folder where you want to store the project files. For example: `$HOME/src/CBSR`.
+
+2. Install the project dependencies:
+
+    ```sh
+    cd biobank-ng/frontend
+    npm install
+    ```
+
+### Configure the backend
+
+The application needs to communicate with a backend server. The DNS name and port number must be specified. To
+do this, define the following environment variable in your shell:
+
+```
+export BACKEND_SERVER=https://biobank-training.cbsr.ualberta.ca:8443
+```
+
+In this example, the backend server runs at `biobank-training.cbsr.ualberta.ca` port 8443.
+
+If you want to use a different backend server, replace `biobank-training.cbsr.ualberta.ca` with the DNS name
+of your server. To use a port other than 80, append a colon and then the port number.
+
+### Running in development mode
+
+To run the application in development mode, use the following command at the project's root directory:
+
+```sh
+cd __project_root/biobank-ng/frontend
+npm run dev
+```
+
+Where `__project_root__` is the name of the folder where you cloned the repository.
+
+After this command starts, it will display a URL. Open this URL in your web browser and you will see the
+application's homepage.
+
+Usually, the URL is [http://127.0.0.1:3000/](http://127.0.0.1:3000/).
