@@ -110,3 +110,15 @@ After this command starts, it will display a URL. Open this URL in your web brow
 application's homepage.
 
 Usually, the URL is [http://127.0.0.1:3000/](http://127.0.0.1:3000/).
+
+### Code Formatting
+
+This project uses [Prettier](https://prettier.io/) to format the source code. Please install a Prettier plugin
+in your code editor and configure it to run Prettier prior to saving a file.
+
+The config file for prettier is here: [.prettierrc](https://github.com/CBSR-Biobank/biobank-ng/blob/main/frontend/.prettierrc).
+
+#### VS Code
+
+Here is an article on how to set up Prettier on VS Code:
+[https://www.robinwieruch.de/how-to-use-prettier-vscode/](https://www.robinwieruch.de/how-to-use-prettier-vscode/).
