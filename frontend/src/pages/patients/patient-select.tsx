@@ -8,8 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { AdminPage } from '../admin-page';
 
 export function PatientSelect() {
-  const { setPatient } = usePatientStore();
   const navigate = useNavigate();
+  const { setPatient } = usePatientStore();
   const [input, setInput] = useState('');
 
   useEffect(() => {
@@ -29,9 +29,7 @@ export function PatientSelect() {
     if (e) {
       e.preventDefault();
     }
-    if (input.trim() !== '') {
-      navigate(`/patients/${input}`);
-    }
+    navigate(`/patients/${input}`);
   };
 
   return (
@@ -41,14 +39,14 @@ export function PatientSelect() {
         <AdminPage.Title hasBorder>
           <p className="text-4xl font-semibold text-sky-600">Select a Patient</p>
         </AdminPage.Title>
-        <form className="flex w-full max-w-sm items-center space-x-2 pt-8" onClick={handleSubmit} autoComplete="on">
+        <form className="flex w-full max-w-sm items-center space-x-2 pt-8" onSubmit={handleSubmit} autoComplete="on">
           <Input
             id="patientNumber"
             placeholder="Patient Number"
             onChange={handleInputChange}
             onKeyUp={handleInputKeyUp}
           />
-          <Button type="submit" icon={faPaperPlane}>
+          <Button type="submit" icon={faPaperPlane} disabled={input.trim() === ''}>
             Submit
           </Button>
         </form>
