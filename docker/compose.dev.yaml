@@ -27,18 +27,15 @@ services:
             context: ../
             dockerfile: Dockerfile
         image: app-image
-        develop:
-            watch:
-                - action: sync+restart
-                  path: ../src
-                  target: /app/src
-                - action: sync+restart
-                  path: ../pom.xml
-                  target: /app/pom.xml
-        #command: sh -c "/app/mvnw clean spring-boot:run"
+        volumes:
+            - ../target/biobank-0.0.1-SNAPSHOT.jar:/app.jar
+        # develop:
+        #     watch:
+        #         - action: sync+restart
+        #           path: ../target/biobank-0.0.1-SNAPSHOT.jar
+        #           target: /app.jar
+        command: sh -c "java -jar /app.jar"
         working_dir: /app
-        # volumes:
-        #     - ../src:/app/src
         ports:
             - 9000:9000
             - 35729:35729
