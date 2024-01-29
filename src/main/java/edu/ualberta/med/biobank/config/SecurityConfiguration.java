@@ -27,7 +27,6 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -47,23 +46,12 @@ public class SecurityConfiguration {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
             .securityMatchers(m ->
-                m.requestMatchers("/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+                m.requestMatchers("/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/**")
             )
             .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
             .httpBasic(withDefaults())
             .formLogin(withDefaults())
             .logout(logout -> logout.permitAll())
-            .build();
-    }
-
-    @Bean
-    SecurityFilterChain actuatorFilterChain(HttpSecurity http) throws Exception {
-        return http
-            .securityMatchers(m ->
-                m.requestMatchers("/actuator/**")
-            )
-            .authorizeHttpRequests(auth -> auth.anyRequest().hasRole("ADMIN"))
-            .httpBasic(withDefaults())
             .build();
     }
 
@@ -89,7 +77,7 @@ public class SecurityConfiguration {
     @Bean
     SecurityFilterChain tokenSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
-            .securityMatcher(new AntPathRequestMatcher("/token"))
+            .securityMatchers(m -> m.requestMatchers("/token"))
             .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .csrf(AbstractHttpConfigurer::disable)
