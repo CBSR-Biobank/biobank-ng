@@ -21,8 +21,6 @@ You may also like to visit the web site at:
 
 http://biosample.ca/
 
-Please see the Wiki for this project for more documentation.
-
 ## Documentation
 
 1. [Install](documents/install.md)
