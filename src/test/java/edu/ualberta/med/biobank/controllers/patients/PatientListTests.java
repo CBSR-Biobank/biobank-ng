@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.controllers.endpoints.PatientNumberEndpoint;
 import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.matchers.PatientMatcher;
 import edu.ualberta.med.biobank.test.ControllerTest;
-import edu.ualberta.med.biobank.test.TestFixtures;
+import edu.ualberta.med.biobank.test.fixtures.PatientFixtureBuilder;
 import edu.ualberta.med.biobank.util.LoggingUtils;
 import jakarta.transaction.Transactional;
 import net.datafaker.Faker;
@@ -49,7 +49,7 @@ class PatientListTests extends ControllerTest {
     @Test
     @WithMockUser(value = "testuser")
     void get_when_present_is_ok() throws Exception {
-        var patient = new TestFixtures.PatientFixtureBuilder().numCollectionEvents(1).numSpecimens(1).build(factory);
+        var patient = new PatientFixtureBuilder().numCollectionEvents(1).numSpecimens(1).build(factory);
 
         MvcResult result =
             this.mvc.perform(get(new PatientNumberEndpoint(patient.getPnumber()).url()))
@@ -64,13 +64,13 @@ class PatientListTests extends ControllerTest {
 
     @Test
     @WithMockUser(value = "non_member_user")
-    void get_when_present_and_not_member_is_bad_request() throws Exception {
+    void get_when_present_and_not_member_is_forbidden() throws Exception {
         createSingleStudyUser("non_member_user");
 
-        var patient = new TestFixtures.PatientFixtureBuilder().build(factory);
+        var patient = new PatientFixtureBuilder().build(factory);
 
         this.mvc.perform(get(new PatientNumberEndpoint(patient.getPnumber()).url()))
-            .andExpect(status().isBadRequest())
+            .andExpect(status().isForbidden())
             .andExpect(jsonPath("$.message", Matchers.matchesRegex(".*permission.*")));
     }
 

@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.dtos.StudyDTO;
 import edu.ualberta.med.biobank.dtos.StudyNameDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
+import edu.ualberta.med.biobank.errors.Forbidden;
 import edu.ualberta.med.biobank.errors.Unauthorized;
 import edu.ualberta.med.biobank.permission.patient.StudyReadPermission;
 import edu.ualberta.med.biobank.repositories.StudyRepository;
@@ -94,7 +95,7 @@ public class StudyService {
 
                 return studyData.map(d -> StudyDTO.fromTuple(d));
             })
-            .mapLeft(err -> new Unauthorized("invalid user"));
+            .mapLeft(err -> new Forbidden("invalid user"));
     }
 
     /**

@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.applicationevents.VisitReadEvent;
 import edu.ualberta.med.biobank.domain.Log;
 import edu.ualberta.med.biobank.dtos.LoggingDTO;
 import edu.ualberta.med.biobank.repositories.LoggingRepository;
-import edu.ualberta.med.biobank.util.LoggingUtils;
 import jakarta.persistence.Tuple;
 
 @Service

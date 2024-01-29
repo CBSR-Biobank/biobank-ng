@@ -1,8 +1,8 @@
 import { PatientApi } from '@app/api/patient-api';
 import { Patient, PatientUpdate } from '@app/models/patient';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { PropertyChangerResult } from '../property-changer/property-changer';
-import { PropertyChangerDate } from '../property-changer/property-changer-date';
 import { PropertyChangerStudy } from '../property-changer/property-changer-study';
 import { PropertyChangerText } from '../property-changer/property-changer-text';
 import { ShowError } from '../show-error';
@@ -12,19 +12,32 @@ export const PatientPropertyChanger: React.FC<{
   propertyToUpdate: string;
   onClose: () => void;
 }> = ({ patient, propertyToUpdate, onClose }) => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const updatePatient = useMutation((updatedPatient: PatientUpdate) => PatientApi.update(updatedPatient), {
-    onSuccess: (patient) => {
-      queryClient.setQueryData(['patients', patient.id], patient);
-      queryClient.invalidateQueries(['publication', 'types']);
+  const updatePatient = useMutation(
+    (updatedPatient: PatientUpdate) => PatientApi.update(patient.pnumber, updatedPatient),
+    {
+      onSuccess: (updated) => {
+        queryClient.setQueryData(['patients', updated.pnumber], updated);
+        queryClient.invalidateQueries(['patients', updated.pnumber]);
+
+        if (updated.pnumber != patient.pnumber) {
+          navigate(`../${updated.pnumber}`);
+        }
+      }
     }
-  });
+  );
 
   const handleClose = (result: PropertyChangerResult, propertyName: string, newValue?: unknown) => {
     if (result === 'ok') {
       const prop = propertyName as keyof PatientUpdate;
-      const newValues = { ...patient, [prop]: newValue };
+      const newValues = {
+        pnumber: patient.pnumber,
+        studyNameShort: patient.studyNameShort,
+        [prop]: newValue
+      };
+      console.log(prop, newValues);
       updatePatient.mutate(newValues);
     }
     onClose();
@@ -58,10 +71,7 @@ export const PatientPropertyChanger: React.FC<{
         />
       );
 
-    case 'createdAt':
-      return <PropertyChangerDate {...commonProps} label="Date Added" value={patient.createdAt} required={true} />;
-
-    case 'study':
+    case 'studyNameShort':
       return <PropertyChangerStudy {...commonProps} label="Study" value={patient.studyNameShort} required={true} />;
 
     default:

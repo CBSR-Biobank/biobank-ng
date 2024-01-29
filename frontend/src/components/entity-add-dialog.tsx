@@ -42,8 +42,8 @@ export const EntityAddDialog: React.FC<
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger className="focus-visible:outline-primary-600 flex h-10 items-center gap-1 rounded-md bg-secondary px-4 text-sm font-normal text-secondary-foreground hover:bg-secondary/90">
-        {buttonLabel ?? 'Add'}
         <FontAwesomeIcon icon={buttonIcon ?? faPlus} />
+        {buttonLabel ?? 'Add'}
       </DialogTrigger>
       <DialogContent onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader>

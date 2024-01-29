@@ -64,7 +64,7 @@ export function StudySelect<T extends FieldValues, U extends FieldPathByValue<T,
                     />
                     <div className="flex flex-col items-start">
                       <p>{option.nameShort}</p>
-                      <p className="text-sm text-muted-foreground">{option.name}</p>
+                      <p className="text-sm text-muted-foreground max-w-[40rem]">{option.name}</p>
                     </div>
                   </CommandItem>
                 ))}

@@ -23,7 +23,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import edu.ualberta.med.biobank.controllers.endpoints.PatientCommentAddEndpoint;
 import edu.ualberta.med.biobank.dtos.CommentAddDTO;
 import edu.ualberta.med.biobank.test.ControllerTest;
-import edu.ualberta.med.biobank.test.TestFixtures;
+import edu.ualberta.med.biobank.test.fixtures.PatientFixtureBuilder;
 import edu.ualberta.med.biobank.util.JsonUtil;
 import jakarta.transaction.Transactional;
 import net.datafaker.Faker;
@@ -40,7 +40,7 @@ class PatientCommentAddTests extends ControllerTest {
     @Test
     @WithMockUser(value = "testuser")
     void patient_comment_post_succeeds() throws Exception {
-        var patient = new TestFixtures.PatientFixtureBuilder().numCollectionEvents(1).build(factory);
+        var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
         var dto = new CommentAddDTO(new Faker().lorem().paragraph(2));
 
         MvcResult result = mvc
@@ -60,7 +60,7 @@ class PatientCommentAddTests extends ControllerTest {
 
     @Test
     void patient_comment_post_when_anonymous_is_unauthorized() throws Exception {
-        var patient = new TestFixtures.PatientFixtureBuilder().numCollectionEvents(1).build(factory);
+        var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
         var dto = new CommentAddDTO(new Faker().lorem().paragraph(2));
 
         this.mvc.perform(
@@ -73,10 +73,10 @@ class PatientCommentAddTests extends ControllerTest {
 
     @Test
     @WithMockUser(value = "non_member_user")
-    void patient_comment_post_when_non_member_user_is_bad_request() throws Exception {
+    void patient_comment_post_when_non_member_user_is_forbidden() throws Exception {
         createSingleStudyUser("non_member_user");
 
-        var patient = new TestFixtures.PatientFixtureBuilder().numCollectionEvents(1).build(factory);
+        var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
         var dto = new CommentAddDTO(new Faker().lorem().paragraph(2));
 
         this.mvc.perform(
@@ -84,14 +84,13 @@ class PatientCommentAddTests extends ControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(JsonUtil.asJsonString(dto))
             )
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message", Matchers.matchesRegex(".*permission.*")))
-            .andDo(MockMvcResultHandlers.print());
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.message", Matchers.matchesRegex(".*permission.*")));
     }
 
     @Test
     @WithMockUser(value = "testuser")
-    void patient_comment_post_fails_with_invalid_pnumber() throws Exception {
+    void patient_comment_post_fails_when_invalid_pnumber_is_not_found() throws Exception {
         var badPnumber = new Faker().internet().username();
         var dto = new CommentAddDTO(new Faker().lorem().paragraph(2));
 
@@ -101,8 +100,8 @@ class PatientCommentAddTests extends ControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(JsonUtil.asJsonString(dto))
             )
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message", Matchers.matchesRegex("patient.*exists")))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.message", Matchers.matchesRegex("patient.*not exist.*")))
             .andDo(MockMvcResultHandlers.print());
     }
 

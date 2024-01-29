@@ -64,15 +64,14 @@ export class PatientApi {
     return patientSchema.parse(result);
   }
 
-  static async update(patient: PatientUpdate) {
+  static async update(pnumber: string, newValues: PatientUpdate) {
     const data = {
-      pnumber: patient.pnumber,
-      createdAt: patient.createdAt,
-      studyNameShort: patient.studyNameShort
+      pnumber: newValues.pnumber,
+      studyNameShort: newValues.studyNameShort
     };
     const response = await httpClient({
       method: 'PUT',
-      path: ['patients', patient.pnumber],
+      path: ['patients', pnumber],
       body: JSON.stringify(data),
       query: undefined
     });

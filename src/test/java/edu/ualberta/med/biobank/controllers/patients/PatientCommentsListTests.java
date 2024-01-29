@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.dtos.CommentDTO;
 import edu.ualberta.med.biobank.matchers.CommentMatcher;
 import edu.ualberta.med.biobank.repositories.UserRepository;
 import edu.ualberta.med.biobank.test.ControllerTest;
-import edu.ualberta.med.biobank.test.TestFixtures;
+import edu.ualberta.med.biobank.test.fixtures.PatientFixtureBuilder;
 import edu.ualberta.med.biobank.util.LoggingUtils;
 import jakarta.transaction.Transactional;
 import net.datafaker.Faker;
@@ -43,7 +43,7 @@ class PatientCommentsListTests extends ControllerTest {
     @WithMockUser(value = "testuser")
     void get_when_has_comments_is_ok() throws Exception {
         User testuser = userRepository.getReferenceById(2); // KLUDGE: ID 2 belongs to testuser - see V1__init.sql
-        var patient = new TestFixtures.PatientFixtureBuilder().numComments(1).commentUsername(testuser).build(factory);
+        var patient = new PatientFixtureBuilder().numComments(1).commentUsername(testuser).build(factory);
 
         MvcResult result =
             this.mvc.perform(get(new PatientCommentsListEndpoint(patient.getPnumber()).url()))
@@ -58,28 +58,28 @@ class PatientCommentsListTests extends ControllerTest {
 
     @Test
     void get_when_present_and_anonymous_is_unauthorized() throws Exception {
-        var patient = new TestFixtures.PatientFixtureBuilder().numComments(1).build(factory);
+        var patient = new PatientFixtureBuilder().numComments(1).build(factory);
         this.mvc.perform(get(new PatientCommentsListEndpoint(patient.getPnumber()).url()))
             .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(value = "non_member_user")
-    void get_when_present_and_not_member_is_bad_request() throws Exception {
+    void get_when_present_and_not_member_is_forbidden() throws Exception {
         createSingleStudyUser("non_member_user");
-        var patient = new TestFixtures.PatientFixtureBuilder().numComments(1).build(factory);
+        var patient = new PatientFixtureBuilder().numComments(1).build(factory);
 
         this.mvc.perform(get(new PatientCommentsListEndpoint(patient.getPnumber()).url()))
-            .andExpect(status().isBadRequest())
+            .andExpect(status().isForbidden())
             .andExpect(jsonPath("$.message", Matchers.matchesRegex(".*permission.*")));
     }
 
     @Test
     @WithMockUser(value = "testuser")
-    void get_when_patient_not_exist_is_bad_request() throws Exception {
+    void get_when_patient_not_exist_is_not_found() throws Exception {
         var badPnumber = new Faker().internet().username();
 
         this.mvc.perform(get(new PatientCommentsListEndpoint(badPnumber).url()))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isNotFound());
     }
 }

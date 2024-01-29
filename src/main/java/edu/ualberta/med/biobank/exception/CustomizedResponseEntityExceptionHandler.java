@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
+import edu.ualberta.med.biobank.errors.Forbidden;
 import edu.ualberta.med.biobank.errors.PermissionError;
 import edu.ualberta.med.biobank.errors.Unauthorized;
 import edu.ualberta.med.biobank.errors.ValidationError;
@@ -46,12 +47,12 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
             status = HttpStatus.NOT_FOUND;
         }
 
-        if (appErrorException.appError instanceof Unauthorized) {
-            status = HttpStatus.UNAUTHORIZED;
+        if (appErrorException.appError instanceof Forbidden || appErrorException.appError instanceof PermissionError) {
+            status = HttpStatus.FORBIDDEN;
         }
 
-        if (appErrorException.appError instanceof PermissionError) {
-            status = HttpStatus.BAD_REQUEST;
+        if (appErrorException.appError instanceof Unauthorized) {
+            status = HttpStatus.UNAUTHORIZED;
         }
 
         if (appErrorException.appError instanceof ValidationError) {

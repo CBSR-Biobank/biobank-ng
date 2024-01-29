@@ -79,7 +79,7 @@ export function PatientDetails() {
             {patient.pnumber}
           </EntityProperty>
 
-          <EntityProperty propName="study" label="Study" allowChanges handleChange={handlePropChange}>
+          <EntityProperty propName="studyNameShort" label="Study" allowChanges handleChange={handlePropChange}>
             {patient.studyNameShort}
           </EntityProperty>
         </div>

@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.controllers.endpoints.VisitNumberEndpoint;
 import edu.ualberta.med.biobank.dtos.AliquotSpecimenDTO;
 import edu.ualberta.med.biobank.matchers.AliquotMatcher;
 import edu.ualberta.med.biobank.test.ControllerTest;
-import edu.ualberta.med.biobank.test.TestFixtures;
+import edu.ualberta.med.biobank.test.fixtures.PatientFixtureBuilder;
 import jakarta.transaction.Transactional;
 
 @Testcontainers
@@ -33,7 +33,7 @@ class SpecimenControllerTest extends ControllerTest {
 
     @Test
     @WithMockUser
-    void getWhenEmptyTableIs404() throws Exception {
+    void get_when_empty_table_is404() throws Exception {
         var patient = factory.createPatient();
 
         this.mvc.perform(get(new VisitNumberEndpoint(patient.getPnumber(), 9999).url()))
@@ -41,8 +41,8 @@ class SpecimenControllerTest extends ControllerTest {
     }
 
     @Test
-    void getWhenPresentAndUnauthorized() throws Exception {
-        var patient = new TestFixtures.PatientFixtureBuilder()
+    void get_when_present_and_unauthorized() throws Exception {
+        var patient = new PatientFixtureBuilder()
             .numCollectionEvents(1)
             .numSpecimens(1)
             .build(factory);
@@ -56,8 +56,8 @@ class SpecimenControllerTest extends ControllerTest {
     @Test
     @WithMockUser(value = "testuser")
     @DisplayName("When source specimen is present returns OK")
-    void getWhenPresentIsOk() throws Exception {
-        var patient = new TestFixtures.PatientFixtureBuilder()
+    void get_when_present_is_ok() throws Exception {
+        var patient = new PatientFixtureBuilder()
             .numCollectionEvents(1)
             .numSpecimens(1)
             .numAliquots(1)
@@ -89,10 +89,10 @@ class SpecimenControllerTest extends ControllerTest {
     @Test
     @WithMockUser(value = "non_member_user")
     @DisplayName("When source specimen is present returns OK")
-    void getWhenPresentAndNotMemberIsBadRequest() throws Exception {
+    void get_when_present_and_not_member_is_forbidden() throws Exception {
         createSingleStudyUser("non_member_user");
 
-        var patient = new TestFixtures.PatientFixtureBuilder()
+        var patient = new PatientFixtureBuilder()
             .numCollectionEvents(1)
             .numSpecimens(1)
             .numAliquots(1)
@@ -102,13 +102,13 @@ class SpecimenControllerTest extends ControllerTest {
         var specimen = collectionEvent.getOriginalSpecimens().stream().findFirst().get();
 
         this.mvc.perform(get(new AliquotsEndpoint(specimen.getInventoryId()).url()))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockUser(value = "testuser")
-    void getWhenNotSourceSpecimenIsBadRequest() throws Exception {
-        var patient = new TestFixtures.PatientFixtureBuilder()
+    void get_when_not_source_specimen_is_bad_request() throws Exception {
+        var patient = new PatientFixtureBuilder()
             .numCollectionEvents(1)
             .numSpecimens(1)
             .numAliquots(1)
@@ -130,8 +130,8 @@ class SpecimenControllerTest extends ControllerTest {
     @Test
     @WithMockUser(value = "testuser")
     @DisplayName("When source specimen inventory ID is invalid returns 404")
-    void getWhenNotPresentIsNotFound() throws Exception {
-        var patient = new TestFixtures.PatientFixtureBuilder()
+    void get_when_not_present_is_not_found() throws Exception {
+        var patient = new PatientFixtureBuilder()
             .numCollectionEvents(1)
             .numSpecimens(1)
             .build(factory);

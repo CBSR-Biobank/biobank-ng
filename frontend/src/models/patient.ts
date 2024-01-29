@@ -16,6 +16,6 @@ export const patientSchema = domainEntitySchema.extend({
 
 export type Patient = z.infer<typeof patientSchema>;
 
-export type PatientAdd = Pick<Patient, 'pnumber' | 'createdAt' | 'studyNameShort'>;
+export type PatientAdd = Pick<Patient, 'pnumber' | 'studyNameShort'>;
 
 export type PatientUpdate = PatientAdd;

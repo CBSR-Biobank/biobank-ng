@@ -119,7 +119,7 @@ class PatientCreateTests extends ControllerTest {
 
     @Test
     @WithMockUser(value = "non_member_user")
-    void post_fails_when_not_member() throws Exception {
+    void post_with_not_member_is_forbidden() throws Exception {
         createSingleStudyUser("non_member_user");
         Study study = factory.createStudy();
         var dto = new PatientAddDTO(getMethodNameR(), study.getNameShort());
@@ -129,6 +129,6 @@ class PatientCreateTests extends ControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(JsonUtil.asJsonString(dto))
             )
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isForbidden());
     }
 }

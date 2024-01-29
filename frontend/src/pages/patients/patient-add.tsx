@@ -70,9 +70,7 @@ export function PatientAddPage() {
   }, []);
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = (values) => {
-    console.log(values);
-    const createdAt = new Date(Date.parse(values.createdAt));
-    addPatient.mutate({ ...values, createdAt });
+    addPatient.mutate(values);
   };
 
   if (studyNamesQry.isLoading || !studyNamesQry.data) {

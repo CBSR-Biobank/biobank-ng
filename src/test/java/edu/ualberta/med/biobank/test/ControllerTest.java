@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.domain.CSMUser;
 import edu.ualberta.med.biobank.domain.Membership;
 import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.domain.User;
+import edu.ualberta.med.biobank.test.Factory.MembershipBuilder;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -95,13 +96,21 @@ public class ControllerTest extends BaseTest {
         return globalAdmin;
     }
 
-    protected User createSingleStudyUser(String username) {
+    protected User createSingleStudyUser(String username, boolean hasEveryPermission) {
         User user = factory.createUser();
         user.setLogin(username);
         em.persist(user);
         em.flush();
-        factory.buildMembership().setStudy().create();
+        MembershipBuilder builder = factory.buildMembership().setStudy();
+        if (hasEveryPermission) {
+            builder.setEveryPermission(true);
+        }
+        builder.create();
         return user;
+    }
+
+    protected User createSingleStudyUser(String username) {
+        return createSingleStudyUser(username, false);
     }
 
     protected static ObjectMapper objectMapper() {

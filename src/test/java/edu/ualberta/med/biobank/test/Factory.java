@@ -1,14 +1,5 @@
 package edu.ualberta.med.biobank.test;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import edu.ualberta.med.biobank.domain.Address;
 import edu.ualberta.med.biobank.domain.AliquotedSpecimen;
 import edu.ualberta.med.biobank.domain.CSMUser;
@@ -52,7 +43,16 @@ import edu.ualberta.med.biobank.domain.type.LabelingLayout;
 import edu.ualberta.med.biobank.domain.util.EventAttrTypeEnum;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import net.datafaker.Faker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tries to make setting up test data easier by requiring the absolute minimum amount of data and
