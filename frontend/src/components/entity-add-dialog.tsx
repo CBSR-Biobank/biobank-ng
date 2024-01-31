@@ -1,5 +1,6 @@
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -9,10 +10,9 @@ import {
 } from '@app/components/ui/dialog';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
 import { CancelButton } from './cancel-button';
 import { OkButton } from './ok-button';
+import { Button } from './ui/button';
 
 export const EntityAddDialog: React.FC<
   React.PropsWithChildren<{
@@ -22,28 +22,23 @@ export const EntityAddDialog: React.FC<
     buttonIcon?: IconProp;
     okButtonEnabled: GLboolean;
     onOk: () => void;
+    onCancel: () => void;
   }>
-> = ({ title, message, buttonLabel, buttonIcon, okButtonEnabled, onOk, children }) => {
-  const [open, setOpen] = useState(false);
-
-  const handleOpenChange = () => {
-    setOpen((open) => !open);
-  };
-
+> = ({ title, message, buttonLabel, buttonIcon, okButtonEnabled, onOk, onCancel, children }) => {
   const handleOk = () => {
-    setOpen(false);
     onOk();
   };
 
   const handleCancel = () => {
-    setOpen(false);
+    onCancel();
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger className="focus-visible:outline-primary-600 flex h-10 items-center gap-1 rounded-md bg-secondary px-4 text-sm font-normal text-secondary-foreground hover:bg-secondary/90">
-        <FontAwesomeIcon icon={buttonIcon ?? faPlus} />
-        {buttonLabel ?? 'Add'}
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="secondary" icon={buttonIcon ?? faPlus}>
+          {buttonLabel ?? 'Add'}
+        </Button>
       </DialogTrigger>
       <DialogContent onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader>
@@ -53,9 +48,13 @@ export const EntityAddDialog: React.FC<
 
         {children}
 
-        <DialogFooter className="grid-cols-1 gap-3 lg:grid-cols-2">
-          <CancelButton onClick={handleCancel} />
-          <OkButton disabled={!okButtonEnabled} onClick={handleOk} />
+        <DialogFooter className="grid-cols-1 gap-4 lg:grid-cols-2">
+          <DialogClose asChild>
+            <CancelButton type="button" onClick={handleCancel} />
+          </DialogClose>
+          <DialogClose asChild>
+            <OkButton type="button" disabled={!okButtonEnabled} onClick={handleOk} />
+          </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -1,13 +1,15 @@
+import { CollectionEventApi } from '@app/api/collection-event-api';
 import { PatientApi } from '@app/api/patient-api';
 import { CircularProgress } from '@app/components/circular-progress';
 import { EntityProperty } from '@app/components/entity-property';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@app/components/ui/collapsible';
+import { CollectionEventAdd } from '@app/models/collection-event';
 import { CommentAdd } from '@app/models/comment';
 import { AdminPage } from '@app/pages/admin-page';
 import { CollectionEventTable } from '@app/pages/collection-events/collection-event-table';
 import { usePatientStore } from '@app/store';
 import { cn } from '@app/utils';
-import { faChevronRight, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -17,6 +19,7 @@ import { CommentAddDialog } from '../comment-add-dialog';
 import { Button } from '../ui/button';
 import { PatientComments } from './patient-comments';
 import { PatientMutator } from './patient-mutator';
+import { VisitAddDialog } from './visit-add-dialog';
 
 export function PatientDetails() {
   const navigate = useNavigate();
@@ -26,10 +29,31 @@ export function PatientDetails() {
   const [commentsSectionIsOpen, setCommentsSectionIsOpen] = useState(false);
 
   const queryClient = useQueryClient();
+
+  const addCollectionEvent = useMutation(
+    (newVisit: CollectionEventAdd) => {
+      if (!patient) {
+        return Promise.resolve(null);
+      }
+      return CollectionEventApi.add(patient, newVisit);
+    },
+    {
+      onSuccess: (newCevent) => {
+        queryClient.invalidateQueries(['patients', patient?.pnumber]);
+        if (newCevent) {
+          navigate(`${newCevent.visitNumber}`);
+        }
+      },
+      onError: (error) => {
+        console.log('here', error);
+      }
+    }
+  );
+
   const addComment = useMutation(
     (newComment: CommentAdd) => {
       if (!patient) {
-        return Promise.reject();
+        return Promise.resolve(null);
       }
 
       return PatientApi.addComment(patient, newComment);
@@ -58,6 +82,10 @@ export function PatientDetails() {
     navigate('/patients');
   };
 
+  const handleVisitAdded = (newVisitNumber: number) => {
+    addCollectionEvent.mutate({ visitNumber: newVisitNumber });
+  };
+
   const handleCommentAdded = (newComment: string) => {
     addComment.mutate({ message: newComment });
   };
@@ -65,6 +93,8 @@ export function PatientDetails() {
   if (!patient) {
     return <CircularProgress />;
   }
+
+  var disallowVisitNumbers = patient.collectionEvents.map((ce) => ce.visitNumber);
 
   return (
     <AdminPage>
@@ -118,11 +148,9 @@ export function PatientDetails() {
 
         <CollectionEventTable collectionEvents={patient.collectionEvents} />
       </div>
-      <div className="flex gap-4 pt-8">
-        <BackButton onClick={backClicked} />
-        <Button variant="secondary" icon={faPlusCircle}>
-          Add Visit
-        </Button>
+      <div className="flex flex-col gap-3 pt-8 md:w-max md:flex-row">
+        <BackButton onClick={backClicked} className="md:w-min" />
+        <VisitAddDialog disallow={disallowVisitNumbers} onSubmit={handleVisitAdded} />
         <CommentAddDialog onSubmit={handleCommentAdded} />
       </div>
 

@@ -10,7 +10,10 @@ const schema = z.object({
 
 export type FormInputs = z.infer<typeof schema>;
 
-export const CommentAddDialog: React.FC<{ onSubmit: (newComment: string) => void }> = ({ onSubmit }) => {
+export const CommentAddDialog: React.FC<{ title?: string; onSubmit: (newComment: string) => void }> = ({
+  title,
+  onSubmit
+}) => {
   const {
     register,
     getValues,
@@ -33,14 +36,19 @@ export const CommentAddDialog: React.FC<{ onSubmit: (newComment: string) => void
     reset();
   };
 
+  const handleCancel = () => {
+    reset();
+  };
+
   return (
     <EntityAddDialog
-      title="Patient"
+      title={title ?? 'Entity'}
       message="Add a comment"
       buttonLabel="Add Comment"
       buttonIcon={faComment}
       okButtonEnabled={isValid}
       onOk={handleSubmit}
+      onCancel={handleCancel}
     >
       <form>
         <div className="grid grid-cols-1 gap-6">

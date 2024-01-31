@@ -5,11 +5,7 @@ import { z } from 'zod';
 import { httpClient } from './api';
 
 export class PatientApi {
-  static async getByPnumber(pnumber?: string) {
-    if (!pnumber) {
-      return null;
-    }
-
+  static async getByPnumber(pnumber: string) {
     const response = await httpClient({
       method: 'GET',
       path: ['patients', pnumber],
@@ -21,11 +17,7 @@ export class PatientApi {
     return patient;
   }
 
-  static async getPatientComments(pnumber?: string) {
-    if (!pnumber) {
-      return null;
-    }
-
+  static async getPatientComments(pnumber: string) {
     const response = await httpClient({
       method: 'GET',
       path: ['patients', pnumber, 'comments'],
@@ -37,11 +29,7 @@ export class PatientApi {
     return cevent;
   }
 
-  static async getPatientCollectionEvent(pnumber?: string, vnumber?: number) {
-    if (!pnumber || !vnumber) {
-      return null;
-    }
-
+  static async getPatientCollectionEvent(pnumber: string, vnumber: number) {
     const response = await httpClient({
       method: 'GET',
       path: ['patients', pnumber, 'collection-events', vnumber],
@@ -80,11 +68,7 @@ export class PatientApi {
   }
 
   // parameters are required to be optional due to TypeScript and useQuery
-  static async addComment(patient?: Patient, comment?: CommentAdd) {
-    if (!patient || !comment) {
-      return null;
-    }
-
+  static async addComment(patient: Patient, comment: CommentAdd) {
     const response = await httpClient({
       method: 'POST',
       path: ['patients', patient.pnumber, 'comments'],

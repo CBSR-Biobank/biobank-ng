@@ -75,6 +75,34 @@ type CollectionEventGet = {
   body: undefined;
 };
 
+type CollectionEventCreate = {
+  method: 'POST';
+  path: ['patients', string, 'collection-events'];
+  query: undefined;
+  body: string;
+};
+
+type CollectionEventDelete = {
+  method: 'DELETE';
+  path: ['patients', string, 'collection-events', number];
+  query: undefined;
+  body: undefined;
+};
+
+type CollectionEventListComments = {
+  method: 'GET';
+  path: ['patients', string, 'collection-events', number, 'comments'];
+  query: undefined;
+  body: undefined;
+};
+
+type CollectionEventAddComment = {
+  method: 'POST';
+  path: ['patients', string, 'collection-events', number, 'comments'];
+  query: undefined;
+  body: string;
+};
+
 type AliquotsGet = {
   method: 'GET';
   path: ['specimens', string, 'aliquots'];
@@ -100,6 +128,10 @@ export type Endpoint =
   | PatientAddComment
   | CollectionEventsGet
   | CollectionEventGet
+  | CollectionEventCreate
+  | CollectionEventDelete
+  | CollectionEventListComments
+  | CollectionEventAddComment
   | AliquotsGet
   | StudyNames;
 

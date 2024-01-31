@@ -36,6 +36,21 @@ public class BiobankEventPublisher {
         applicationEventPublisher.publishEvent(event);
     }
 
+    public void publishVisitCreated(String username, String pnumber, Integer vnumber) {
+        var event = new VisitCreatedEvent(this, username, pnumber, vnumber);
+        applicationEventPublisher.publishEvent(event);
+    }
+
+    public void publishVisitUpdated(String username, String pnumber, Integer vnumber) {
+        var event = new VisitUpdatedEvent(this, username, pnumber, vnumber);
+        applicationEventPublisher.publishEvent(event);
+    }
+
+    public void publishVisitDeleted(String username, String pnumber, Integer vnumber) {
+        var event = new VisitDeletedEvent(this, username, pnumber, vnumber);
+        applicationEventPublisher.publishEvent(event);
+    }
+
     public void publishSpecimenRead(final String username, final String pnumber, final String inventoryId) {
         var event = new SpecimenReadEvent(this, username, pnumber, inventoryId);
         applicationEventPublisher.publishEvent(event);

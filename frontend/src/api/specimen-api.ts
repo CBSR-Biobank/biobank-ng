@@ -3,11 +3,7 @@ import { z } from 'zod';
 import { httpClient } from './api';
 
 export class SpecimenApi {
-  static async getByParentInventoryId(inventoryId?: string) {
-    if (!inventoryId) {
-      return null;
-    }
-
+  static async getByParentInventoryId(inventoryId: string) {
     const response = await httpClient({
       method: 'GET',
       path: ['specimens', inventoryId, 'aliquots'],

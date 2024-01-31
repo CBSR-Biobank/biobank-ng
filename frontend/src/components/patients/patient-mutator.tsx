@@ -37,7 +37,6 @@ export const PatientMutator: React.FC<{
         studyNameShort: patient.studyNameShort,
         [prop]: newValue
       };
-      console.log(prop, newValues);
       updatePatient.mutate(newValues);
     }
     onClose();

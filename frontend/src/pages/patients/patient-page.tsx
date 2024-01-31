@@ -9,6 +9,11 @@ import { Outlet, useParams } from 'react-router-dom';
 
 export function PatientPage() {
   const params = useParams();
+
+  if (!params.pnumber) {
+    throw new Error('pnumber is invalid');
+  }
+
   const { setPatient } = usePatientStore();
   const patientQry = usePatient(params.pnumber);
   const { data: patient } = patientQry;

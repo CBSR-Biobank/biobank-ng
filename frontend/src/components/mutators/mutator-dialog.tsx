@@ -7,20 +7,37 @@ import {
   DialogTitle
 } from '@app/components/ui/dialog';
 import { cn } from '@app/utils';
+import { VariantProps, cva } from 'class-variance-authority';
 import { CancelButton } from '../cancel-button';
 import { OkButton } from '../ok-button';
 
+const mutatorVariants = cva('', {
+  variants: {
+    size: {
+      sm: 'md:w-[425px]',
+      md: 'md:w-[600px]',
+      lg: 'md:w-[800px]'
+    }
+  },
+  defaultVariants: {
+    size: 'md'
+  }
+});
+
+type MutatorVariantProps = VariantProps<typeof mutatorVariants>;
+
 export const MutatorDialog: React.FC<
-  React.PropsWithChildren<{
-    title: string;
-    message?: string;
-    valid: boolean;
-    required?: boolean;
-    open: boolean;
-    size: 'default' | 'sm' | 'md' | 'lg';
-    onOk: () => void;
-    onCancel: () => void;
-  }>
+  React.PropsWithChildren<
+    MutatorVariantProps & {
+      title: string;
+      message?: string;
+      valid: boolean;
+      required?: boolean;
+      open: boolean;
+      onOk: () => void;
+      onCancel: () => void;
+    }
+  >
 > = ({ title, message, valid, open, size, onOk, onCancel, children }) => {
   const handleOk = () => {
     onOk();
@@ -30,15 +47,9 @@ export const MutatorDialog: React.FC<
     onCancel();
   };
 
-  const contentClass = cn({
-    'w-[425px]': size === 'sm',
-    'w-[600px]': size === 'md' || size === 'default',
-    'w-[800px]': size === 'lg'
-  });
-
   return (
     <Dialog open={open} onOpenChange={handleCancel}>
-      <DialogContent className={contentClass}>
+      <DialogContent className={cn(mutatorVariants({ size }))}>
         <DialogHeader>
           <DialogTitle className="text-primary-600">{title}</DialogTitle>
           {message && <DialogDescription>{message}</DialogDescription>}

@@ -1,16 +1,5 @@
 package edu.ualberta.med.biobank.services;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.applicationevents.BiobankEventPublisher;
 import edu.ualberta.med.biobank.domain.Comment;
 import edu.ualberta.med.biobank.domain.Patient;
@@ -35,6 +24,18 @@ import io.jbock.util.Either;
 import jakarta.persistence.Tuple;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
 @Service
 public class PatientService {
@@ -76,67 +77,26 @@ public class PatientService {
             .orElseGet(() -> Either.left(new EntityNotFound("patient")));
     }
 
-    public Either<AppError, PatientDTO> findByPnumber(String pnumber, boolean checkPermission) {
-        return patientExists(pnumber)
+    public Either<AppError, PatientDTO> get(String pnumber) {
+        return getInternal(pnumber)
             .flatMap(patient -> {
-                Either<AppError, Boolean> allowedMaybe = checkPermission
-                    ? new PatientReadPermission(patient.studyId()).isAllowed()
-                    : Either.right(true);
-
-                return allowedMaybe.flatMap(allowed -> {
-                    logger.debug("patient study id: {}, allowed: {}", patient.studyId(), allowed);
-                    if (!allowed) {
-                        return Either.left(new PermissionError("patient read"));
-                    }
-
-                    var ceSummary = collectionEventRepository
-                        .findSummariesByPatient(pnumber, Tuple.class)
-                        .stream()
-                        .map(row -> CollectionEventSummaryDTO.fromTuple(row))
-                        .toList();
-
-                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                    eventPublisher.publishPatientRead(auth.getName(), pnumber);
-
-                    return Either.right(patient.withCollectionEvents(ceSummary));
-                });
-            });
-    }
-
-    public Either<AppError, PatientDTO> findByPnumber(String pnumber) {
-        return findByPnumber(pnumber, true);
-    }
-
-    public Either<AppError, Collection<CommentDTO>> patientComments(String pnumber) {
-        return patientExists(pnumber)
-            .flatMap(patient -> {
-                var permission = new PatientReadPermission(patient.studyId());
-                return permission.isAllowed();
-            })
-            .flatMap(allowed -> {
-                if (!allowed) {
-                    return Either.left(new PermissionError("study"));
-                }
-
-                Map<Integer, CommentDTO> comments = new HashMap<>();
-
-                patientRepository
-                    .patientComments(pnumber, Tuple.class)
-                    .stream()
-                    .forEach(row -> {
-                        var commentId = row.get("commentId", Integer.class);
-                        if (commentId != null) {
-                            comments.computeIfAbsent(commentId, id -> CommentDTO.fromTuple(row));
+                return new PatientReadPermission(patient.studyId())
+                    .isAllowed()
+                    .flatMap(allowed -> {
+                        logger.debug("patient study id: {}, allowed: {}", patient.studyId(), allowed);
+                        if (!allowed) {
+                            return Either.left(new PermissionError("patient read"));
                         }
-                    });
 
-                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                eventPublisher.publishPatientRead(auth.getName(), pnumber);
-                return Either.right(comments.values());
+                        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                        eventPublisher.publishPatientRead(auth.getName(), pnumber);
+
+                        return Either.right(patient);
+                    });
             });
     }
 
-    public Either<AppError, PatientDTO> save(PatientAddDTO dto) {
+    public Either<AppError, PatientDTO> add(PatientAddDTO dto) {
         var violations = validator.validate(dto);
 
         if (!violations.isEmpty()) {
@@ -213,7 +173,7 @@ public class PatientService {
                 }
                 return Either.right(newStudyId);
             })
-            .flatMap(ignored -> findByPnumber(pnumber, false))
+            .flatMap(ignored -> getInternal(pnumber))
             .flatMap(patientDTO -> {
                 var permission = new PatientUpdatePermission(patientDTO.studyId());
                 return permission
@@ -246,8 +206,37 @@ public class PatientService {
             });
     }
 
-    public Either<AppError, CommentDTO> addPatientComment(String pnumber, CommentAddDTO dto) {
-        var violations = validator.validate(dto);
+    public Either<AppError, Collection<CommentDTO>> getComments(String pnumber) {
+        return patientExists(pnumber)
+            .flatMap(patient -> {
+                var permission = new PatientReadPermission(patient.studyId());
+                return permission.isAllowed();
+            })
+            .flatMap(allowed -> {
+                if (!allowed) {
+                    return Either.left(new PermissionError("study"));
+                }
+
+                Map<Integer, CommentDTO> comments = new LinkedHashMap<>();
+
+                patientRepository
+                    .patientComments(pnumber, Tuple.class)
+                    .stream()
+                    .forEach(row -> {
+                        var commentId = row.get("commentId", Integer.class);
+                        if (commentId != null) {
+                            comments.computeIfAbsent(commentId, id -> CommentDTO.fromTuple(row));
+                        }
+                    });
+
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                eventPublisher.publishPatientRead(auth.getName(), pnumber);
+                return Either.right(comments.values());
+            });
+    }
+
+    public Either<AppError, CommentDTO> addComment(String pnumber, CommentAddDTO commentDTO) {
+        var violations = validator.validate(commentDTO);
 
         if (!violations.isEmpty()) {
             List<String> errors = new ArrayList<>();
@@ -275,7 +264,7 @@ public class PatientService {
                         Comment comment = new Comment();
                         comment.setUser(user);
                         comment.setCreatedAt(new Date());
-                        comment.setMessage(dto.message().trim());
+                        comment.setMessage(commentDTO.message().trim());
 
                         Patient patientToUpdate = patientRepository.getReferenceById(patient.id());
                         patientToUpdate.getComments().add(comment);
@@ -284,6 +273,24 @@ public class PatientService {
                         eventPublisher.publishPatientUpdated(userDto.username(), pnumber);
                         return Either.right(CommentDTO.fromComment(comment));
                     });
+            });
+    }
+
+    /**
+     * This method is only visible to the package. It is not meant to be used outside the package.
+     *
+     * It does not check for user permissions or update the LOG table.
+     */
+    Either<AppError, PatientDTO> getInternal(String pnumber) {
+        return patientExists(pnumber)
+            .flatMap(patient -> {
+                var ceSummary = collectionEventRepository
+                    .findSummariesByPatient(pnumber, Tuple.class)
+                    .stream()
+                    .map(row -> CollectionEventSummaryDTO.fromTuple(row))
+                    .toList();
+
+                return Either.right(patient.withCollectionEvents(ceSummary));
             });
     }
 

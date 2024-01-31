@@ -54,14 +54,9 @@ public class CollectionEventMatcher {
             )
             .and(hasFeature("studyId", CollectionEventDTO::studyId, equalTo(expected.getPatient().getStudy().getId())))
             .and(
-                hasFeature("attributes size", CollectionEventDTO::attributes, hasSize(expected.getEventAttrs().size()))
-            );
-
-        if (!expected.getComments().isEmpty()) {
-            matchers.and(
-                hasFeature("comments", CollectionEventDTO::comments, CommentMatcher.containsAll(expected.getComments()))
-            );
-        }
+                hasFeature("attributes size", CollectionEventDTO::annotations, hasSize(expected.getEventAttrs().size()))
+            )
+            .and(hasFeature("commentCount", CollectionEventDTO::studyId, equalTo(expected.getComments().size())));
 
         if (!sourceSpecimens(expected).isEmpty()) {
             matchers.and(

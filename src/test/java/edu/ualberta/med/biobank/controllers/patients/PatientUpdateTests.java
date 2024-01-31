@@ -172,7 +172,6 @@ class PatientUpdateTests extends ControllerTest {
             )
             .andExpect(status().isForbidden())
             .andExpect(jsonPath("$.message", Matchers.matchesRegex(".*permission.*study.*")))
-            .andExpect(jsonPath("$.message", Matchers.containsString(patientStudy.getNameShort())))
-            .andDo(MockMvcResultHandlers.print());
+            .andExpect(jsonPath("$.message", Matchers.containsString(patientStudy.getNameShort())));
     }
 }

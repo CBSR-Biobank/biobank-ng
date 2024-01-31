@@ -1,28 +1,19 @@
 package edu.ualberta.med.biobank.domain;
 
+import java.util.Date;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.util.Date;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
 
 @Entity
 @Table(name = "LOG")
 public class Log implements ValueObject {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "id-generator")
-    @GenericGenerator(
-        name = "id-generator",
-        type = edu.ualberta.med.biobank.domain.util.CustomIdGenerator.class,
-        parameters = {
-            @Parameter(name = "initial_value", value = "1"), @Parameter(name = "increment_size", value = "50")
-        }
-    )
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "ID", nullable = false)
     private Integer id;
 

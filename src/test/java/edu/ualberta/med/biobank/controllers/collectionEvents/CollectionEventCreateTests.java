@@ -4,8 +4,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.reactor.IOSession.Status;
 import edu.ualberta.med.biobank.controllers.endpoints.CollectionEventEndpoint;
+import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.dtos.CollectionEventAddDTO;
 import edu.ualberta.med.biobank.test.ControllerTest;
 import edu.ualberta.med.biobank.test.fixtures.PatientFixtureBuilder;
@@ -49,7 +49,7 @@ class CollectionEventCreateTests extends ControllerTest {
             .andExpect(jsonPath("$.patientNumber", Matchers.is(patient.getPnumber())))
             .andExpect(jsonPath("$.studyId", Matchers.is(patient.getStudy().getId())))
             .andExpect(jsonPath("$.studyNameShort", Matchers.is(patient.getStudy().getNameShort())))
-            .andExpect(jsonPath("$.status", Matchers.is(Status.ACTIVE.name())))
+            .andExpect(jsonPath("$.status", Matchers.is(Status.ACTIVE.getName())))
             .andExpect(jsonPath("$.attributes", Matchers.hasSize(0)))
             .andExpect(jsonPath("$.comments", Matchers.hasSize(0)))
             .andExpect(jsonPath("$.sourceSpecimens", Matchers.hasSize(0)))
@@ -117,6 +117,6 @@ class CollectionEventCreateTests extends ControllerTest {
                     .content(JsonUtil.asJsonString(data))
             )
             .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.message", Matchers.matchesRegex(".*permission.*")));
+            .andExpect(jsonPath("$.message", Matchers.matchesRegex(".*permission.*collection.*")));
     }
 }
