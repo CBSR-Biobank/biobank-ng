@@ -2,10 +2,10 @@ import { cn } from '@app/utils';
 import { useState } from 'react';
 import { Label } from '../ui/label';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
-import { PropertyChangerProps, PropertyOption } from './property-changer';
-import { PropertyChangerDialog } from './property-changer-dialog';
+import { MutatorProps, PropertyOption } from './mutator';
+import { MutatorDialog } from './mutator-dialog';
 
-export function PropertyChangerRadio({
+export function MutatorRadio({
   propertyName,
   title,
   label,
@@ -13,7 +13,7 @@ export function PropertyChangerRadio({
   open,
   onClose,
   propertyOptions
-}: PropertyChangerProps<unknown>) {
+}: MutatorProps<unknown>) {
   const selectedOption = propertyOptions?.find((option) => option.id === value);
   const [input, setInput] = useState<PropertyOption<unknown> | undefined>(selectedOption);
 
@@ -34,7 +34,7 @@ export function PropertyChangerRadio({
   };
 
   return (
-    <PropertyChangerDialog
+    <MutatorDialog
       title={title}
       required={false}
       open={open}
@@ -54,6 +54,6 @@ export function PropertyChangerRadio({
           </div>
         ))}
       </RadioGroup>
-    </PropertyChangerDialog>
+    </MutatorDialog>
   );
 }

@@ -3,28 +3,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { LabelledInput } from '../forms/labelled-input';
-import { PropertyChangerTextareaProps } from './property-changer';
-import { PropertyChangerDialog } from './property-changer-dialog';
+import { MutatorTextareaProps } from './mutator';
+import { MutatorDialog } from './mutator-dialog';
 
-const classes = [
-  'flex',
-  'w-full',
-  'rounded-md',
-  'border',
-  'border-input',
-  'bg-transparent',
-  'px-3',
-  'py-2',
-  'text-sm',
-  'ring-offset-background',
-  'placeholder:text-muted-foreground',
-  'focus-visible:outline-none',
-  'focus-visible:ring-2',
-  'focus-visible:ring-ring',
-  'focus-visible:ring-offset-2',
-  'disabled:cursor-not-allowed',
-  'disabled:opacity-50'
-];
+const classes =
+  'flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
 
 function makeSchema(required: boolean, minlength?: number, maxlength?: number) {
   let valueSchema = z.string().trim();
@@ -48,7 +31,7 @@ function makeSchema(required: boolean, minlength?: number, maxlength?: number) {
   });
 }
 
-export const PropertyChangerText: React.FC<PropertyChangerTextareaProps> = ({
+export const MutatorText: React.FC<MutatorTextareaProps> = ({
   propertyName,
   title,
   label,
@@ -88,7 +71,7 @@ export const PropertyChangerText: React.FC<PropertyChangerTextareaProps> = ({
   };
 
   return (
-    <PropertyChangerDialog
+    <MutatorDialog
       title={title}
       required={required}
       open={open}
@@ -113,6 +96,6 @@ export const PropertyChangerText: React.FC<PropertyChangerTextareaProps> = ({
           )}
         </div>
       </form>
-    </PropertyChangerDialog>
+    </MutatorDialog>
   );
 };

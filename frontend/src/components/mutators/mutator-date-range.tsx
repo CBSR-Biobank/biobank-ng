@@ -3,8 +3,8 @@ import { format } from 'date-fns';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { LabelledInput } from '../forms/labelled-input';
-import { PropertyChangerDateRangeProps } from './property-changer';
-import { PropertyChangerDialog } from './property-changer-dialog';
+import { MutatorDateRangeProps } from './mutator';
+import { MutatorDialog } from './mutator-dialog';
 
 const schema = z
   .object({
@@ -23,14 +23,7 @@ const schema = z
     { message: 'must be later than start date' }
   );
 
-export function PropertyChangerDateRange({
-  propertyName,
-  title,
-  value,
-  required,
-  open,
-  onClose
-}: PropertyChangerDateRangeProps) {
+export function MutatorDateRange({ propertyName, title, value, required, open, onClose }: MutatorDateRangeProps) {
   const {
     register,
     getValues,
@@ -67,7 +60,7 @@ export function PropertyChangerDateRange({
   };
 
   return (
-    <PropertyChangerDialog
+    <MutatorDialog
       size="md"
       title={title}
       required={required}
@@ -94,6 +87,6 @@ export function PropertyChangerDateRange({
           pattern="\d{4}-\d{2}-\d{2}"
         />
       </form>
-    </PropertyChangerDialog>
+    </MutatorDialog>
   );
 }

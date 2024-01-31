@@ -16,13 +16,13 @@ import { BackButton } from '../back-button';
 import { CommentAddDialog } from '../comment-add-dialog';
 import { Button } from '../ui/button';
 import { PatientComments } from './patient-comments';
-import { PatientPropertyChanger } from './patient-property-changer';
+import { PatientMutator } from './patient-mutator';
 
 export function PatientDetails() {
   const navigate = useNavigate();
   const { patient, setCollectionEvent } = usePatientStore();
   const [propertyToUpdate, setPropertyToUpdate] = useState<string | null>(null);
-  const [propertyChangerOpen, setPropertyChangerOpen] = useState(false);
+  const [mutatorOpen, setMutatorOpen] = useState(false);
   const [commentsSectionIsOpen, setCommentsSectionIsOpen] = useState(false);
 
   const queryClient = useQueryClient();
@@ -47,11 +47,11 @@ export function PatientDetails() {
 
   const handlePropChange = (propertyName: string) => {
     setPropertyToUpdate(propertyName);
-    setPropertyChangerOpen(true);
+    setMutatorOpen(true);
   };
 
   const handleUpdate = () => {
-    setPropertyChangerOpen(false);
+    setMutatorOpen(false);
   };
 
   const backClicked = () => {
@@ -126,8 +126,8 @@ export function PatientDetails() {
         <CommentAddDialog onSubmit={handleCommentAdded} />
       </div>
 
-      {propertyChangerOpen && propertyToUpdate && (
-        <PatientPropertyChanger patient={patient} propertyToUpdate={propertyToUpdate} onClose={handleUpdate} />
+      {mutatorOpen && propertyToUpdate && (
+        <PatientMutator patient={patient} propertyToUpdate={propertyToUpdate} onClose={handleUpdate} />
       )}
     </AdminPage>
   );

@@ -5,10 +5,10 @@ import { cn } from '@app/utils';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { useState } from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../ui/command';
-import { PropertyChangerProps, PropertyOption } from './property-changer';
-import { PropertyChangerDialog } from './property-changer-dialog';
+import { MutatorProps, PropertyOption } from './mutator';
+import { MutatorDialog } from './mutator-dialog';
 
-export function PropertyChangerSelect({
+export function MutatorSelect({
   propertyName,
   title,
   label,
@@ -16,7 +16,7 @@ export function PropertyChangerSelect({
   open,
   onClose,
   propertyOptions
-}: PropertyChangerProps<unknown>) {
+}: MutatorProps<unknown>) {
   const selectedOption = propertyOptions?.find((option) => option.id === value);
   const [input, setInput] = useState<PropertyOption<unknown> | undefined>(selectedOption);
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -36,7 +36,7 @@ export function PropertyChangerSelect({
   };
 
   return (
-    <PropertyChangerDialog
+    <MutatorDialog
       title={title}
       required={false}
       open={open}
@@ -78,6 +78,6 @@ export function PropertyChangerSelect({
           </ScrollArea>
         </PopoverContent>
       </Popover>
-    </PropertyChangerDialog>
+    </MutatorDialog>
   );
 }

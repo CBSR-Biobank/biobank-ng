@@ -1,22 +1,15 @@
 import { Status, StatusLabels } from '@app/models/status';
-import { PropertyChangerProps } from './property-changer';
-import { PropertyChangerRadio } from './property-changer-radio';
+import { MutatorProps } from './mutator';
+import { MutatorRadio } from './mutator-radio';
 
-export function PropertyChangerStatus({
-  propertyName,
-  title,
-  value,
-  required,
-  open,
-  onClose
-}: PropertyChangerProps<unknown>) {
+export function MutatorStatus({ propertyName, title, value, required, open, onClose }: MutatorProps<unknown>) {
   const statusOptions = (Object.keys(Status) as Array<keyof typeof Status>).map((key) => ({
     id: Status[key],
     label: StatusLabels[Status[key]]
   }));
 
   return (
-    <PropertyChangerRadio
+    <MutatorRadio
       propertyName={propertyName}
       title={title}
       open={open}

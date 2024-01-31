@@ -2,26 +2,28 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { LabelledInput } from '../forms/labelled-input';
-import { PropertyChangerProps } from './property-changer';
-import { PropertyChangerDialog } from './property-changer-dialog';
+import { MutatorNumberProps } from './mutator';
+import { MutatorDialog } from './mutator-dialog';
 
-const requiredSchema = z.object({
-  value: z.string().trim().url()
-});
-
-const optionalSchema = z.object({
-  value: z.union([z.literal(''), z.string().trim().url()])
-});
-
-export const PropertyChangerUrl: React.FC<PropertyChangerProps<string>> = ({
+export const MutatorNumber: React.FC<MutatorNumberProps> = ({
   propertyName,
   title,
   label,
   value,
   required,
   open,
-  onClose
+  onClose,
+  min = 0,
+  max = Number.MAX_SAFE_INTEGER
 }) => {
+  const requiredSchema = z.object({
+    value: z.coerce.number().gte(min).lte(max)
+  });
+
+  const optionalSchema = z.object({
+    value: z.union([z.literal(''), z.coerce.number().gte(min).lte(max)])
+  });
+
   const schema = required ? requiredSchema : optionalSchema;
 
   const {
@@ -43,7 +45,7 @@ export const PropertyChangerUrl: React.FC<PropertyChangerProps<string>> = ({
   const handleOk = () => {
     const values = getValues();
     const value = values?.value;
-    onClose('ok', propertyName, value === '' ? null : value);
+    onClose('ok', propertyName, value === '' ? null : Number(value));
   };
 
   const handleCancel = () => {
@@ -51,20 +53,20 @@ export const PropertyChangerUrl: React.FC<PropertyChangerProps<string>> = ({
   };
 
   return (
-    <PropertyChangerDialog
+    <MutatorDialog
       title={title}
-      open={open}
       required={required}
-      size="md"
+      open={open}
+      size="lg"
       onOk={handleOk}
       onCancel={handleCancel}
       valid={isValid}
     >
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 gap-6">
-          <LabelledInput type="url" label={label} errorMessage={errors?.value?.message} {...register('value')} />
+          <LabelledInput type="number" label={label} errorMessage={errors?.value?.message} {...register('value')} />
         </div>
       </form>
-    </PropertyChangerDialog>
+    </MutatorDialog>
   );
 };

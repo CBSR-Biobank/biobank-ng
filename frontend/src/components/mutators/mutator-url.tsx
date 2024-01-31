@@ -2,18 +2,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { LabelledInput } from '../forms/labelled-input';
-import { PropertyChangerProps } from './property-changer';
-import { PropertyChangerDialog } from './property-changer-dialog';
+import { MutatorProps } from './mutator';
+import { MutatorDialog } from './mutator-dialog';
 
 const requiredSchema = z.object({
-  value: z.string().trim().email()
+  value: z.string().trim().url()
 });
 
 const optionalSchema = z.object({
-  value: z.union([z.literal(''), z.string().trim().email()])
+  value: z.union([z.literal(''), z.string().trim().url()])
 });
 
-export const PropertyChangerEmail: React.FC<PropertyChangerProps<string>> = ({
+export const MutatorUrl: React.FC<MutatorProps<string>> = ({
   propertyName,
   title,
   label,
@@ -51,10 +51,10 @@ export const PropertyChangerEmail: React.FC<PropertyChangerProps<string>> = ({
   };
 
   return (
-    <PropertyChangerDialog
+    <MutatorDialog
       title={title}
-      required={required}
       open={open}
+      required={required}
       size="md"
       onOk={handleOk}
       onCancel={handleCancel}
@@ -62,9 +62,9 @@ export const PropertyChangerEmail: React.FC<PropertyChangerProps<string>> = ({
     >
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 gap-6">
-          <LabelledInput type="email" label={label} errorMessage={errors?.value?.message} {...register('value')} />
+          <LabelledInput type="url" label={label} errorMessage={errors?.value?.message} {...register('value')} />
         </div>
       </form>
-    </PropertyChangerDialog>
+    </MutatorDialog>
   );
 };

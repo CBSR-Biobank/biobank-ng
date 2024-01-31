@@ -10,7 +10,7 @@ import { cn } from '@app/utils';
 import { CancelButton } from '../cancel-button';
 import { OkButton } from '../ok-button';
 
-export const PropertyChangerDialog: React.FC<
+export const MutatorDialog: React.FC<
   React.PropsWithChildren<{
     title: string;
     message?: string;

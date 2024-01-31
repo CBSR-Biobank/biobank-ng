@@ -6,8 +6,8 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { CircularProgress } from '../circular-progress';
 import { StudySelect } from '../forms/study-select';
-import { PropertyChangerProps } from './property-changer';
-import { PropertyChangerDialog } from './property-changer-dialog';
+import { MutatorProps } from '../mutators/mutator';
+import { MutatorDialog } from '../mutators/mutator-dialog';
 
 const requiredSchema = z.object({
   studyNameShort: z.string()
@@ -17,14 +17,7 @@ const optionalSchema = z.object({
   studyNameShort: z.string().or(z.literal(''))
 });
 
-export function PropertyChangerStudy({
-  propertyName,
-  title,
-  value,
-  required,
-  open,
-  onClose
-}: PropertyChangerProps<string>) {
+export function MutatorStudy({ propertyName, title, value, required, open, onClose }: MutatorProps<string>) {
   const schema = required ? requiredSchema : optionalSchema;
 
   const {
@@ -63,7 +56,7 @@ export function PropertyChangerStudy({
   }
 
   return (
-    <PropertyChangerDialog
+    <MutatorDialog
       size="md"
       title={title}
       required={required}
@@ -75,6 +68,6 @@ export function PropertyChangerStudy({
       <form onSubmit={handleSubmit(onSubmit)}>
         <StudySelect control={control} name="studyNameShort" studies={studyNamesQuery.data} />
       </form>
-    </PropertyChangerDialog>
+    </MutatorDialog>
   );
 }

@@ -2,12 +2,12 @@ import { PatientApi } from '@app/api/patient-api';
 import { Patient, PatientUpdate } from '@app/models/patient';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { PropertyChangerResult } from '../property-changer/property-changer';
-import { PropertyChangerStudy } from '../property-changer/property-changer-study';
-import { PropertyChangerText } from '../property-changer/property-changer-text';
+import { MutatorResult } from '../mutators/mutator';
+import { MutatorText } from '../mutators/mutator-text';
 import { ShowError } from '../show-error';
+import { MutatorStudy } from '../studies/mutator-study';
 
-export const PatientPropertyChanger: React.FC<{
+export const PatientMutator: React.FC<{
   patient: Patient;
   propertyToUpdate: string;
   onClose: () => void;
@@ -29,7 +29,7 @@ export const PatientPropertyChanger: React.FC<{
     }
   );
 
-  const handleClose = (result: PropertyChangerResult, propertyName: string, newValue?: unknown) => {
+  const handleClose = (result: MutatorResult, propertyName: string, newValue?: unknown) => {
     if (result === 'ok') {
       const prop = propertyName as keyof PatientUpdate;
       const newValues = {
@@ -61,7 +61,7 @@ export const PatientPropertyChanger: React.FC<{
   switch (propertyToUpdate) {
     case 'pnumber':
       return (
-        <PropertyChangerText
+        <MutatorText
           {...commonProps}
           label="Patient Number"
           value={patient.pnumber}
@@ -72,7 +72,7 @@ export const PatientPropertyChanger: React.FC<{
       );
 
     case 'studyNameShort':
-      return <PropertyChangerStudy {...commonProps} label="Study" value={patient.studyNameShort} required={true} />;
+      return <MutatorStudy {...commonProps} label="Study" value={patient.studyNameShort} required={true} />;
 
     default:
       throw new Error('property is invalid: ' + propertyToUpdate);
