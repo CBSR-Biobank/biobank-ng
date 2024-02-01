@@ -45,7 +45,7 @@ const router = createBrowserRouter([
           {
             path: ':pnumber',
             async lazy() {
-              let { PatientPage: PatientPage } = await import('@app/pages/patients/patient-page');
+              let { PatientPage } = await import('@app/pages/patients/patient-page');
               return { Component: PatientPage };
             },
             children: [
@@ -64,6 +64,18 @@ const router = createBrowserRouter([
                 }
               }
             ]
+          }
+        ]
+      },
+      {
+        path: 'profile',
+        children: [
+          {
+            index: true,
+            async lazy() {
+              let { UserProfile } = await import('@app/pages/user/user-profile');
+              return { Component: UserProfile };
+            }
           }
         ]
       },

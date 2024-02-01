@@ -1,5 +1,5 @@
 import { fetchAuthenticated } from '@app/api/api';
-import { DashboardLayout } from '@app/components/dashboard-layout';
+import { DashboardLayout } from '@app/components/dashboard/dashboard-layout';
 import { userSchema } from '@app/models/user';
 import { useUserStore } from '@app/store';
 import { useEffect } from 'react';

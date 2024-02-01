@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { Alert } from './alert';
-import { DashboardLayout } from './dashboard-layout';
+import { DashboardLayout } from './dashboard/dashboard-layout';
 import { LabelledInput } from './forms/labelled-input';
 import { OkButton } from './ok-button';
 

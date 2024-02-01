@@ -22,30 +22,30 @@ services:
         ports:
             - 8080:8080
 
-    app:
-        build:
-            context: ../
-            dockerfile: Dockerfile
-        image: app-image
-        volumes:
-            - ../target/biobank-0.0.1-SNAPSHOT.jar:/app.jar
-        # develop:
-        #     watch:
-        #         - action: sync+restart
-        #           path: ../target/biobank-0.0.1-SNAPSHOT.jar
-        #           target: /app.jar
-        command: sh -c "java -jar /app.jar"
-        working_dir: /app
-        ports:
-            - 9000:9000
-            - 35729:35729
-        depends_on:
-            - db
-        environment:
-            - DB_HOST=db
-            - DB_NAME=$DB_NAME
-            - DB_USER=$DB_USER
-            - DB_PASSWORD=$DB_PASSWORD
+    # app:
+    #     build:
+    #         context: ../
+    #         dockerfile: Dockerfile
+    #     image: app-image
+    #     volumes:
+    #         - ../target/biobank-0.0.1-SNAPSHOT.jar:/app.jar
+    #     # develop:
+    #     #     watch:
+    #     #         - action: sync+restart
+    #     #           path: ../target/biobank-0.0.1-SNAPSHOT.jar
+    #     #           target: /app.jar
+    #     command: sh -c "java -jar /app.jar"
+    #     working_dir: /app
+    #     ports:
+    #         - 9000:9000
+    #         - 35729:35729
+    #     depends_on:
+    #         - db
+    #     environment:
+    #         - DB_HOST=db
+    #         - DB_NAME=$DB_NAME
+    #         - DB_USER=$DB_USER
+    #         - DB_PASSWORD=$DB_PASSWORD
 
     frontend:
         image: node:18-alpine
