@@ -31,7 +31,7 @@ export const EntityProperty: React.FC<
   };
 
   return (
-    <div className={cn('grid grid-cols-1 gap-2', className)}>
+    <div className={cn('grid grid-cols-1 content-start gap-2', className)}>
       <p className="text-sm font-semibold text-gray-400">{label}</p>
       <div className="flex gap-0">
         <div className={valueClasses}>
