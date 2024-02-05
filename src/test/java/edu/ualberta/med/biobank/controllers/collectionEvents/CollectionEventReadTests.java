@@ -54,9 +54,9 @@ class CollectionEventReadTests extends ControllerTest {
     void get_when_present_is_ok() throws Exception {
         var patient = new PatientFixtureBuilder()
             .numCollectionEvents(1)
-            .numComments(1)
-            .numSpecimens(1)
-            .numAliquots(1)
+            .numCollectionEventComments(2)
+            .numSpecimens(3)
+            .numAliquots(4)
             .build(factory);
 
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
@@ -79,7 +79,7 @@ class CollectionEventReadTests extends ControllerTest {
 
         var patient = new PatientFixtureBuilder()
             .numCollectionEvents(1)
-            .numComments(1)
+            .numPatientComments(1)
             .numSpecimens(1)
             .numAliquots(1)
             .build(factory);

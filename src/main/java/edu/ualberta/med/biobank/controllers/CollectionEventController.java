@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.controllers;
 
 import edu.ualberta.med.biobank.dtos.CollectionEventAddDTO;
 import edu.ualberta.med.biobank.dtos.CollectionEventDTO;
+import edu.ualberta.med.biobank.dtos.CollectionEventUpdateDTO;
 import edu.ualberta.med.biobank.dtos.CommentAddDTO;
 import edu.ualberta.med.biobank.dtos.CommentDTO;
 import edu.ualberta.med.biobank.exception.AppErrorException;
@@ -16,11 +17,14 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/patients")
 public class CollectionEventController {
 
     @SuppressWarnings("unused")
@@ -33,7 +37,7 @@ public class CollectionEventController {
     }
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    @PostMapping(path = "/patients/{pnumber}/collection-events", consumes = "application/json")
+    @PostMapping(path = "/{pnumber}/collection-events", consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
     public CollectionEventDTO post(@PathVariable String pnumber, @RequestBody CollectionEventAddDTO data) {
         return collectionEventService
@@ -44,7 +48,7 @@ public class CollectionEventController {
     }
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    @GetMapping("/patients/{pnumber}/collection-events/{vnumber}")
+    @GetMapping("/{pnumber}/collection-events/{vnumber}")
     public CollectionEventDTO get(@PathVariable String pnumber, @PathVariable Integer vnumber) {
         return collectionEventService
             .get(pnumber, vnumber)
@@ -54,7 +58,17 @@ public class CollectionEventController {
     }
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    @DeleteMapping("/patients/{pnumber}/collection-events/{vnumber}")
+    @PutMapping(path = "/{pnumber}/collection-events/{vnumber}", consumes = "application/json")
+    public CollectionEventDTO put(
+        @PathVariable String pnumber,
+        @PathVariable Integer vnumber,
+        @RequestBody CollectionEventUpdateDTO data
+    ) {
+        return collectionEventService.update(pnumber, vnumber, data).orElseThrow(err -> new AppErrorException(err));
+    }
+
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @DeleteMapping("/{pnumber}/collection-events/{vnumber}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String pnumber, @PathVariable Integer vnumber) {
         collectionEventService
@@ -65,15 +79,21 @@ public class CollectionEventController {
     }
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    @GetMapping("/patients/{pnumber}/collection-events/{vnumber}/comments")
+    @GetMapping("/{pnumber}/collection-events/{vnumber}/comments")
     public Collection<CommentDTO> getComments(@PathVariable String pnumber, @PathVariable Integer vnumber) {
         return collectionEventService.getComments(pnumber, vnumber).orElseThrow(err -> new AppErrorException(err));
     }
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    @PostMapping(path = "/patients/{pnumber}/collection-events/{vnumber}/comments", consumes="application/json")
+    @PostMapping(path = "/{pnumber}/collection-events/{vnumber}/comments", consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    public CommentDTO postPatientComment(@PathVariable String pnumber, @PathVariable Integer vnumber, @RequestBody CommentAddDTO comment) {
-        return collectionEventService.addComment(pnumber, vnumber, comment).orElseThrow(err -> new AppErrorException(err));
+    public CommentDTO postPatientComment(
+        @PathVariable String pnumber,
+        @PathVariable Integer vnumber,
+        @RequestBody CommentAddDTO comment
+    ) {
+        return collectionEventService
+            .addComment(pnumber, vnumber, comment)
+            .orElseThrow(err -> new AppErrorException(err));
     }
 }

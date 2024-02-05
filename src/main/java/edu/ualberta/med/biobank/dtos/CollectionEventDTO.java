@@ -11,10 +11,10 @@ import jakarta.persistence.Tuple;
 
 public record CollectionEventDTO(
     Integer id,
-    Integer visitNumber,
+    Integer vnumber,
     String status,
     Integer patientId,
-    String patientNumber,
+    String pnumber,
     Integer studyId,
     String studyNameShort,
     Long commentCount,
@@ -30,10 +30,10 @@ public record CollectionEventDTO(
     ) {
         return new CollectionEventDTO(
             id,
-            visitNumber,
+            vnumber,
             status,
             patientId,
-            patientNumber,
+            pnumber,
             studyId,
             studyNameShort,
             commentCount,

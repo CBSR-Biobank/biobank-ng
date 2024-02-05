@@ -28,7 +28,7 @@ export function MutatorRadio<T>({ label, value, onClose, propertyOptions }: Muta
   return (
     <>
       <p className={cn('text-sm font-semibold text-gray-500')}>{label}</p>
-      <RadioGroup defaultValue={`${defaultValue}`} onValueChange={handleChange}>
+      <RadioGroup defaultValue={`${defaultValue?.id}`} onValueChange={handleChange}>
         {(propertyOptions || []).map((option) => (
           <div key={`${option.id}`} className="flex items-center space-x-2">
             <RadioGroupItem value={`${option.id}`} className="border-primary-300 border-2" />

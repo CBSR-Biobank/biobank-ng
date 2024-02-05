@@ -11,20 +11,24 @@ export const VisitAddDialog: React.FC<{
 }> = ({ disallow, onSubmit }) => {
   const schema = z
     .object({
-      vnumber: z.union([z.number().int().min(1, { message: 'should be 1 or greater' }), z.nan()]).optional()
+      vnumber: z.union([z.number().int().min(1, { message: 'should be 1 or greater' }), z.nan()])
     })
-    .refine(
-      (data) => {
-        if (!data.vnumber) {
-          return true;
-        }
-        return !disallow.includes(data.vnumber);
-      },
-      {
-        path: ['vnumber'],
-        message: 'already taken'
+    .superRefine((data, ctx) => {
+      if (!data.vnumber) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom
+          // path not assigned here since an error message would be displayed if the cancel button is pressed
+        });
       }
-    );
+
+      if (disallow.includes(data.vnumber)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['vnumber'],
+          message: 'already taken'
+        });
+      }
+    });
 
   const {
     register,

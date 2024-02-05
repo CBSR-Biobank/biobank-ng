@@ -4,9 +4,18 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { EntityAddDialog } from './entity-add-dialog';
 
-const schema = z.object({
-  message: z.string()
-});
+const schema = z
+  .object({
+    message: z.string()
+  })
+  .superRefine((data, ctx) => {
+    if (!data.message || data.message.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom
+        // path not assigned here since an error message would be displayed if the cancel button is pressed
+      });
+    }
+  });
 
 export type FormInputs = z.infer<typeof schema>;
 

@@ -3,13 +3,16 @@ package edu.ualberta.med.biobank.services;
 import edu.ualberta.med.biobank.applicationevents.BiobankEventPublisher;
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.domain.Comment;
+import edu.ualberta.med.biobank.domain.EventAttr;
 import edu.ualberta.med.biobank.domain.Status;
+import edu.ualberta.med.biobank.domain.StudyEventAttr;
 import edu.ualberta.med.biobank.domain.User;
+import edu.ualberta.med.biobank.dtos.AnnotationDTO;
 import edu.ualberta.med.biobank.dtos.CollectionEventAddDTO;
 import edu.ualberta.med.biobank.dtos.CollectionEventDTO;
+import edu.ualberta.med.biobank.dtos.CollectionEventUpdateDTO;
 import edu.ualberta.med.biobank.dtos.CommentAddDTO;
 import edu.ualberta.med.biobank.dtos.CommentDTO;
-import edu.ualberta.med.biobank.dtos.AnnotationDTO;
 import edu.ualberta.med.biobank.dtos.SourceSpecimenDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
@@ -21,19 +24,26 @@ import edu.ualberta.med.biobank.permission.patient.CollectionEventDeletePermissi
 import edu.ualberta.med.biobank.permission.patient.CollectionEventReadPermission;
 import edu.ualberta.med.biobank.permission.patient.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.repositories.CollectionEventRepository;
+import edu.ualberta.med.biobank.util.DateUtil;
 import edu.ualberta.med.biobank.util.LoggingUtils;
+import edu.ualberta.med.biobank.util.StringUtil;
 import io.jbock.util.Either;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +57,12 @@ public class CollectionEventService {
     @SuppressWarnings("unused")
     final Logger logger = LoggerFactory.getLogger(CollectionEventService.class);
 
+    private class EventAttrValuePair {
+
+        public StudyEventAttr studyAttr;
+        public String value;
+    }
+
     private CollectionEventRepository collectionEventRepository;
 
     private PatientService patientService;
@@ -57,6 +73,7 @@ public class CollectionEventService {
 
     private Validator validator;
 
+    @PersistenceContext
     protected EntityManager em;
 
     public CollectionEventService(
@@ -96,7 +113,7 @@ public class CollectionEventService {
                         }
 
                         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                        eventPublisher.publishVisitRead(auth.getName(), cevent.patientNumber(), cevent.visitNumber());
+                        eventPublisher.publishVisitRead(auth.getName(), cevent.pnumber(), cevent.vnumber());
                         return Either.right(cevent);
                     });
             });
@@ -157,6 +174,72 @@ public class CollectionEventService {
             });
     }
 
+    public Either<AppError, CollectionEventDTO> update(
+        String pnumber,
+        Integer vnumber,
+        CollectionEventUpdateDTO ceventInfo
+    ) {
+        var violations = validator.validate(ceventInfo);
+
+        if (!violations.isEmpty()) {
+            List<String> errors = new ArrayList<>();
+            for (ConstraintViolation<CollectionEventUpdateDTO> constraintViolation : violations) {
+                errors.add(constraintViolation.getMessage());
+            }
+            return Either.left(new ValidationError(String.join(", ", errors)));
+        }
+
+        return getInternal(pnumber, vnumber)
+            .flatMap(ceventDTO -> {
+                var permission = new CollectionEventUpdatePermission(ceventDTO.studyId());
+                return permission
+                    .isAllowed()
+                    .flatMap(allowed -> {
+                        if (!allowed) {
+                            return Either.left(new PermissionError("study: %s".formatted(ceventDTO.studyNameShort())));
+                        }
+
+                        if (vnumber != ceventInfo.vnumber() && getInternal(pnumber, ceventInfo.vnumber()).isRight()) {
+                            return Either.left(
+                                new Forbidden("visit number exists: %d".formatted(ceventInfo.vnumber()))
+                            );
+                        }
+
+                        Status newStatus = Status.fromName(ceventInfo.status());
+                        if (newStatus == null) {
+                            return Either.left(
+                                new ValidationError("invalid status: %s".formatted(ceventInfo.status()))
+                            );
+                        }
+
+                        CollectionEvent cevent = collectionEventRepository.getReferenceById(ceventDTO.id());
+                        return validAnnotations(cevent, ceventInfo.annotations())
+                            .flatMap(annotations -> {
+                                Set<EventAttr> eventAttrs = new HashSet<>(annotations.size());
+                                for (EventAttrValuePair pair : annotations) {
+                                    EventAttr attr = new EventAttr();
+                                    attr.setCollectionEvent(cevent);
+                                    attr.setStudyEventAttr(pair.studyAttr);
+                                    attr.setValue(pair.value);
+                                    em.persist(attr);
+                                    eventAttrs.add(attr);
+                                }
+
+                                cevent.getEventAttrs().clear();
+                                cevent.getEventAttrs().addAll(eventAttrs);
+
+                                cevent.setVisitNumber(ceventInfo.vnumber());
+                                cevent.setActivityStatus(newStatus);
+                                CollectionEvent savedCevent = collectionEventRepository.save(cevent);
+
+                                String username = SecurityContextHolder.getContext().getAuthentication().getName();
+                                eventPublisher.publishVisitUpdated(username, pnumber, vnumber);
+                                return Either.right(CollectionEventDTO.fromCollectionEvent(savedCevent));
+                            });
+                    });
+            });
+    }
+
     public Either<AppError, Boolean> delete(String pnumber, Integer vnumber) {
         return getInternal(pnumber, vnumber)
             .flatMap(ceventDTO -> {
@@ -206,7 +289,7 @@ public class CollectionEventService {
                             });
 
                         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                        eventPublisher.publishVisitRead(auth.getName(), cevent.patientNumber(), cevent.visitNumber());
+                        eventPublisher.publishVisitRead(auth.getName(), cevent.pnumber(), cevent.vnumber());
                         return Either.right(comments.values());
                     });
             });
@@ -300,11 +383,77 @@ public class CollectionEventService {
             .iterator()
             .next()
             .getValue()
-            .withExtras(
-                new ArrayList<>(attributes.values()),
-                new ArrayList<>(sourceSpecimens.values())
-            );
+            .withExtras(new ArrayList<>(attributes.values()), new ArrayList<>(sourceSpecimens.values()));
 
         return Either.right(cevent);
+    }
+
+    /**
+     * Fails fast at the moment
+     *
+     * Could be converted to list all errors
+     */
+    private Either<AppError, List<EventAttrValuePair>> validAnnotations(
+        CollectionEvent cevent,
+        List<AnnotationDTO> annotations
+    ) {
+        List<EventAttrValuePair> result = new ArrayList<>();
+
+        for (StudyEventAttr studyAttr : cevent.getPatient().getStudy().getStudyEventAttrs()) {
+            String label = studyAttr.getGlobalEventAttr().getLabel();
+            Optional<AnnotationDTO> annotationMaybe = annotations
+                .stream()
+                .filter(a -> label.equals(a.name()))
+                .findFirst();
+
+            if (annotationMaybe.isEmpty()) {
+                return Either.left(new ValidationError("annotation not found: %s".formatted(label)));
+            }
+
+            if (!studyAttr.getActivityStatus().equals(Status.ACTIVE)) {
+                return Either.left(new ValidationError("annotation not active: %s".formatted(label)));
+            }
+
+            EventAttrValuePair pair = new EventAttrValuePair();
+            pair.studyAttr = studyAttr;
+            pair.value = annotationMaybe.get().value();
+
+            if (studyAttr.getRequired() && pair.value.isBlank()) {
+                return Either.left(new ValidationError("annotation value is required: %s".formatted(label)));
+            }
+
+            String type = studyAttr.getGlobalEventAttr().getEventAttrType().getName();
+
+            if (type.equals("number") && !StringUtil.isNumeric(pair.value)) {
+                return Either.left(new ValidationError("annotation value is not numeric: %s".formatted(label)));
+            }
+
+            if (type.equals("date_time")) {
+                try {
+                    DateUtil.parseDateTime(pair.value);
+                } catch (ParseException ex) {
+                    return Either.left(new ValidationError("annotation value is not date time: %s".formatted(label)));
+                }
+            }
+
+            String permissible = studyAttr.getPermissible();
+            if (type.contains("select_") && !permissible.isBlank()) {
+                List<String> validValues = List.of(permissible.split(StringUtil.MUTIPLE_VALUES_DELIMITER));
+
+                for (String value : pair.value.split(StringUtil.MUTIPLE_VALUES_DELIMITER)) {
+                    if (!validValues.contains(value)) {
+                        return Either.left(
+                            new ValidationError(
+                                "invalid annotation value, not one of: %s'".formatted(String.join(",", validValues))
+                            )
+                        );
+                    }
+                }
+            }
+
+            result.add(pair);
+        }
+
+        return Either.right(result);
     }
 }

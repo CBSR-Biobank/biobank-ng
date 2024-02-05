@@ -2,8 +2,16 @@ package edu.ualberta.med.biobank.dtos;
 
 import edu.ualberta.med.biobank.domain.EventAttr;
 import jakarta.persistence.Tuple;
+import jakarta.validation.constraints.NotNull;
 
-public record AnnotationDTO(String type, String name, String value) {
+public record AnnotationDTO(
+    @NotNull(message = "type cannot be blank")
+    String type,
+
+    @NotNull(message = "name cannot be blank")
+    String name,
+
+    String value) {
 
     public AnnotationDTO withValue(String v) {
         return new AnnotationDTO(type, name, v);

@@ -34,13 +34,13 @@ public class CollectionEventMatcher {
             "a collection-event with",
             hasFeature("id", CollectionEventDTO::id, equalTo(expected.getId()))
         )
-            .and(hasFeature("visitNumber", CollectionEventDTO::visitNumber, equalTo(expected.getVisitNumber())))
+            .and(hasFeature("visitNumber", CollectionEventDTO::vnumber, equalTo(expected.getVisitNumber())))
             .and(hasFeature("status", CollectionEventDTO::status, equalTo(expected.getActivityStatus().toString())))
             .and(hasFeature("patientId", CollectionEventDTO::patientId, equalTo(expected.getPatient().getId())))
             .and(
                 hasFeature(
                     "patientNumber",
-                    CollectionEventDTO::patientNumber,
+                    CollectionEventDTO::pnumber,
                     equalTo(expected.getPatient().getPnumber())
                 )
             )
@@ -56,7 +56,13 @@ public class CollectionEventMatcher {
             .and(
                 hasFeature("attributes size", CollectionEventDTO::annotations, hasSize(expected.getEventAttrs().size()))
             )
-            .and(hasFeature("commentCount", CollectionEventDTO::studyId, equalTo(expected.getComments().size())));
+            .and(
+                hasFeature(
+                    "commentCount",
+                    CollectionEventDTO::commentCount,
+                    equalTo(Long.valueOf(expected.getComments().size()))
+                )
+            );
 
         if (!sourceSpecimens(expected).isEmpty()) {
             matchers.and(

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.controllers.patients;
+package edu.ualberta.med.biobank.controllers.collectionEvents;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -20,7 +20,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import edu.ualberta.med.biobank.controllers.endpoints.PatientCommentAddEndpoint;
+import edu.ualberta.med.biobank.controllers.endpoints.CeventCommentAddEndpoint;
 import edu.ualberta.med.biobank.dtos.CommentAddDTO;
 import edu.ualberta.med.biobank.test.ControllerTest;
 import edu.ualberta.med.biobank.test.fixtures.PatientFixtureBuilder;
@@ -32,20 +32,21 @@ import net.datafaker.Faker;
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-class PatientCommentAddTests extends ControllerTest {
+class CollectionEventCommentAddTests extends ControllerTest {
 
     @SuppressWarnings("unused")
-    private final Logger logger = LoggerFactory.getLogger(PatientCommentAddTests.class);
+    private final Logger logger = LoggerFactory.getLogger(CollectionEventCommentAddTests.class);
 
     @Test
     @WithMockUser(value = "testuser")
     void post_succeeds() throws Exception {
         var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
+        var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var dto = new CommentAddDTO(new Faker().lorem().paragraph(2));
 
         MvcResult result = mvc
             .perform(
-                post(new PatientCommentAddEndpoint(patient.getPnumber()).url())
+                post(new CeventCommentAddEndpoint(patient.getPnumber(), collectionEvent.getVisitNumber()).url())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(JsonUtil.asJsonString(dto))
             )
@@ -61,10 +62,11 @@ class PatientCommentAddTests extends ControllerTest {
     @Test
     void post_when_anonymous_is_unauthorized() throws Exception {
         var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
+        var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var dto = new CommentAddDTO(new Faker().lorem().paragraph(2));
 
         this.mvc.perform(
-                post(new PatientCommentAddEndpoint(patient.getPnumber()).url())
+                post(new CeventCommentAddEndpoint(patient.getPnumber(), collectionEvent.getVisitNumber()).url())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(JsonUtil.asJsonString(dto))
             )
@@ -77,10 +79,11 @@ class PatientCommentAddTests extends ControllerTest {
         createSingleStudyUser("non_member_user");
 
         var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
+        var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var dto = new CommentAddDTO(new Faker().lorem().paragraph(2));
 
         this.mvc.perform(
-                post(new PatientCommentAddEndpoint(patient.getPnumber()).url())
+                post(new CeventCommentAddEndpoint(patient.getPnumber(), collectionEvent.getVisitNumber()).url())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(JsonUtil.asJsonString(dto))
             )
@@ -90,34 +93,35 @@ class PatientCommentAddTests extends ControllerTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    void post_fails_when_invalid_pnumber_is_not_found() throws Exception {
-        var badPnumber = new Faker().internet().username();
+    void post_fails_when_invalid_vnumber_is_not_found() throws Exception {
+        var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
+        var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
+        var badVnumber = collectionEvent.getVisitNumber() + 10;
         var dto = new CommentAddDTO(new Faker().lorem().paragraph(2));
 
         mvc
             .perform(
-                post(new PatientCommentAddEndpoint(badPnumber).url())
+                post(new CeventCommentAddEndpoint(patient.getPnumber(), badVnumber).url())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(JsonUtil.asJsonString(dto))
             )
             .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message", Matchers.matchesRegex("patient.*not exist.*")))
-            .andDo(MockMvcResultHandlers.print());
+            .andExpect(jsonPath("$.message", Matchers.matchesRegex("collection event.*")));
     }
 
     @Test
     @WithMockUser(value = "testuser")
     void post_fails_with_blank_message() throws Exception {
-        var badPnumber = new Faker().internet().username();
-        var dto = new CommentAddDTO("");
+        var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
+        var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
+        var badCommentDTO = new CommentAddDTO("");
 
         this.mvc.perform(
-                post(new PatientCommentAddEndpoint(badPnumber).url())
+                post(new CeventCommentAddEndpoint(patient.getPnumber(), collectionEvent.getVisitNumber()).url())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(JsonUtil.asJsonString(dto))
+                    .content(JsonUtil.asJsonString(badCommentDTO))
             )
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message", Matchers.matchesRegex(".*cannot be blank.*")))
-            .andDo(MockMvcResultHandlers.print());
+            .andExpect(jsonPath("$.message", Matchers.matchesRegex(".*cannot be blank.*")));
     }
 }

@@ -8,7 +8,10 @@ import { CommentAddDialog } from '@app/components/comment-add-dialog';
 import { EntityDeleteDialog } from '@app/components/entity-delete-dialog';
 import { EntityProperty } from '@app/components/entity-property';
 import { InfoCard } from '@app/components/info-card';
+import { MutatorDialog } from '@app/components/mutators/mutator-dialog';
+import { MutatorStatus } from '@app/components/mutators/mutator-status';
 import { OkButton } from '@app/components/ok-button';
+import { MutatorVisitNumber } from '@app/components/patients/mutator-visit-number';
 import { ShowError } from '@app/components/show-error';
 import { SourceSpecimenTable } from '@app/components/specimens/source-specimens-table';
 import { StatusChip } from '@app/components/status-chip';
@@ -25,7 +28,8 @@ import {
 } from '@app/components/ui/dialog';
 import { useCollectionEvent } from '@app/hooks/use-collection-event';
 import { CommentAdd } from '@app/models/comment';
-import { Patient } from '@app/models/patient';
+import { Patient, takenVisitNumbers } from '@app/models/patient';
+import { Status } from '@app/models/status';
 import { usePatientStore } from '@app/store';
 import { cn } from '@app/utils';
 import { faChevronRight, faTrash, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
@@ -38,9 +42,10 @@ import { AdminPage } from '../admin-page';
 function DeleteNotAllowed() {
   return (
     <Dialog>
-      <DialogTrigger className="focus-visible:outline-destructive-600 flex h-10 items-center gap-1 rounded-md bg-destructive px-4 text-sm font-normal text-destructive-foreground hover:bg-destructive/90">
-        <FontAwesomeIcon icon={faTrash} />
-        Delete Visit
+      <DialogTrigger asChild>
+        <Button variant="destructive" icon={faTrash}>
+          Delete Visit
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
@@ -122,6 +127,28 @@ const CollectionEventViewInternal: React.FC<{ patient: Patient; vnumber: number 
     navigate('..');
   };
 
+  const handleVnumberUpdated = (value?: number) => {
+    if (!value) {
+      throw new Error('new pnumber value is invalid');
+    }
+    if (!patient) {
+      throw new Error('patient is invalid');
+    }
+    console.log(value);
+    //handleUpdate({ pnumber: value, studyNameShort: patient.studyNameShort });
+  };
+
+  const handleStatusUpdated = (value?: Status) => {
+    if (!value) {
+      throw new Error('status value is invalid');
+    }
+    if (!patient) {
+      throw new Error('patient is invalid');
+    }
+    console.log(value);
+    //handleUpdate({ pnumber: value, studyNameShort: patient.studyNameShort });
+  };
+
   return (
     <>
       <AdminPage>
@@ -134,19 +161,39 @@ const CollectionEventViewInternal: React.FC<{ patient: Patient; vnumber: number 
 
         <div className="bg-basic-100 border-top flex flex-col gap-8 rounded-md drop-shadow-md">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <EntityProperty propName="patientNumber" label="Patient Number" allowChanges={false}>
+            <EntityProperty propName="patientNumber" label="Patient Number">
               {collectionEvent.patientNumber}
-            </EntityProperty>
-
-            <EntityProperty propName="visitNumber" label="Visit" allowChanges={true} handleChange={handlePropChange}>
-              {collectionEvent.visitNumber}
             </EntityProperty>
 
             <EntityProperty propName="studyNameShort" label="Study" allowChanges={false}>
               {collectionEvent.studyNameShort}
             </EntityProperty>
 
-            <EntityProperty propName="status" label="Status" allowChanges={true} handleChange={handlePropChange}>
+            <EntityProperty
+              propName="visitNumber"
+              label="Visit"
+              mutator={
+                <MutatorDialog title="Update Patient">
+                  <MutatorVisitNumber
+                    vnumber={collectionEvent.visitNumber}
+                    disallow={takenVisitNumbers(patient)}
+                    onClose={handleVnumberUpdated}
+                  />
+                </MutatorDialog>
+              }
+            >
+              {collectionEvent.visitNumber}
+            </EntityProperty>
+
+            <EntityProperty
+              propName="status"
+              label="Status"
+              mutator={
+                <MutatorDialog title="Update Patient">
+                  <MutatorStatus label="Status" value={collectionEvent.status} onClose={handleStatusUpdated} required />
+                </MutatorDialog>
+              }
+            >
               <StatusChip status={collectionEvent.status} size="xs" />
             </EntityProperty>
 

@@ -1,15 +1,13 @@
-import { PatientApi } from '@app/api/patient-api';
 import { CircularProgress } from '@app/components/circular-progress';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@app/components/ui/collapsible';
-import { usePatientCollectionEventAdd, usePatientCommentAdd } from '@app/hooks/use-patient';
-import { PatientUpdate } from '@app/models/patient';
+import { usePatientCollectionEventAdd, usePatientCommentAdd, usePatientUpdate } from '@app/hooks/use-patient';
+import { PatientUpdate, takenVisitNumbers } from '@app/models/patient';
 import { AdminPage } from '@app/pages/admin-page';
 import { CollectionEventTable } from '@app/pages/collection-events/collection-event-table';
 import { usePatientStore } from '@app/store';
 import { cn } from '@app/utils';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BackButton } from '../back-button';
@@ -28,14 +26,7 @@ export function PatientDetails() {
   const collectionEventAddMutation = usePatientCollectionEventAdd();
   const commentAddMutation = usePatientCommentAdd();
   const [commentsSectionIsOpen, setCommentsSectionIsOpen] = useState(false);
-  const queryClient = useQueryClient();
-
-  const updatePatient = useMutation((updatedPatient: PatientUpdate) => {
-    if (!patient) {
-      throw new Error('patient is invalid');
-    }
-    return PatientApi.update(patient.pnumber, updatedPatient);
-  });
+  const updatePatientMutation = usePatientUpdate();
 
   const backClicked = () => {
     navigate('/patients');
@@ -53,6 +44,9 @@ export function PatientDetails() {
   };
 
   const handleCommentAdd = (newComment: string) => {
+    if (newComment.trim().length <= 0) {
+      throw new Error('comment is empty');
+    }
     commentAddMutation.mutate({ message: newComment });
   };
 
@@ -61,11 +55,8 @@ export function PatientDetails() {
       throw new Error('patient is invalid');
     }
 
-    updatePatient.mutate(updated, {
+    updatePatientMutation.mutate(updated, {
       onSuccess: (updated) => {
-        queryClient.setQueryData(['patients', updated.pnumber], updated);
-        queryClient.invalidateQueries(['patients', updated.pnumber]);
-
         if (updated.pnumber != patient.pnumber) {
           navigate(`../${updated.pnumber}`);
         }
@@ -97,14 +88,6 @@ export function PatientDetails() {
     return <CircularProgress />;
   }
 
-  const disallowVisitNumbers = patient.collectionEvents.map((ce) => ce.visitNumber);
-
-  const commonProps = {
-    title: 'Update Patient',
-    open: true,
-    onClose: () => {}
-  };
-
   return (
     <AdminPage>
       <AdminPage.Title hasBorder>
@@ -121,10 +104,9 @@ export function PatientDetails() {
             mutator={
               <MutatorDialog title="Update Patient">
                 <MutatorText
-                  {...commonProps}
                   label="Patient Number"
                   value={patient.pnumber}
-                  required={true}
+                  required
                   maxlen={80}
                   onClose={handlePnumberUpdated}
                 />
@@ -139,13 +121,7 @@ export function PatientDetails() {
             label="Study"
             mutator={
               <MutatorDialog title="Update Patient">
-                <MutatorStudy
-                  {...commonProps}
-                  label="Study"
-                  value={patient.studyNameShort}
-                  required={true}
-                  onClose={handleStudyUpdated}
-                />
+                <MutatorStudy label="Study" value={patient.studyNameShort} required onClose={handleStudyUpdated} />
               </MutatorDialog>
             }
           >
@@ -189,7 +165,7 @@ export function PatientDetails() {
       </div>
       <div className="flex flex-col gap-3 pt-8 md:w-max md:flex-row">
         <BackButton onClick={backClicked} className="md:w-min" />
-        <VisitAddDialog disallow={disallowVisitNumbers} onSubmit={handleVisitAdd} />
+        <VisitAddDialog disallow={takenVisitNumbers(patient)} onSubmit={handleVisitAdd} />
         <CommentAddDialog onSubmit={handleCommentAdd} />
       </div>
     </AdminPage>
