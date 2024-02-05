@@ -24,7 +24,9 @@ export const PatientNotExist: React.FC<{ pnumber: string }> = ({ pnumber }) => {
             <BackButton />
           </Link>
           <Link to={`/patients/add?pnumber=${pnumber}`}>
-            <Button icon={faPlusCircle}>Add Patient</Button>
+            <Button variant="secondary" icon={faPlusCircle}>
+              Add Patient
+            </Button>
           </Link>
         </div>
       </div>

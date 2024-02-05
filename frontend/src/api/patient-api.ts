@@ -1,4 +1,3 @@
-import { collectionEventSchema } from '@app/models/collection-event';
 import { CommentAdd, commentSchema } from '@app/models/comment';
 import { Patient, PatientAdd, PatientUpdate, patientSchema } from '@app/models/patient';
 import { z } from 'zod';
@@ -26,18 +25,6 @@ export class PatientApi {
     });
     const result = await response.json();
     const cevent = z.array(commentSchema).parse(result);
-    return cevent;
-  }
-
-  static async getPatientCollectionEvent(pnumber: string, vnumber: number) {
-    const response = await httpClient({
-      method: 'GET',
-      path: ['patients', pnumber, 'collection-events', vnumber],
-      body: undefined,
-      query: undefined
-    });
-    const result = await response.json();
-    const cevent = collectionEventSchema.parse(result);
     return cevent;
   }
 

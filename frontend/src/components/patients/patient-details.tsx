@@ -1,18 +1,14 @@
-import { CollectionEventApi } from '@app/api/collection-event-api';
-import { PatientApi } from '@app/api/patient-api';
 import { CircularProgress } from '@app/components/circular-progress';
 import { EntityProperty } from '@app/components/entity-property';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@app/components/ui/collapsible';
-import { CollectionEventAdd } from '@app/models/collection-event';
-import { CommentAdd } from '@app/models/comment';
+import { usePatientCollectionEventAdd, usePatientCommentAdd } from '@app/hooks/use-patient';
 import { AdminPage } from '@app/pages/admin-page';
 import { CollectionEventTable } from '@app/pages/collection-events/collection-event-table';
 import { usePatientStore } from '@app/store';
 import { cn } from '@app/utils';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BackButton } from '../back-button';
 import { CommentAddDialog } from '../comment-add-dialog';
@@ -23,51 +19,12 @@ import { VisitAddDialog } from './visit-add-dialog';
 
 export function PatientDetails() {
   const navigate = useNavigate();
-  const { patient, setCollectionEvent } = usePatientStore();
+  const { patient } = usePatientStore();
+  const collectionEventAddMutation = usePatientCollectionEventAdd();
+  const commentAddMutation = usePatientCommentAdd();
   const [propertyToUpdate, setPropertyToUpdate] = useState<string | null>(null);
   const [mutatorOpen, setMutatorOpen] = useState(false);
   const [commentsSectionIsOpen, setCommentsSectionIsOpen] = useState(false);
-
-  const queryClient = useQueryClient();
-
-  const addCollectionEvent = useMutation(
-    (newVisit: CollectionEventAdd) => {
-      if (!patient) {
-        return Promise.resolve(null);
-      }
-      return CollectionEventApi.add(patient, newVisit);
-    },
-    {
-      onSuccess: (newCevent) => {
-        queryClient.invalidateQueries(['patients', patient?.pnumber]);
-        if (newCevent) {
-          navigate(`${newCevent.visitNumber}`);
-        }
-      },
-      onError: (error) => {
-        console.log('here', error);
-      }
-    }
-  );
-
-  const addComment = useMutation(
-    (newComment: CommentAdd) => {
-      if (!patient) {
-        return Promise.resolve(null);
-      }
-
-      return PatientApi.addComment(patient, newComment);
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['patients', patient?.pnumber]);
-      }
-    }
-  );
-
-  useEffect(() => {
-    setCollectionEvent(undefined);
-  }, []);
 
   const handlePropChange = (propertyName: string) => {
     setPropertyToUpdate(propertyName);
@@ -82,19 +39,26 @@ export function PatientDetails() {
     navigate('/patients');
   };
 
-  const handleVisitAdded = (newVisitNumber: number) => {
-    addCollectionEvent.mutate({ visitNumber: newVisitNumber });
+  const handleVisitAdd = (newVisitNumber: number) => {
+    collectionEventAddMutation.mutate(
+      { visitNumber: newVisitNumber },
+      {
+        onSuccess: () => {
+          navigate(`${newVisitNumber}`);
+        }
+      }
+    );
   };
 
-  const handleCommentAdded = (newComment: string) => {
-    addComment.mutate({ message: newComment });
+  const handleCommentAdd = (newComment: string) => {
+    commentAddMutation.mutate({ message: newComment });
   };
 
   if (!patient) {
     return <CircularProgress />;
   }
 
-  var disallowVisitNumbers = patient.collectionEvents.map((ce) => ce.visitNumber);
+  const disallowVisitNumbers = patient.collectionEvents.map((ce) => ce.visitNumber);
 
   return (
     <AdminPage>
@@ -150,8 +114,8 @@ export function PatientDetails() {
       </div>
       <div className="flex flex-col gap-3 pt-8 md:w-max md:flex-row">
         <BackButton onClick={backClicked} className="md:w-min" />
-        <VisitAddDialog disallow={disallowVisitNumbers} onSubmit={handleVisitAdded} />
-        <CommentAddDialog onSubmit={handleCommentAdded} />
+        <VisitAddDialog disallow={disallowVisitNumbers} onSubmit={handleVisitAdd} />
+        <CommentAddDialog onSubmit={handleCommentAdd} />
       </div>
 
       {mutatorOpen && propertyToUpdate && (
