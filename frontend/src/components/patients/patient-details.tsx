@@ -1,20 +1,25 @@
+import { PatientApi } from '@app/api/patient-api';
 import { CircularProgress } from '@app/components/circular-progress';
-import { EntityProperty } from '@app/components/entity-property';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@app/components/ui/collapsible';
 import { usePatientCollectionEventAdd, usePatientCommentAdd } from '@app/hooks/use-patient';
+import { PatientUpdate } from '@app/models/patient';
 import { AdminPage } from '@app/pages/admin-page';
 import { CollectionEventTable } from '@app/pages/collection-events/collection-event-table';
 import { usePatientStore } from '@app/store';
 import { cn } from '@app/utils';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BackButton } from '../back-button';
 import { CommentAddDialog } from '../comment-add-dialog';
+import { EntityProperty } from '../entity-property';
+import { MutatorDialog } from '../mutators/mutator-dialog';
+import { MutatorText } from '../mutators/mutator-text';
+import { MutatorStudy } from '../studies/mutator-study';
 import { Button } from '../ui/button';
 import { PatientComments } from './patient-comments';
-import { PatientMutator } from './patient-mutator';
 import { VisitAddDialog } from './visit-add-dialog';
 
 export function PatientDetails() {
@@ -22,18 +27,15 @@ export function PatientDetails() {
   const { patient } = usePatientStore();
   const collectionEventAddMutation = usePatientCollectionEventAdd();
   const commentAddMutation = usePatientCommentAdd();
-  const [propertyToUpdate, setPropertyToUpdate] = useState<string | null>(null);
-  const [mutatorOpen, setMutatorOpen] = useState(false);
   const [commentsSectionIsOpen, setCommentsSectionIsOpen] = useState(false);
+  const queryClient = useQueryClient();
 
-  const handlePropChange = (propertyName: string) => {
-    setPropertyToUpdate(propertyName);
-    setMutatorOpen(true);
-  };
-
-  const handleUpdate = () => {
-    setMutatorOpen(false);
-  };
+  const updatePatient = useMutation((updatedPatient: PatientUpdate) => {
+    if (!patient) {
+      throw new Error('patient is invalid');
+    }
+    return PatientApi.update(patient.pnumber, updatedPatient);
+  });
 
   const backClicked = () => {
     navigate('/patients');
@@ -54,11 +56,54 @@ export function PatientDetails() {
     commentAddMutation.mutate({ message: newComment });
   };
 
+  const handleUpdate = (updated: PatientUpdate) => {
+    if (!patient) {
+      throw new Error('patient is invalid');
+    }
+
+    updatePatient.mutate(updated, {
+      onSuccess: (updated) => {
+        queryClient.setQueryData(['patients', updated.pnumber], updated);
+        queryClient.invalidateQueries(['patients', updated.pnumber]);
+
+        if (updated.pnumber != patient.pnumber) {
+          navigate(`../${updated.pnumber}`);
+        }
+      }
+    });
+  };
+
+  const handlePnumberUpdated = (value?: string) => {
+    if (!value) {
+      throw new Error('new pnumber value is invalid');
+    }
+    if (!patient) {
+      throw new Error('patient is invalid');
+    }
+    handleUpdate({ pnumber: value, studyNameShort: patient.studyNameShort });
+  };
+
+  const handleStudyUpdated = (value?: string) => {
+    if (!value) {
+      throw new Error('new study name short value is invalid');
+    }
+    if (!patient) {
+      throw new Error('patient is invalid');
+    }
+    handleUpdate({ pnumber: patient.pnumber, studyNameShort: value });
+  };
+
   if (!patient) {
     return <CircularProgress />;
   }
 
   const disallowVisitNumbers = patient.collectionEvents.map((ce) => ce.visitNumber);
+
+  const commonProps = {
+    title: 'Update Patient',
+    open: true,
+    onClose: () => {}
+  };
 
   return (
     <AdminPage>
@@ -69,11 +114,41 @@ export function PatientDetails() {
 
       <div className="bg-basic-100 border-top flex flex-col gap-8 rounded-md drop-shadow-md">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <EntityProperty propName="pnumber" label="Patient Number" allowChanges handleChange={handlePropChange}>
+          <EntityProperty
+            propName="pnumber"
+            label="Patient Number"
+            allowChanges={false}
+            mutator={
+              <MutatorDialog title="Update Patient">
+                <MutatorText
+                  {...commonProps}
+                  label="Patient Number"
+                  value={patient.pnumber}
+                  required={true}
+                  maxlen={80}
+                  onClose={handlePnumberUpdated}
+                />
+              </MutatorDialog>
+            }
+          >
             {patient.pnumber}
           </EntityProperty>
 
-          <EntityProperty propName="studyNameShort" label="Study" allowChanges handleChange={handlePropChange}>
+          <EntityProperty
+            propName="studyNameShort"
+            label="Study"
+            mutator={
+              <MutatorDialog title="Update Patient">
+                <MutatorStudy
+                  {...commonProps}
+                  label="Study"
+                  value={patient.studyNameShort}
+                  required={true}
+                  onClose={handleStudyUpdated}
+                />
+              </MutatorDialog>
+            }
+          >
             {patient.studyNameShort}
           </EntityProperty>
         </div>
@@ -117,10 +192,6 @@ export function PatientDetails() {
         <VisitAddDialog disallow={disallowVisitNumbers} onSubmit={handleVisitAdd} />
         <CommentAddDialog onSubmit={handleCommentAdd} />
       </div>
-
-      {mutatorOpen && propertyToUpdate && (
-        <PatientMutator patient={patient} propertyToUpdate={propertyToUpdate} onClose={handleUpdate} />
-      )}
     </AdminPage>
   );
 }
