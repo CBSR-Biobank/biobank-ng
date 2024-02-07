@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.services;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +15,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.domain.Study;
+import edu.ualberta.med.biobank.dtos.AnnotationTypeDTO;
 import edu.ualberta.med.biobank.dtos.StudyDTO;
 import edu.ualberta.med.biobank.dtos.StudyNameDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.errors.Forbidden;
 import edu.ualberta.med.biobank.errors.Unauthorized;
+import edu.ualberta.med.biobank.errors.ValidationError;
 import edu.ualberta.med.biobank.permission.patient.StudyReadPermission;
 import edu.ualberta.med.biobank.repositories.StudyRepository;
 import edu.ualberta.med.biobank.util.LoggingUtils;
@@ -136,5 +139,9 @@ public class StudyService {
                 logger.debug("studyNames: user: {}, num_studies: {}", auth.getName(), result.size());
                 return Either.right(result);
             });
+    }
+
+    public Either<AppError, List<AnnotationTypeDTO>> annotations() {
+        return Either.left(new ValidationError("needs implementation"));
     }
 }

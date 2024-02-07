@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import edu.ualberta.med.biobank.dtos.AnnotationTypeDTO;
 import edu.ualberta.med.biobank.dtos.StudyDTO;
 import edu.ualberta.med.biobank.dtos.StudyNameDTO;
 import edu.ualberta.med.biobank.exception.AppErrorException;
@@ -52,6 +53,14 @@ public class StudyController {
     public StudyDTO get(@PathVariable String nameshort) {
         return studyService
             .findByNameShort(nameshort)
+            .orElseThrow(err -> new AppErrorException(err));
+    }
+
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @GetMapping("annotation-types")
+    public List<AnnotationTypeDTO> annotationTypes() {
+        return studyService
+            .annotations()
             .orElseThrow(err -> new AppErrorException(err));
     }
 }
