@@ -82,5 +82,26 @@ public interface StudyRepository extends JpaRepository<Study, Integer> {
         """,
         nativeQuery = true
     )
-    <T> Collection<T> getNames(Set<Integer> statusValues, Class<T> type);
+    <T> Collection<T> listNames(Set<Integer> statusValues, Class<T> type);
+
+    @Query(
+        value = """
+        select
+            eat.NAME type,
+            gea.LABEL label,
+            sea.ACTIVITY_STATUS_ID status,
+            sea.REQUIRED required,
+            sea.PERMISSIBLE validValues
+        from study
+        left join study_event_attr sea on sea.STUDY_ID = study.ID
+        left join global_event_attr gea on gea.id = sea.GLOBAL_EVENT_ATTR_ID
+        left join event_attr_type eat on eat.ID = gea.EVENT_ATTR_TYPE_ID
+        where
+            study.name_short = :nameshort
+            and sea.activity_status_id in :statusValues
+        order by gea.label
+        """,
+        nativeQuery = true
+    )
+    <T> Collection<T> listStudyAttributes(String nameshort, Set<Integer> statusValues, Class<T> type);
 }

@@ -6,7 +6,7 @@ import { SourceSpecimen } from '@app/models/specimen';
 import { cn } from '@app/utils';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import format from 'date-fns/format';
+import { format } from 'date-fns';
 import { useState } from 'react';
 import { AliquotsTable } from './aliquots-table';
 

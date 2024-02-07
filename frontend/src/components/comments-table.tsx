@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@app/components/ui/table';
 import { Comment } from '@app/models/comment';
-import format from 'date-fns/format';
+import { format } from 'date-fns';
 
 export const CommentsTable: React.FC<{ comments: Comment[] }> = ({ comments }) => {
   return (

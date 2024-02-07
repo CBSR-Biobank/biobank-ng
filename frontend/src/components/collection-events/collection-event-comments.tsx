@@ -1,7 +1,7 @@
 import { CircularProgress } from '@app/components/circular-progress';
 import { InfoCard } from '@app/components/info-card';
 import { ShowError } from '@app/components/show-error';
-import { useCollectionEventComments } from '@app/hooks/use-collection-event-comment';
+import { useCollectionEventComments } from '@app/hooks/use-collection-event';
 import { forwardRef } from 'react';
 import { CommentCard } from '../comment-card';
 

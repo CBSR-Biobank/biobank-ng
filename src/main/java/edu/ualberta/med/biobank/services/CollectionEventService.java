@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.permission.patient.CollectionEventDeletePermissi
 import edu.ualberta.med.biobank.permission.patient.CollectionEventReadPermission;
 import edu.ualberta.med.biobank.permission.patient.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.repositories.CollectionEventRepository;
+import edu.ualberta.med.biobank.repositories.EventAttrRepository;
 import edu.ualberta.med.biobank.util.DateUtil;
 import edu.ualberta.med.biobank.util.LoggingUtils;
 import edu.ualberta.med.biobank.util.StringUtil;
@@ -31,9 +32,9 @@ import io.jbock.util.Either;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
+import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 @Service
 public class CollectionEventService {
@@ -65,6 +67,8 @@ public class CollectionEventService {
 
     private CollectionEventRepository collectionEventRepository;
 
+    private EventAttrRepository eventAttrRepository;
+
     private PatientService patientService;
 
     private UserService userService;
@@ -78,12 +82,14 @@ public class CollectionEventService {
 
     public CollectionEventService(
         CollectionEventRepository collectionEventRepository,
+        EventAttrRepository eventAttrRepository,
         PatientService patientService,
         UserService userService,
         Validator validator,
         BiobankEventPublisher eventPublisher
     ) {
         this.collectionEventRepository = collectionEventRepository;
+        this.eventAttrRepository = eventAttrRepository;
         this.patientService = patientService;
         this.userService = userService;
         this.validator = validator;
@@ -174,6 +180,7 @@ public class CollectionEventService {
             });
     }
 
+    @Transactional
     public Either<AppError, CollectionEventDTO> update(
         String pnumber,
         Integer vnumber,
@@ -215,19 +222,10 @@ public class CollectionEventService {
                         CollectionEvent cevent = collectionEventRepository.getReferenceById(ceventDTO.id());
                         return validAnnotations(cevent, ceventInfo.annotations())
                             .flatMap(annotations -> {
-                                Set<EventAttr> eventAttrs = new HashSet<>(annotations.size());
-                                for (EventAttrValuePair pair : annotations) {
-                                    EventAttr attr = new EventAttr();
-                                    attr.setCollectionEvent(cevent);
-                                    attr.setStudyEventAttr(pair.studyAttr);
-                                    attr.setValue(pair.value);
-                                    em.persist(attr);
-                                    eventAttrs.add(attr);
-                                }
+                                Set<EventAttrValuePair> notPresent = updatePresentEventAttrs(cevent, annotations);
+                                Set<EventAttr> attrsToAdd = addEventAttrs(cevent, notPresent);
 
-                                cevent.getEventAttrs().clear();
-                                cevent.getEventAttrs().addAll(eventAttrs);
-
+                                cevent.getEventAttrs().addAll(attrsToAdd);
                                 cevent.setVisitNumber(ceventInfo.vnumber());
                                 cevent.setActivityStatus(newStatus);
                                 CollectionEvent savedCevent = collectionEventRepository.save(cevent);
@@ -437,14 +435,17 @@ public class CollectionEventService {
             }
 
             String permissible = studyAttr.getPermissible();
-            if (type.contains("select_") && !permissible.isBlank()) {
+            if (type.contains("select_") && !permissible.isBlank() && pair.value != null && !pair.value.isBlank()) {
                 List<String> validValues = List.of(permissible.split(StringUtil.MUTIPLE_VALUES_DELIMITER));
 
                 for (String value : pair.value.split(StringUtil.MUTIPLE_VALUES_DELIMITER)) {
                     if (!validValues.contains(value)) {
                         return Either.left(
                             new ValidationError(
-                                "invalid annotation value, not one of: %s'".formatted(String.join(",", validValues))
+                                "invalid annotation value for '%s', not one of: %s'".formatted(
+                                        studyAttr.getGlobalEventAttr().getLabel(),
+                                        String.join(",", validValues)
+                                    )
                             )
                         );
                     }
@@ -455,5 +456,36 @@ public class CollectionEventService {
         }
 
         return Either.right(result);
+    }
+
+    // returns the annotations that were not present in the collection event
+    private Set<EventAttrValuePair> updatePresentEventAttrs(
+        CollectionEvent cevent,
+        List<EventAttrValuePair> annotations
+    ) {
+        Set<EventAttrValuePair> notPresent = new HashSet<>(annotations);
+        for (EventAttr attr : cevent.getEventAttrs()) {
+            for (EventAttrValuePair pair : annotations) {
+                if (attr.getStudyEventAttr().getId() == pair.studyAttr.getId()) {
+                    attr.setValue(pair.value);
+                    eventAttrRepository.saveAndFlush(attr);
+                    notPresent.remove(pair);
+                }
+            }
+        }
+        eventAttrRepository.flush();
+        return notPresent;
+    }
+
+    private Set<EventAttr> addEventAttrs(CollectionEvent cevent, Set<EventAttrValuePair> annotations) {
+        Set<EventAttr> eventAttrs = new HashSet<>(annotations.size());
+        for (EventAttrValuePair pair : annotations) {
+            EventAttr attr = new EventAttr();
+            attr.setCollectionEvent(cevent);
+            attr.setStudyEventAttr(pair.studyAttr);
+            attr.setValue(pair.value);
+            eventAttrs.add(eventAttrRepository.saveAndFlush(attr));
+        }
+        return eventAttrs;
     }
 }

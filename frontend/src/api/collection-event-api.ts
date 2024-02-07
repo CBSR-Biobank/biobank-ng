@@ -1,6 +1,5 @@
-import { CollectionEventAdd, collectionEventSchema } from '@app/models/collection-event';
+import { CollectionEventAdd, CollectionEventUpdate, collectionEventSchema } from '@app/models/collection-event';
 import { CommentAdd, commentSchema } from '@app/models/comment';
-import { Patient } from '@app/models/patient';
 import { z } from 'zod';
 import { httpClient } from './api';
 
@@ -17,12 +16,12 @@ export class CollectionEventApi {
     return cevent;
   }
 
-  static async add(patient: Patient, cevent: CollectionEventAdd) {
+  static async add(pnumber: string, cevent: CollectionEventAdd) {
     const response = await httpClient({
       method: 'POST',
-      path: ['patients', patient.pnumber, 'collection-events'],
+      path: ['patients', pnumber, 'collection-events'],
       body: JSON.stringify({
-        vnumber: cevent.visitNumber
+        vnumber: cevent.vnumber
       }),
       query: undefined
     });
@@ -30,10 +29,21 @@ export class CollectionEventApi {
     return collectionEventSchema.parse(result);
   }
 
-  static async delete(patient: Patient, visitNumber: number) {
+  static async update(pnumber: string, vnumber: number, cevent: CollectionEventUpdate) {
+    const response = await httpClient({
+      method: 'PUT',
+      path: ['patients', pnumber, 'collection-events', vnumber],
+      body: JSON.stringify(cevent),
+      query: undefined
+    });
+    const result = await response.json();
+    return collectionEventSchema.parse(result);
+  }
+
+  static async delete(pnumber: string, visitNumber: number) {
     await httpClient({
       method: 'DELETE',
-      path: ['patients', patient.pnumber, 'collection-events', visitNumber],
+      path: ['patients', pnumber, 'collection-events', visitNumber],
       body: undefined,
       query: undefined
     });

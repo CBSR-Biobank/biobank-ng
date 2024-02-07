@@ -5,7 +5,7 @@ import { StatusChip } from '@app/components/status-chip';
 import { TableCell, TableRow } from '@app/components/ui/table';
 import { useAliquots } from '@app/hooks/use-specimen';
 import { SourceSpecimen } from '@app/models/specimen';
-import format from 'date-fns/format';
+import { format } from 'date-fns';
 import { forwardRef } from 'react';
 
 export type AliquotsTableProps = {

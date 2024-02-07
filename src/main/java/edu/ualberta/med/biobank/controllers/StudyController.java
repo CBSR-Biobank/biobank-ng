@@ -57,10 +57,10 @@ public class StudyController {
     }
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    @GetMapping("annotation-types")
-    public List<AnnotationTypeDTO> annotationTypes() {
+    @GetMapping("/{nameshort}/annotation-types")
+    public List<AnnotationTypeDTO> annotationTypes(@PathVariable String nameshort, @RequestParam(required = false) String[] status) {
         return studyService
-            .annotations()
+            .annotationTypes(nameshort, status)
             .orElseThrow(err -> new AppErrorException(err));
     }
 }

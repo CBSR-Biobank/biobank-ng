@@ -1,13 +1,11 @@
 package edu.ualberta.med.biobank.repositories;
 
-import edu.ualberta.med.biobank.domain.CollectionEvent;
-import jakarta.persistence.Tuple;
 import java.util.Collection;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import edu.ualberta.med.biobank.domain.CollectionEvent;
 
 @Repository
 public interface CollectionEventRepository

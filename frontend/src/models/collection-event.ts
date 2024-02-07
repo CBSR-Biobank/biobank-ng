@@ -15,9 +15,9 @@ export const collectionEventBriefSchema = domainEntitySchema.extend({
 
 export const collectionEventSchema = domainEntitySchema.extend({
   id: z.number(),
-  visitNumber: z.number(),
+  vnumber: z.number(),
   patientId: z.number(),
-  patientNumber: z.string(),
+  pnumber: z.string(),
   studyId: z.number(),
   studyNameShort: z.string(),
   status: z.nativeEnum(Status),
@@ -29,4 +29,6 @@ export const collectionEventSchema = domainEntitySchema.extend({
 export type CollectionEventBrief = z.infer<typeof collectionEventBriefSchema>;
 export type CollectionEvent = z.infer<typeof collectionEventSchema>;
 
-export type CollectionEventAdd = Pick<CollectionEvent, 'visitNumber'>;
+export type CollectionEventAdd = Pick<CollectionEvent, 'vnumber'>;
+
+export type CollectionEventUpdate = Pick<CollectionEvent, 'vnumber' | 'status' | 'annotations' | 'sourceSpecimens'>;

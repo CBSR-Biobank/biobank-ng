@@ -2,7 +2,7 @@ import { StudyApi } from '@app/api/study-api';
 import { DialogClose, DialogFooter } from '@app/components/ui/dialog';
 import { Status } from '@app/models/status';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { CancelButton } from '../cancel-button';
@@ -36,8 +36,10 @@ export function MutatorStudy({ value, required, onClose }: MutatorProps<string>)
     }
   });
 
-  const studyNamesQuery = useQuery(['studies', 'names'], async () => StudyApi.names(Status.ACTIVE), {
-    keepPreviousData: true
+  const studyNamesQuery = useQuery({
+    queryKey: ['studies', 'names'],
+    queryFn: async () => StudyApi.names(Status.ACTIVE),
+    placeholderData: keepPreviousData
   });
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = () => {

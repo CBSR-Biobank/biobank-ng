@@ -1,7 +1,7 @@
 import { CircularProgress } from '@app/components/circular-progress';
 import { InfoCard } from '@app/components/info-card';
 import { ShowError } from '@app/components/show-error';
-import { usePatientComments } from '@app/hooks/use-patient-comments';
+import { usePatientComments } from '@app/hooks/use-patient';
 import { forwardRef } from 'react';
 import { CommentsTable } from '../comments-table';
 

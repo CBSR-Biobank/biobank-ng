@@ -1,9 +1,10 @@
 import { CircularProgress } from '@app/components/circular-progress';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@app/components/ui/collapsible';
-import { usePatientCollectionEventAdd, usePatientCommentAdd, usePatientUpdate } from '@app/hooks/use-patient';
+import { useCollectionEventAdd } from '@app/hooks/use-collection-event';
+import { usePatientCommentAdd, usePatientUpdate } from '@app/hooks/use-patient';
+import { CollectionEventAdd } from '@app/models/collection-event';
 import { PatientUpdate, takenVisitNumbers } from '@app/models/patient';
 import { AdminPage } from '@app/pages/admin-page';
-import { CollectionEventTable } from '@app/pages/collection-events/collection-event-table';
 import { usePatientStore } from '@app/store';
 import { cn } from '@app/utils';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
@@ -11,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BackButton } from '../back-button';
+import { CollectionEventTable } from '../collection-events/collection-event-table';
 import { CommentAddDialog } from '../comment-add-dialog';
 import { EntityProperty } from '../entity-property';
 import { MutatorDialog } from '../mutators/mutator-dialog';
@@ -23,7 +25,7 @@ import { VisitAddDialog } from './visit-add-dialog';
 export function PatientDetails() {
   const navigate = useNavigate();
   const { patient } = usePatientStore();
-  const collectionEventAddMutation = usePatientCollectionEventAdd();
+  const collectionEventAddMutation = useCollectionEventAdd();
   const commentAddMutation = usePatientCommentAdd();
   const [commentsSectionIsOpen, setCommentsSectionIsOpen] = useState(false);
   const updatePatientMutation = usePatientUpdate();
@@ -33,8 +35,15 @@ export function PatientDetails() {
   };
 
   const handleVisitAdd = (newVisitNumber: number) => {
+    if (!patient) {
+      throw new Error('patient is invalid');
+    }
+
+    const pnumber = patient?.pnumber;
+    const newVisit: CollectionEventAdd = { vnumber: newVisitNumber };
+
     collectionEventAddMutation.mutate(
-      { visitNumber: newVisitNumber },
+      { pnumber, newVisit },
       {
         onSuccess: () => {
           navigate(`${newVisitNumber}`);
@@ -100,7 +109,6 @@ export function PatientDetails() {
           <EntityProperty
             propName="pnumber"
             label="Patient Number"
-            allowChanges={false}
             mutator={
               <MutatorDialog title="Update Patient">
                 <MutatorText

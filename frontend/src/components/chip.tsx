@@ -4,12 +4,12 @@ import { VariantProps, cva } from 'class-variance-authority';
 const foreground = 'text-slate-100';
 const background = 'bg-gray-600';
 
-const chipVariants = cva('rounded-full bg-slate-600 font-semibold text-gray-100', {
+const chipVariants = cva('rounded-lg bg-slate-600 font-semibold text-gray-100', {
   variants: {
     variant: {
       default: [foreground, background, 'rounded-md'],
       basic: [foreground, 'bg-gray-500'],
-      primary: [foreground, 'bg-slate-300'],
+      primary: ['bg-sky-300/80 text-sky-600'],
       secondary: ['text-gray-100 bg-slate-600']
     },
     size: {

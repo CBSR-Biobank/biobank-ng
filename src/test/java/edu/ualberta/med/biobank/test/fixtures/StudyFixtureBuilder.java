@@ -2,12 +2,12 @@ package edu.ualberta.med.biobank.test.fixtures;
 
 import edu.ualberta.med.biobank.domain.EventAttrType;
 import edu.ualberta.med.biobank.domain.GlobalEventAttr;
+import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.domain.Study;
 import edu.ualberta.med.biobank.domain.StudyEventAttr;
 import edu.ualberta.med.biobank.dtos.AnnotationTypeDTO;
 import edu.ualberta.med.biobank.test.Factory;
 import jakarta.persistence.EntityManager;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +27,13 @@ public final class StudyFixtureBuilder {
         return this;
     }
 
-    public StudyFixtureBuilder addAttributeType(String type, String label, boolean required, String... validValues) {
+    public StudyFixtureBuilder withAttributeType(
+        String type,
+        String label,
+        String status,
+        boolean required,
+        String... validValues
+    ) {
         if (em == null) {
             throw new RuntimeException("entity manager not set");
         }
@@ -61,6 +67,7 @@ public final class StudyFixtureBuilder {
 
         StudyEventAttr attr = new StudyEventAttr();
         attr.setGlobalEventAttr(base);
+        attr.setActivityStatus(Status.fromName(status));
         if (validValues != null) {
             attr.setPermissible(String.join(";", validValues));
         }
@@ -70,8 +77,17 @@ public final class StudyFixtureBuilder {
         return this;
     }
 
-    public StudyFixtureBuilder addAttribute(AnnotationTypeDTO dto) {
-        return addAttributeType(dto.type(), dto.label(), dto.required(), dto.validValues());
+    public StudyFixtureBuilder withAttributeType(
+        String type,
+        String label,
+        String status,
+        boolean required
+    ) {
+        return withAttributeType(type, label, status, required, (String[]) null);
+    }
+
+    public StudyFixtureBuilder withAttributeType(AnnotationTypeDTO dto) {
+        return withAttributeType(dto.type(), dto.label(), dto.status(), dto.required(), dto.validValues());
     }
 
     public Study build(Factory factory) {

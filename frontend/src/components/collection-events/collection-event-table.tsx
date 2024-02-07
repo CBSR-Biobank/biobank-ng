@@ -2,7 +2,7 @@ import { InfoCard } from '@app/components/info-card';
 import { Button } from '@app/components/ui/button';
 import { CollectionEventBrief } from '@app/models/collection-event';
 import { cn } from '@app/utils';
-import format from 'date-fns/format';
+import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
 
 const buttonClass = 'transition ease-in-out delay-150 hover:scale-[1.15] duration-200';

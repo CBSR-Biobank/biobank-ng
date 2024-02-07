@@ -4,24 +4,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
-
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MvcResult;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
 import edu.ualberta.med.biobank.controllers.endpoints.CollectionEventUpdateEndpoint;
 import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.domain.Study;
@@ -36,7 +18,23 @@ import edu.ualberta.med.biobank.util.DateUtil;
 import edu.ualberta.med.biobank.util.JsonUtil;
 import edu.ualberta.med.biobank.util.LoggingUtils;
 import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 import net.datafaker.Faker;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MvcResult;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
 @Transactional
@@ -49,14 +47,24 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
 
     private static Stream<Arguments> provideValidValues() {
         var faker = new Faker();
-        String[] selectValues = new String[] { "one", "two"};
+        String[] selectValues = new String[] { "one", "two" };
 
         return Stream.of(
             Arguments.of("text", "test_label", new String[0], faker.lorem().sentence()),
             Arguments.of("number", "test_label", new String[0], Long.toString(faker.number().randomNumber())),
-            Arguments.of("date_time", "test_label", new String[0], faker.date().past(1000, TimeUnit.DAYS, DateUtil.DATE_TIME_PATTERN)),
+            Arguments.of(
+                "date_time",
+                "test_label",
+                new String[0],
+                faker.date().past(1000, TimeUnit.DAYS, DateUtil.DATE_TIME_PATTERN)
+            ),
             Arguments.of("select_single", "test_label", selectValues, selectValues[1]),
-            Arguments.of("select_multiple", "test_label", selectValues, String.format("%s;%s", selectValues[0], selectValues[1]))
+            Arguments.of(
+                "select_multiple",
+                "test_label",
+                selectValues,
+                String.format("%s;%s", selectValues[0], selectValues[1])
+            )
         );
     }
 
@@ -64,9 +72,15 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
     @MethodSource("provideValidValues")
     @WithMockUser(value = "testuser")
     void put_succeeds(String type, String label, String[] validValues, String value) throws Exception {
-        AnnotationTypeDTO annotationType = new AnnotationTypeDTO(type, label, false, validValues);
+        AnnotationTypeDTO annotationType = new AnnotationTypeDTO(
+            type,
+            label,
+            Status.ACTIVE.getName(),
+            false,
+            validValues
+        );
 
-        new StudyFixtureBuilder().setEntityManger(em).addAttribute(annotationType).build(factory);
+        new StudyFixtureBuilder().setEntityManger(em).withAttributeType(annotationType).build(factory);
 
         var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
@@ -94,9 +108,15 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
     @WithMockUser(value = "testuser")
     void put_with_invalid_label_fails_with_bad_request() throws Exception {
         Faker faker = new Faker();
-        AnnotationTypeDTO annotationType = new AnnotationTypeDTO("test_text", "test_label", false, new String[0]);
+        AnnotationTypeDTO annotationType = new AnnotationTypeDTO(
+            "test_text",
+            "test_label",
+            Status.ACTIVE.getName(),
+            false,
+            new String[0]
+        );
 
-        new StudyFixtureBuilder().setEntityManger(em).addAttribute(annotationType).build(factory);
+        new StudyFixtureBuilder().setEntityManger(em).withAttributeType(annotationType).build(factory);
 
         var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
@@ -119,9 +139,15 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
     @WithMockUser(value = "testuser")
     void put_with_non_active_fails_with_bad_request() throws Exception {
         Faker faker = new Faker();
-        AnnotationTypeDTO annotationType = new AnnotationTypeDTO("text", "test_label", false, new String[0]);
+        AnnotationTypeDTO annotationType = new AnnotationTypeDTO(
+            "text",
+            "test_label",
+            Status.ACTIVE.getName(),
+            false,
+            new String[0]
+        );
 
-        Study study = new StudyFixtureBuilder().setEntityManger(em).addAttribute(annotationType).build(factory);
+        Study study = new StudyFixtureBuilder().setEntityManger(em).withAttributeType(annotationType).build(factory);
 
         study.getStudyEventAttrs().stream().findFirst().get().setActivityStatus(Status.CLOSED);
         em.persist(study);
@@ -148,9 +174,15 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
     void put_with_select_and_invalid_value_fails_with_bad_request() throws Exception {
         Faker faker = new Faker();
         String[] validValues = new String[] { "one", "two" };
-        AnnotationTypeDTO annotationType = new AnnotationTypeDTO("select_single", "test_label", false, validValues);
+        AnnotationTypeDTO annotationType = new AnnotationTypeDTO(
+            "select_single",
+            "test_label",
+            Status.ACTIVE.getName(),
+            false,
+            validValues
+        );
 
-        new StudyFixtureBuilder().setEntityManger(em).addAttribute(annotationType).build(factory);
+        new StudyFixtureBuilder().setEntityManger(em).withAttributeType(annotationType).build(factory);
 
         var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
@@ -177,11 +209,12 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
         AnnotationTypeDTO annotationType = new AnnotationTypeDTO(
             "select_multiple",
             "test_label",
+            Status.ACTIVE.getName(),
             false,
             validValues
         );
 
-        new StudyFixtureBuilder().setEntityManger(em).addAttribute(annotationType).build(factory);
+        new StudyFixtureBuilder().setEntityManger(em).withAttributeType(annotationType).build(factory);
 
         var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
@@ -208,11 +241,12 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
         AnnotationTypeDTO annotationType = new AnnotationTypeDTO(
             "number",
             "test_label",
+            Status.ACTIVE.getName(),
             false,
             new String[0]
         );
 
-        new StudyFixtureBuilder().setEntityManger(em).addAttribute(annotationType).build(factory);
+        new StudyFixtureBuilder().setEntityManger(em).withAttributeType(annotationType).build(factory);
 
         var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
@@ -238,11 +272,12 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
         AnnotationTypeDTO annotationType = new AnnotationTypeDTO(
             "date_time",
             "test_label",
+            Status.ACTIVE.getName(),
             false,
             new String[0]
         );
 
-        new StudyFixtureBuilder().setEntityManger(em).addAttribute(annotationType).build(factory);
+        new StudyFixtureBuilder().setEntityManger(em).withAttributeType(annotationType).build(factory);
 
         var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
@@ -268,11 +303,12 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
         AnnotationTypeDTO annotationType = new AnnotationTypeDTO(
             "text",
             "test_label",
+            Status.ACTIVE.getName(),
             true,
             new String[0]
         );
 
-        new StudyFixtureBuilder().setEntityManger(em).addAttribute(annotationType).build(factory);
+        new StudyFixtureBuilder().setEntityManger(em).withAttributeType(annotationType).build(factory);
 
         var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();

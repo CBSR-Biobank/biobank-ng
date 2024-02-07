@@ -82,6 +82,13 @@ type CollectionEventCreate = {
   body: string;
 };
 
+type CollectionEventUpdate = {
+  method: 'PUT';
+  path: ['patients', string, 'collection-events', number];
+  query: undefined;
+  body: string;
+};
+
 type CollectionEventDelete = {
   method: 'DELETE';
   path: ['patients', string, 'collection-events', number];
@@ -117,6 +124,13 @@ type StudyNames = {
   body: undefined;
 };
 
+type StudyAnnotationTypes = {
+  method: 'GET';
+  path: ['studies', string, 'annotation-types'];
+  query: { status?: Status | undefined };
+  body: undefined;
+};
+
 export type Endpoint =
   | Auth
   | Logging
@@ -129,11 +143,13 @@ export type Endpoint =
   | CollectionEventsGet
   | CollectionEventGet
   | CollectionEventCreate
+  | CollectionEventUpdate
   | CollectionEventDelete
   | CollectionEventListComments
   | CollectionEventAddComment
   | AliquotsGet
-  | StudyNames;
+  | StudyNames
+  | StudyAnnotationTypes;
 
 export type ApiError = {
   status: number;

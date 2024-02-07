@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.controllers.studies;
 
+import org.junit.jupiter.params.provider.Arguments;
+import java.util.stream.Stream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -40,38 +42,25 @@ class StudyNameListTests extends ControllerTest {
     @ParameterizedTest
     @MethodSource("provideStatus")
     @WithMockUser(value = "testuser")
-    void get_study_names_when_none_present_is_not_found(List<String> status) throws Exception {
-        String[] statusArray;
-
-        if (status.isEmpty()) {
-            statusArray = null;
-        } else {
-            statusArray = status.toArray(new String[0]);
-        }
-
-        this.mvc.perform(get(new StudyNamesEndpoint(statusArray).url())).andExpect(status().isNotFound());
+    void get_when_none_present_is_not_found(List<String> statuses) throws Exception {
+        StudyNamesEndpoint endpoint = new StudyNamesEndpoint(statuses.toArray(new String[0]));
+        this.mvc.perform(get(endpoint.url())).andExpect(status().isNotFound());
     }
 
     @ParameterizedTest
     @MethodSource("provideStatus")
     @WithMockUser(value = "testuser")
-    void get_study_names_when_present_is_ok(List<String> status) throws Exception {
+    void get_when_present_is_ok(List<String> statuses) throws Exception {
         var study = factory.createStudy();
-        String[] statusArray;
+        StudyNamesEndpoint endpoint = new StudyNamesEndpoint(statuses.toArray(new String[0]));
 
-        if (status.isEmpty()) {
-            statusArray = null;
-        } else {
-            statusArray = status.toArray(new String[0]);
-        }
-
-        if (status.size() == 1) {
-            study.setActivityStatus(Status.fromName(status.getFirst()));
+        if (statuses.size() == 1) {
+            study.setActivityStatus(Status.fromName(statuses.getFirst()));
             em.persist(study);
             em.flush();
         }
 
-        MvcResult result = this.mvc.perform(get(new StudyNamesEndpoint(statusArray).url())).andExpect(status().isOk()).andReturn();
+        MvcResult result = this.mvc.perform(get(endpoint.url())).andExpect(status().isOk()).andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
         List<StudyNameDTO> dtos = List.of(mapper.readValue(result.getResponse().getContentAsString(), StudyNameDTO[].class));
@@ -81,24 +70,18 @@ class StudyNameListTests extends ControllerTest {
     @ParameterizedTest
     @MethodSource("provideStatus")
     @WithMockUser(value = "single_study_user")
-    void get_study_names_when_present_and_is_single_study_user_is_ok(List<String> status) throws Exception {
+    void get_when_present_and_is_single_study_user_is_ok(List<String> statuses) throws Exception {
         var study = factory.createStudy();
         createSingleStudyUser("single_study_user");
-        String[] statusArray;
+        StudyNamesEndpoint endpoint = new StudyNamesEndpoint(statuses.toArray(new String[0]));
 
-        if (status.isEmpty()) {
-            statusArray = null;
-        } else {
-            statusArray = status.toArray(new String[0]);
-        }
-
-        if (status.size() == 1) {
-            study.setActivityStatus(Status.fromName(status.getFirst()));
+        if (statuses.size() == 1) {
+            study.setActivityStatus(Status.fromName(statuses.getFirst()));
             em.persist(study);
             em.flush();
         }
 
-        MvcResult result = this.mvc.perform(get(new StudyNamesEndpoint(statusArray).url())).andExpect(status().isOk()).andReturn();
+        MvcResult result = this.mvc.perform(get(endpoint.url())).andExpect(status().isOk()).andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
         List<StudyNameDTO> dtos = List.of(mapper.readValue(result.getResponse().getContentAsString(), StudyNameDTO[].class));

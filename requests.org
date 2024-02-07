@@ -1,0 +1,90 @@
+#+title: Biobank-NG API Testing
+
+* Collection Events
+:PROPERTIES:
+:header-args: :eval no-export
+:END:
+
+** Update
+
+#+begin_src sh :results replace
+http --ignore-stdin \
+      -A bearer \
+      --auth eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoibG95b2xhIiwiZXhwIjoxNzA3NDc2MjkzLCJpYXQiOjE3MDc0NzI2OTMsInNjb3BlIjoiUk9MRV9BRE1JTiBST0xFX1VTRVIifQ.W17yniEhd3JQ6qoZ4WUnme71tCfWN4n30vc3onQ_10EHCdKuiabqtxaHNSiol9SErpyDhE262YhDGx0anNbuqAbSQXSFT1vHtND9xiWkwQN2uz1QqcAdCKKRfh1H43XTnKz1DngTXyA2-IKvNiVspVundr1pDs0xxgYF05jbjv93HtOK2XV6btnihKH-SiAVJ8HZNGB7VTL9V5wVWRGl2kWIMnplkRYQlNCFhQFUcgUmzd93tvmkvnlfxrhb6hKfovb4SRhrdx3Ra8zkB60hsompRofQABqLYkaYc7lTwWZ-nu5NwdvtezyHxVvKtgURwRMR_AEmSJ5GLt2KgDp5KA \
+      PUT :9000/api/patients/2016-0120/collection-events/3 \
+      vnumber=3 \
+      status="Active" \
+      'annotations[0][name]=Phlebotomist' \
+      'annotations[0][value]=test' \
+      'annotations[1][name]=Consent' \
+      'annotations[1][value]=Consented' \
+      'annotations[2][name]=Visit Type' \
+      'annotations[2][value]=Clinic' \
+      'annotations[3][name]=Patient Type' \
+      'annotations[3][value]=PNET'
+#+end_src
+
+#+RESULTS:
+| {"id":58475 | vnumber:3 | status:"Active" | patientId:27307 | pnumber:"2016-0120" | studyId:31 | studyNameShort:"QPCS" | commentCount:0 | annotations:[{"type":"text" | name:"Phlebotomist" | value:"test"} | {"type":"select_multiple" | name:"Consent" | value:"Consented"} | {"type":"select_single" | name:"Visit Type" | value:"Clinic"} | {"type":"select_single" | name:"Patient Type" | value:"PNET"}] | sourceSpecimens:[]} |
+
+*** Query
+:PROPERTIES:
+:header-args: :engine mysql :database biobank :dbuser root :dbpassword root :cmdline --protocol=tcp :results replace
+:END:
+
+#+begin_src sql
+select
+    st.id st_id,
+    sattr.id sattr_id,
+    gattr.id gattr_id,
+    gattr.label,
+    atype.name,
+    sattr.permissible
+from study_event_attr sattr
+left join global_event_attr gattr on gattr.id = sattr.global_event_attr_id
+left join event_attr_type atype on atype.id = gattr.event_attr_type_id
+left join study st on st.id = sattr.STUDY_ID
+where st.name_short='QPCS';
+#+end_src
+
+#+RESULTS:
+| st_id | sattr_id | gattr_id | label        | name            | permissible                                                                                                              |
+|-------+----------+----------+--------------+-----------------+--------------------------------------------------------------------------------------------------------------------------|
+|    31 |       56 |        4 | Phlebotomist | text            | NULL                                                                                                                     |
+|    31 |       57 |        3 | Consent      | select_multiple | Consented;Not consented;Pending consent                                                                                  |
+|    31 |       62 |        5 | Visit Type   | select_single   | Clinic;JGH;Other;RVH A2;RVH O.R.;RVH S9;RVH ward                                                                         |
+|    31 |       63 |        7 | Patient Type | select_single   | Biopsy diag;Cancer TBA;Collangial carcinoma;Control family;IPMN;Liver met;Not diagnosed;PC case;PNET;Path report pending |
+
+#+begin_src sql
+SET @pnumber := '2016-0120';
+SET @vnumber := '3';
+
+select
+    ce.id ce_id,
+    ce.visit_number,
+    ce.ACTIVITY_STATUS_ID,
+    st.id st_id,
+    sattr.id sattr_id,
+    gattr.id gattr_id,
+    eattr.id eattr_id,
+    gattr.label,
+    eattr.value
+from collection_event ce
+left join patient pt on pt.id = ce.patient_id
+left join study st on st.id=pt.study_id
+left join study_event_attr sattr on sattr.study_id = st.id
+left join global_event_attr gattr on gattr.id = sattr.global_event_attr_id
+left join event_attr eattr on eattr.study_event_attr_id = sattr.id
+    and eattr.collection_event_id=ce.id
+where
+    pt.pnumber = @pnumber
+    and visit_number = @vnumber;
+#+end_src
+
+#+RESULTS:
+| ce_id | visit_number | ACTIVITY_STATUS_ID | st_id | sattr_id | gattr_id | eattr_id | label        | value     |
+|-------+--------------+--------------------+-------+----------+----------+----------+--------------+-----------|
+| 58475 |            3 |                  1 |    31 |       56 |        4 |    56193 | Phlebotomist | test      |
+| 58475 |            3 |                  1 |    31 |       57 |        3 |    56192 | Consent      | Consented |
+| 58475 |            3 |                  1 |    31 |       62 |        5 |    56195 | Visit Type   | Clinic    |
+| 58475 |            3 |                  1 |    31 |       63 |        7 |    56194 | Patient Type | PNET      |

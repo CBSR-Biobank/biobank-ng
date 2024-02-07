@@ -16,3 +16,11 @@ export const annotationSchema = z.object({
 
 export type AnnotationType = z.infer<typeof annotationTypeSchema>;
 export type Annotation = z.infer<typeof annotationSchema>;
+
+export function annotationValueAsDate(annotation: Annotation) {
+  if (!annotation.value || annotation.value === '') {
+    return undefined;
+  }
+  const schema = z.union([z.undefined(), z.string().pipe(z.coerce.date())]).optional();
+  return schema.parse(annotation.value);
+}

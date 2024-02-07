@@ -20,7 +20,7 @@ export const PatientBreadcrumbs: React.FC = () => {
 
     const ceventMatch = matchPath({ path: '/patients/:pnumber/:vnumber', end: true }, route);
     if (ceventMatch && collectionEvent && route === ceventMatch.pathname) {
-      label = `Visit ${collectionEvent.visitNumber}`;
+      label = `Visit ${collectionEvent.vnumber}`;
     }
 
     return { label, route, isLast };

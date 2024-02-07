@@ -83,8 +83,7 @@ class PatientCreateTests extends ControllerTest {
                 post(new PatientAddEndpoint().url()).contentType(MediaType.APPLICATION_JSON).content(data.toString())
             )
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message", Matchers.matchesRegex(errMessage)))
-            .andDo(MockMvcResultHandlers.print());
+            .andExpect(jsonPath("$.message", Matchers.matchesRegex(errMessage)));
     }
 
     @Test

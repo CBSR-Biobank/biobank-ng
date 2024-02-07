@@ -1,5 +1,5 @@
 import { clsx, type ClassValue } from 'clsx';
-import format from 'date-fns/format';
+import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 

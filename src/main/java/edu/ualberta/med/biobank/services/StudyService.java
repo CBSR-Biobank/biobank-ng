@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.services;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import edu.ualberta.med.biobank.dtos.StudyNameDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.errors.Forbidden;
+import edu.ualberta.med.biobank.errors.PermissionError;
 import edu.ualberta.med.biobank.errors.Unauthorized;
 import edu.ualberta.med.biobank.errors.ValidationError;
 import edu.ualberta.med.biobank.permission.patient.StudyReadPermission;
@@ -110,18 +112,10 @@ public class StudyService {
      *
      * @see {@link StudyNameDTO}
      */
-    public Either<AppError, List<StudyNameDTO>> studyNames(String... status) {
-        return Status
-            .fromStrings(status)
-            .flatMap(statuses -> {
-                Set<Integer> statusIds = new HashSet<>();
-                if (status != null) {
-                    statusIds.addAll(statuses.stream().map(s -> s.getId()).toList());
-                } else {
-                    statusIds.addAll(Status.valuesList().stream().map(s -> s.getId()).toList());
-                }
-
-                var names = studyRepository.getNames(statusIds, Tuple.class);
+    public Either<AppError, List<StudyNameDTO>> studyNames(String... stringStatuses) {
+        return statusStringsToIds(stringStatuses)
+            .flatMap(statusIds -> {
+                Collection<Tuple> names = studyRepository.listNames(statusIds, Tuple.class);
                 if (names.isEmpty()) {
                     return Either.left(new EntityNotFound("study names not found"));
                 }
@@ -141,7 +135,44 @@ public class StudyService {
             });
     }
 
-    public Either<AppError, List<AnnotationTypeDTO>> annotations() {
-        return Either.left(new ValidationError("needs implementation"));
+    public Either<AppError, List<AnnotationTypeDTO>> annotationTypes(String nameshort, String... stringStatuses) {
+        var found = studyRepository.findByNameShort(nameshort, Tuple.class).stream().findFirst();
+
+        if (found.isEmpty()) {
+            return Either.left(new EntityNotFound("study"));
+        }
+
+        var study = StudyDTO.fromTuple(found.get());
+        return new StudyReadPermission(study.id())
+            .isAllowed()
+            .flatMap(allowed -> {
+                if (!allowed) {
+                    return Either.left(new PermissionError("study read permission"));
+                }
+                return statusStringsToIds(stringStatuses);
+            })
+            .flatMap(statusIds -> {
+                Collection<Tuple> attributeTypes = studyRepository.listStudyAttributes(nameshort, statusIds, Tuple.class);
+                if (attributeTypes.isEmpty()) {
+                    return Either.left(new EntityNotFound("attribute types not found"));
+                }
+
+                var dtos = attributeTypes.stream().map(s -> AnnotationTypeDTO.fromTuple(s)).toList();
+                return Either.right(dtos);
+            });
+    }
+
+    private Either<AppError, Set<Integer>> statusStringsToIds(String... stringStatuses) {
+        return Status
+            .fromStrings(stringStatuses)
+            .map(statuses -> {
+                Set<Integer> statusIds = new HashSet<>();
+                if (stringStatuses != null) {
+                    statusIds.addAll(statuses.stream().map(s -> s.getId()).toList());
+                } else {
+                    statusIds.addAll(Status.valuesList().stream().map(s -> s.getId()).toList());
+                }
+                return statusIds;
+            });
     }
 }

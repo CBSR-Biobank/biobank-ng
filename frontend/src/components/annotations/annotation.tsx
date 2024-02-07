@@ -1,56 +1,93 @@
-import { Annotation } from '@app/models/annotation';
-import { ReactNode } from 'react';
-import { z } from 'zod';
+import { Annotation, annotationValueAsDate } from '@app/models/annotation';
 import { Chip } from '../chip';
 import { EntityProperty } from '../entity-property';
+import { MutatorDate } from '../mutators/mutator-date';
+import { MutatorDialog } from '../mutators/mutator-dialog';
+import { MutatorNumber } from '../mutators/mutator-number';
+import { MutatorText } from '../mutators/mutator-text';
 
-const AnnotationComp: React.FC<{ annotation: Annotation; onClick: (propertyName: string) => void }> = ({
-  annotation,
-  onClick
-}) => {
-  let value: ReactNode = <></>;
-
-  if (annotation.value) {
-    if (annotation.type === 'date_time') {
-      const schema = z.union([z.null(), z.string().pipe(z.coerce.date())]).optional();
-      value = <>{schema.parse(annotation.value)}</>;
-    }
-
-    if (annotation.type === 'select_single') {
-      value = <Chip>{annotation.value}</Chip>;
-    }
-
-    if (annotation.type === 'select_multiple') {
-      value = <Chip>{annotation.value}</Chip>;
-    }
-  }
-
+const AnnotationMutator: React.FC<{
+  annotation: Annotation;
+  onClick: (propertyName: string, value?: string) => void;
+}> = ({ annotation, onClick }) => {
   switch (annotation.type) {
     case 'number':
-    case 'text':
-    case 'date_time': {
       return (
-        <EntityProperty
-          propName={annotation.name}
+        <MutatorNumber
           label={annotation.name}
-          allowChanges={true}
-          handleChange={() => onClick(annotation.name)}
-        >
-          <>{value}</>
-        </EntityProperty>
+          value={annotation.value ? parseFloat(annotation.value) : undefined}
+          required
+          onClose={(value?: number) => onClick(annotation.name, value ? `{$value}` : undefined)}
+        />
       );
-    }
+
+    case 'text':
+      return (
+        <MutatorText
+          label={annotation.name}
+          value={annotation.value ?? undefined}
+          required
+          onClose={(value?: string) => onClick(annotation.name, value)}
+        />
+      );
+
+    case 'date_time':
+      return (
+        <MutatorDate
+          label={annotation.name}
+          value={annotationValueAsDate(annotation)}
+          required
+          onClose={(value?: Date) => onClick(annotation.name, value ? `{$value}` : undefined)}
+        />
+      );
   }
 };
 
-export const Annotations: React.FC<{ annotations: Annotation[]; onClick: (propertyName: string) => void }> = ({
-  annotations,
-  onClick
-}) => {
+const AnnotationValue: React.FC<{ annotation: Annotation }> = ({ annotation }) => {
+  if (annotation.value) {
+    if (annotation.type === 'date_time') {
+      return <>{annotationValueAsDate(annotation)}</>;
+    }
+
+    if (annotation.type === 'select_single') {
+      return (
+        <Chip variant="primary" size="sm">
+          {annotation.value}
+        </Chip>
+      );
+    }
+
+    if (annotation.type === 'select_multiple') {
+      return annotation.value.split(';').map((value) => (
+        <Chip key={value} variant="primary" size="sm">
+          {value}
+        </Chip>
+      ));
+    }
+  }
+
+  return <>{annotation.value}</>;
+};
+
+export const Annotations: React.FC<{
+  annotations: Annotation[];
+  onClick: (annotationName: string, value?: string) => void;
+}> = ({ annotations, onClick }) => {
   return (
     <>
       {annotations.map((annotation) => (
-        <AnnotationComp key={annotation.name} annotation={annotation} onClick={onClick} />
+        <EntityProperty
+          key={annotation.name}
+          propName={annotation.name}
+          label={annotation.name}
+          mutator={
+            <MutatorDialog title="Update Patient">
+              <AnnotationMutator annotation={annotation} onClick={onClick}></AnnotationMutator>
+            </MutatorDialog>
+          }
+        >
+          <AnnotationValue annotation={annotation} />
+        </EntityProperty>
       ))}
     </>
   );
