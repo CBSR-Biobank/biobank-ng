@@ -3,10 +3,17 @@ import { AdminPage } from '../admin-page';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserDoctor, faGear, faG } from '@fortawesome/free-solid-svg-icons';
 import { Card, CardContent, CardHeader, CardTitle } from '@app/components/ui/card';
+import { EntityProperty } from '@app/components/entity-property';
+import { MutatorDialog } from '@app/components/mutators/mutator-dialog';
+import { MutatorText } from '@app/components/mutators/mutator-text';
+import { cn } from '@app/utils';
+import { Button } from '@app/components/ui/button';
+
 
 
 export function UserProfile() {
   const { user } = useUserStore();
+  const userGroups = user?.groups;
   
   return (
     <>
@@ -25,53 +32,77 @@ export function UserProfile() {
                     <CardTitle>
                   
                         {/* <p className='text-3xl font-semibold text-sky-600'>{user?.fullname}</p> */}
-                        <p className='pl-4 text-3xl font-semibold text-sky-600'>Bryan Kostelyk</p>  {/* Test Name*/}
+                        <p className='pl-4 text-3xl font-semibold text-sky-600'>{user?.fullname}</p>  {/* Test Name*/}
                         <p className='pl-4 text-sm font-semibold text-gray-400'>{user?.isGlobalAdmin ? ' Admin': ''}</p>
                   
                     </CardTitle>
                 </div>
-                  <div className='flex items-center rounded-xl shadow-md p-1 hover:bg-slate-200'>
-                  <FontAwesomeIcon icon={faGear} size='2x' color='gray'/> {/* Wrap in button for settings window */}
-                  </div>
               </div>
-              {/* {JSON.stringify(user, null, 2)}  */}
             </CardHeader>
 
+              <CardContent>
+                
+                <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+                  <Card>
+                    <CardHeader>
+                      <div className='flex items-center justify-between'>
+                        <CardTitle>
+                          <p className='pl-4 text-2xl font-semibold text-sky-400'>My Info</p>
+                          <p className='pl-4 text-sm font-semibold text-gray-400'>Last log in: </p>
+                          
+                        </CardTitle>
+                        <Button className='flex'>
+                           <FontAwesomeIcon icon={faGear} className={'flex size-6 hover:animate-spin'}/>
+                        </Button>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent>
+                  
+                        {/* {user?.username} */}
+                        <EntityProperty
+                          propName={'userName'}
+                          label={'User Name'}
+                          >
+                          {user?.username}
+                        </EntityProperty>
+                        {/* {user?.username} */}
+                        <EntityProperty
+                          propName={'fullName'}
+                          label={'Full Name'}
+                          >
+                          {user?.fullname}
+                        </EntityProperty>
+                        
+                        <EntityProperty
+                         propName={'userType'} 
+                         label={'User Type'}>
+                          {user?.groups.map((group) => (
+                            <p key={group.groupId}>{group.name}</p>
+                             ))}
+                        </EntityProperty>
+
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>
+                        <p className='pl-4 text-2xl font-semibold text-sky-400'>My Patient Studies</p>
+                      </CardTitle>
+                    </CardHeader>
+                      <CardContent>
+                        {/* {user?.username} */}
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi tenetur quam perspiciatis quisquam? Maxime doloremque, corporis ex error blanditiis placeat sed voluptate at, reiciendis aliquid eaque iste, cupiditate dolorum quaerat.
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi tenetur quam perspiciatis quisquam? Maxime doloremque, corporis ex error blanditiis placeat sed voluptate at, reiciendis aliquid eaque iste, cupiditate dolorum quaerat.
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi tenetur quam perspiciatis quisquam? Maxime doloremque, corporis ex error blanditiis placeat sed voluptate at, reiciendis aliquid eaque iste, cupiditate dolorum quaerat.
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi tenetur quam perspiciatis quisquam? Maxime doloremque, corporis ex error blanditiis placeat sed voluptate at, reiciendis aliquid eaque iste, cupiditate dolorum quaerat.
+                        </p>
+                      </CardContent>
+                  </Card>
+                </div>
+
+              </CardContent>
             
-            <CardContent>
-              <div className='flex items-center space-x-8'>
-                <Card>
-                  <CardContent>
-                    {/* {user?.username} */}
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi tenetur quam perspiciatis quisquam? Maxime doloremque, corporis ex error blanditiis placeat sed voluptate at, reiciendis aliquid eaque iste, cupiditate dolorum quaerat.
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi tenetur quam perspiciatis quisquam? Maxime doloremque, corporis ex error blanditiis placeat sed voluptate at, reiciendis aliquid eaque iste, cupiditate dolorum quaerat.
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi tenetur quam perspiciatis quisquam? Maxime doloremque, corporis ex error blanditiis placeat sed voluptate at, reiciendis aliquid eaque iste, cupiditate dolorum quaerat.
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi tenetur quam perspiciatis quisquam? Maxime doloremque, corporis ex error blanditiis placeat sed voluptate at, reiciendis aliquid eaque iste, cupiditate dolorum quaerat.
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent>
-                    {/* {user?.username} */}
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi tenetur quam perspiciatis quisquam? Maxime doloremque, corporis ex error blanditiis placeat sed voluptate at, reiciendis aliquid eaque iste, cupiditate dolorum quaerat.
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi tenetur quam perspiciatis quisquam? Maxime doloremque, corporis ex error blanditiis placeat sed voluptate at, reiciendis aliquid eaque iste, cupiditate dolorum quaerat.
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi tenetur quam perspiciatis quisquam? Maxime doloremque, corporis ex error blanditiis placeat sed voluptate at, reiciendis aliquid eaque iste, cupiditate dolorum quaerat.
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi tenetur quam perspiciatis quisquam? Maxime doloremque, corporis ex error blanditiis placeat sed voluptate at, reiciendis aliquid eaque iste, cupiditate dolorum quaerat.
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent>
-                    {/* {user?.username} */}
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi tenetur quam perspiciatis quisquam? Maxime doloremque, corporis ex error blanditiis placeat sed voluptate at, reiciendis aliquid eaque iste, cupiditate dolorum quaerat.
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi tenetur quam perspiciatis quisquam? Maxime doloremque, corporis ex error blanditiis placeat sed voluptate at, reiciendis aliquid eaque iste, cupiditate dolorum quaerat.
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi tenetur quam perspiciatis quisquam? Maxime doloremque, corporis ex error blanditiis placeat sed voluptate at, reiciendis aliquid eaque iste, cupiditate dolorum quaerat.
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi tenetur quam perspiciatis quisquam? Maxime doloremque, corporis ex error blanditiis placeat sed voluptate at, reiciendis aliquid eaque iste, cupiditate dolorum quaerat.
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-            </CardContent>
           </Card>
         </div>
        
