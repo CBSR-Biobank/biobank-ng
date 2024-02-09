@@ -22,7 +22,6 @@ export function MutatorSelect<T>({ label, value, onClose, propertyOptions }: Mut
 
   const handleOk = () => {
     onClose(input?.id);
-    handleOk();
   };
 
   return (

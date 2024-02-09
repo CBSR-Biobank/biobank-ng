@@ -31,6 +31,8 @@ import {
   useCollectionEventDelete,
   useCollectionEventUpdate
 } from '@app/hooks/use-collection-event';
+import { useStudyAnnotationTypes } from '@app/hooks/use-study';
+import { Annotation } from '@app/models/annotation';
 import { CollectionEvent } from '@app/models/collection-event';
 import { Patient, takenVisitNumbers } from '@app/models/patient';
 import { Status } from '@app/models/status';
@@ -137,7 +139,7 @@ const Buttons: React.FC<{ collectionEvent: CollectionEvent }> = ({ collectionEve
           <div className="grid grid-cols-1 place-items-center gap-4">
             <p>Are you sure you want to delete this visit?</p>
             <div className="grid grid-cols-1 place-items-center">
-              <Chip message={`Visit ${collectionEvent.vnumber}`} variant="default" size="sm" />
+              <Chip message={`Visit ${collectionEvent.vnumber}`} size="sm" />
             </div>
           </div>
         </EntityDeleteDialog>
@@ -146,6 +148,30 @@ const Buttons: React.FC<{ collectionEvent: CollectionEvent }> = ({ collectionEve
       )}
       <CommentAddDialog title="Visit" onSubmit={handleCommentAdded} />
     </div>
+  );
+};
+
+export const CollectionEventAnnotations: React.FC<{
+  collectionEvent: CollectionEvent;
+  onClick: (annotation: Annotation, value?: string) => void;
+}> = ({ collectionEvent, onClick }) => {
+  const { annotationTypes, isLoading, isError, error } = useStudyAnnotationTypes(collectionEvent.studyNameShort);
+
+  if (isError) {
+    return <ShowError error={error} />;
+  }
+
+  if (isLoading || !annotationTypes) {
+    return <CircularProgress />;
+  }
+
+  return (
+    <Annotations
+      mutatorTitle="Update Visit"
+      annotations={collectionEvent.annotations}
+      annotationTypes={annotationTypes}
+      onUpdate={onClick}
+    />
   );
 };
 
@@ -193,18 +219,9 @@ export const CollectionEventDetails: React.FC<{ patient: Patient; vnumber: numbe
     });
   };
 
-  const handleAnnotationChange = (annotationName: string, value?: string) => {
-    if (!value) {
-      return; // do nothing
-    }
-
-    const annotations = collectionEvent.annotations.map((a) => {
-      if (a.name === annotationName) {
-        return { ...a, value };
-      }
-      return a;
-    });
-
+  const handleAnnotationChange = (annotation: Annotation, value?: string) => {
+    const annotations = collectionEvent.annotations.filter((a) => a.name !== annotation.name);
+    annotations.push({ ...annotation, value: value ?? '' });
     updateMutation.mutate({
       pnumber: collectionEvent.pnumber,
       vnumber: collectionEvent.vnumber,
@@ -227,7 +244,7 @@ export const CollectionEventDetails: React.FC<{ patient: Patient; vnumber: numbe
             {collectionEvent.pnumber}
           </EntityProperty>
 
-          <EntityProperty propName="studyNameShort" label="Study" allowChanges={false}>
+          <EntityProperty propName="studyNameShort" label="Study">
             {collectionEvent.studyNameShort}
           </EntityProperty>
 
@@ -259,7 +276,7 @@ export const CollectionEventDetails: React.FC<{ patient: Patient; vnumber: numbe
             <StatusChip status={collectionEvent.status} size="xs" />
           </EntityProperty>
 
-          <Annotations annotations={collectionEvent.annotations} onClick={handleAnnotationChange} />
+          <CollectionEventAnnotations collectionEvent={collectionEvent} onClick={handleAnnotationChange} />
         </div>
 
         <CommentsCollapsible

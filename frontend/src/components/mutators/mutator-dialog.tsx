@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@app/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@app/components/ui/tooltip';
 import { cn } from '@app/utils';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { faPencil } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { VariantProps, cva } from 'class-variance-authority';
@@ -24,23 +25,23 @@ export const MutatorDialog: React.FC<
   React.PropsWithChildren<
     MutatorVariantProps & {
       title: string;
+      icon?: IconProp;
+      tooltip?: string;
     }
   >
-> = ({ title, size, children }) => {
+> = ({ title, icon = faPencil, tooltip = 'Update', size, children }) => {
   return (
-    <TooltipProvider>
+    <TooltipProvider delayDuration={200}>
       <Dialog>
         <Tooltip>
           <TooltipTrigger asChild>
             <DialogTrigger asChild>
               <button className="flex cursor-pointer items-center rounded-r-lg bg-gray-300/50 p-3 text-sky-400 hover:bg-gray-400">
-                <FontAwesomeIcon icon={faPencil} />
+                <FontAwesomeIcon icon={icon} />
               </button>
             </DialogTrigger>
           </TooltipTrigger>
-          <TooltipContent>
-            <p>Update</p>
-          </TooltipContent>
+          <TooltipContent className="text-xs">{tooltip}</TooltipContent>
         </Tooltip>
         <DialogContent className={cn(mutatorVariants({ size }))}>
           <DialogHeader>

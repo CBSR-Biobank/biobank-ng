@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.dtos;
 
+import edu.ualberta.med.biobank.domain.ProcessingEvent;
 import edu.ualberta.med.biobank.domain.Specimen;
 import edu.ualberta.med.biobank.domain.Status;
 import jakarta.persistence.Tuple;
@@ -44,6 +45,15 @@ public record SourceSpecimenDTO(
     }
 
     public static SourceSpecimenDTO fromSpecimen(Specimen specimen) {
+        Integer peventId = null;
+        String worksheet = null;
+
+        ProcessingEvent pevent = specimen.getProcessingEvent();
+        if (pevent != null) {
+            peventId = pevent.getId();
+            worksheet = pevent.getWorksheet();
+        }
+
         return new SourceSpecimenDTO(
             specimen.getId(),
             specimen.getInventoryId(),
@@ -58,8 +68,8 @@ public record SourceSpecimenDTO(
             specimen.getCurrentCenter().getNameShort(),
             !specimen.getComments().isEmpty(),
             specimen.getSpecimenPosition() != null ? specimen.getSpecimenPosition().getPositionString() : null,
-            specimen.getProcessingEvent().getId(),
-            specimen.getProcessingEvent().getWorksheet()
+            peventId,
+            worksheet
         );
     }
 }

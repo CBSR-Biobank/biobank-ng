@@ -1,20 +1,12 @@
 import { z } from 'zod';
-
-const annotationTypeSchema = z.union([
-  z.literal('number'),
-  z.literal('text'),
-  z.literal('date_time'),
-  z.literal('select_single'),
-  z.literal('select_multiple')
-]);
+import { annotationTypeNameSchema } from './annotation-type';
 
 export const annotationSchema = z.object({
-  type: annotationTypeSchema,
+  type: annotationTypeNameSchema,
   name: z.string(),
   value: z.string().nullable()
 });
 
-export type AnnotationType = z.infer<typeof annotationTypeSchema>;
 export type Annotation = z.infer<typeof annotationSchema>;
 
 export function annotationValueAsDate(annotation: Annotation) {

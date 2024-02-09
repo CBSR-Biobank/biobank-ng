@@ -1,14 +1,14 @@
 import { usePatientStore } from '@app/store';
 import { capitalizeWord } from '@app/utils';
 import { matchPath, useLocation } from 'react-router-dom';
-import { Breadcrumbs } from './breadcrumbs';
+import { Breadcrumb, Breadcrumbs } from './breadcrumbs';
 
 export const PatientBreadcrumbs: React.FC = () => {
   const { pathname } = useLocation();
   const { patient, collectionEvent } = usePatientStore();
 
   const pathnames = pathname.split('/').filter(Boolean);
-  const breadcrumbs = pathnames.map((name, index) => {
+  const breadcrumbs = pathnames.map((name, index): Breadcrumb => {
     const route = `/${pathnames.slice(0, index + 1).join('/')}`;
     const isLast = index === pathnames.length - 1;
     let label = capitalizeWord(name);

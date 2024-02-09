@@ -202,6 +202,8 @@ public class CollectionEventService {
                 return permission
                     .isAllowed()
                     .flatMap(allowed -> {
+                        logger.debug("ceventInfo: {}", LoggingUtils.prettyPrintJson(ceventInfo));
+
                         if (!allowed) {
                             return Either.left(new PermissionError("study: %s".formatted(ceventDTO.studyNameShort())));
                         }
@@ -228,7 +230,7 @@ public class CollectionEventService {
                                 cevent.getEventAttrs().addAll(attrsToAdd);
                                 cevent.setVisitNumber(ceventInfo.vnumber());
                                 cevent.setActivityStatus(newStatus);
-                                CollectionEvent savedCevent = collectionEventRepository.save(cevent);
+                                CollectionEvent savedCevent = collectionEventRepository.saveAndFlush(cevent);
 
                                 String username = SecurityContextHolder.getContext().getAuthentication().getName();
                                 eventPublisher.publishVisitUpdated(username, pnumber, vnumber);
@@ -422,32 +424,36 @@ public class CollectionEventService {
 
             String type = studyAttr.getGlobalEventAttr().getEventAttrType().getName();
 
-            if (type.equals("number") && !StringUtil.isNumeric(pair.value)) {
-                return Either.left(new ValidationError("annotation value is not numeric: %s".formatted(label)));
-            }
-
-            if (type.equals("date_time")) {
-                try {
-                    DateUtil.parseDateTime(pair.value);
-                } catch (ParseException ex) {
-                    return Either.left(new ValidationError("annotation value is not date time: %s".formatted(label)));
+            if (!pair.value.isBlank()) {
+                if (type.equals("number") && !StringUtil.isNumeric(pair.value)) {
+                    return Either.left(new ValidationError("annotation value is not numeric: %s".formatted(label)));
                 }
-            }
 
-            String permissible = studyAttr.getPermissible();
-            if (type.contains("select_") && !permissible.isBlank() && pair.value != null && !pair.value.isBlank()) {
-                List<String> validValues = List.of(permissible.split(StringUtil.MUTIPLE_VALUES_DELIMITER));
-
-                for (String value : pair.value.split(StringUtil.MUTIPLE_VALUES_DELIMITER)) {
-                    if (!validValues.contains(value)) {
+                if (type.equals("date_time")) {
+                    try {
+                        DateUtil.parseDateTime(pair.value);
+                    } catch (ParseException ex) {
                         return Either.left(
-                            new ValidationError(
-                                "invalid annotation value for '%s', not one of: %s'".formatted(
-                                        studyAttr.getGlobalEventAttr().getLabel(),
-                                        String.join(",", validValues)
-                                    )
-                            )
+                            new ValidationError("annotation value is not date time: %s".formatted(label))
                         );
+                    }
+                }
+
+                String permissible = studyAttr.getPermissible();
+                if (type.contains("select_") && !permissible.isBlank() && pair.value != null && !pair.value.isBlank()) {
+                    List<String> validValues = List.of(permissible.split(StringUtil.MUTIPLE_VALUES_DELIMITER));
+
+                    for (String value : pair.value.split(StringUtil.MUTIPLE_VALUES_DELIMITER)) {
+                        if (!validValues.contains(value)) {
+                            return Either.left(
+                                new ValidationError(
+                                    "invalid annotation value for '%s', not one of: %s'".formatted(
+                                            studyAttr.getGlobalEventAttr().getLabel(),
+                                            String.join(",", validValues)
+                                        )
+                                )
+                            );
+                        }
                     }
                 }
             }
