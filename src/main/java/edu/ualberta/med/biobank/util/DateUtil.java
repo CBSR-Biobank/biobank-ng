@@ -9,9 +9,13 @@ import java.sql.Timestamp;
 
 public class DateUtil {
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    public static final String DATE_PATTERN = "yyyy-MM-dd";
 
-    private static final DateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+    public static final String DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm'Z'";
+
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat(DATE_PATTERN);
+
+    private static final DateFormat DATE_TIME_FORMAT = new SimpleDateFormat(DATE_TIME_PATTERN);
 
     private DateUtil() {
         throw new AssertionError();
@@ -19,6 +23,10 @@ public class DateUtil {
 
     public static Date parseDate(String datestring) throws ParseException {
         return DATE_FORMAT.parse(datestring);
+    }
+
+    public static Date parseDateTime(String timestring) throws ParseException {
+        return DATE_TIME_FORMAT.parse(timestring);
     }
 
     public static String datetimeToString(Date date) {

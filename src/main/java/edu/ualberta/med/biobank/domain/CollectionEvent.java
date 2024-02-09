@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.domain;
 
 import java.util.HashSet;
 import java.util.Set;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -41,7 +42,7 @@ public class CollectionEvent extends DomainEntity implements HasStatus, HasComme
     @OneToMany(cascade = jakarta.persistence.CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "collectionEvent")
     private Set<EventAttr> eventAttrs = new HashSet<EventAttr>(0);
 
-    @ManyToMany(cascade = jakarta.persistence.CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "COLLECTION_EVENT_COMMENT", joinColumns = {
             @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false) }, inverseJoinColumns = {
                     @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false) })

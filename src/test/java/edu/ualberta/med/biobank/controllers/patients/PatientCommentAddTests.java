@@ -39,7 +39,7 @@ class PatientCommentAddTests extends ControllerTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    void patient_comment_post_succeeds() throws Exception {
+    void post_succeeds() throws Exception {
         var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
         var dto = new CommentAddDTO(new Faker().lorem().paragraph(2));
 
@@ -59,7 +59,7 @@ class PatientCommentAddTests extends ControllerTest {
     }
 
     @Test
-    void patient_comment_post_when_anonymous_is_unauthorized() throws Exception {
+    void post_when_anonymous_is_unauthorized() throws Exception {
         var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
         var dto = new CommentAddDTO(new Faker().lorem().paragraph(2));
 
@@ -73,7 +73,7 @@ class PatientCommentAddTests extends ControllerTest {
 
     @Test
     @WithMockUser(value = "non_member_user")
-    void patient_comment_post_when_non_member_user_is_forbidden() throws Exception {
+    void post_when_non_member_user_is_forbidden() throws Exception {
         createSingleStudyUser("non_member_user");
 
         var patient = new PatientFixtureBuilder().numCollectionEvents(1).build(factory);
@@ -90,7 +90,7 @@ class PatientCommentAddTests extends ControllerTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    void patient_comment_post_fails_when_invalid_pnumber_is_not_found() throws Exception {
+    void post_fails_when_invalid_pnumber_is_not_found() throws Exception {
         var badPnumber = new Faker().internet().username();
         var dto = new CommentAddDTO(new Faker().lorem().paragraph(2));
 
@@ -107,7 +107,7 @@ class PatientCommentAddTests extends ControllerTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    void patient_comment_post_fails_with_blank_message() throws Exception {
+    void post_fails_with_blank_message() throws Exception {
         var badPnumber = new Faker().internet().username();
         var dto = new CommentAddDTO("");
 

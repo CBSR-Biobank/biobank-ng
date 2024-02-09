@@ -88,6 +88,6 @@ interface PatientState {
 export const usePatientStore = create<PatientState>((set) => ({
   patient: undefined,
   collectionEvent: undefined,
-  setPatient: (patient) => set((state) => ({ ...state, patient })),
+  setPatient: (patient) => set((state) => ({ ...state, patient, collectionEvent: undefined })),
   setCollectionEvent: (collectionEvent) => set((state) => ({ ...state, collectionEvent }))
 }));

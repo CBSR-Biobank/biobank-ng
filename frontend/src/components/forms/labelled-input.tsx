@@ -24,7 +24,7 @@ export const LabelledInput = React.forwardRef<HTMLInputElement, LabelledInputPro
           {...props}
         />
         {errorMessage && (
-          <div className="text-sm text-red-600">
+          <div className="text-xs font-medium text-red-600">
             <span role="alert">{errorMessage}</span>
           </div>
         )}

@@ -1,15 +1,10 @@
-import { collectionEventSchema } from '@app/models/collection-event';
 import { CommentAdd, commentSchema } from '@app/models/comment';
 import { Patient, PatientAdd, PatientUpdate, patientSchema } from '@app/models/patient';
 import { z } from 'zod';
 import { httpClient } from './api';
 
 export class PatientApi {
-  static async getByPnumber(pnumber?: string) {
-    if (!pnumber) {
-      return null;
-    }
-
+  static async getByPnumber(pnumber: string) {
     const response = await httpClient({
       method: 'GET',
       path: ['patients', pnumber],
@@ -21,11 +16,7 @@ export class PatientApi {
     return patient;
   }
 
-  static async getPatientComments(pnumber?: string) {
-    if (!pnumber) {
-      return null;
-    }
-
+  static async getPatientComments(pnumber: string) {
     const response = await httpClient({
       method: 'GET',
       path: ['patients', pnumber, 'comments'],
@@ -34,22 +25,6 @@ export class PatientApi {
     });
     const result = await response.json();
     const cevent = z.array(commentSchema).parse(result);
-    return cevent;
-  }
-
-  static async getPatientCollectionEvent(pnumber?: string, vnumber?: number) {
-    if (!pnumber || !vnumber) {
-      return null;
-    }
-
-    const response = await httpClient({
-      method: 'GET',
-      path: ['patients', pnumber, 'collection-events', vnumber],
-      body: undefined,
-      query: undefined
-    });
-    const result = await response.json();
-    const cevent = collectionEventSchema.parse(result);
     return cevent;
   }
 
@@ -80,11 +55,7 @@ export class PatientApi {
   }
 
   // parameters are required to be optional due to TypeScript and useQuery
-  static async addComment(patient?: Patient, comment?: CommentAdd) {
-    if (!patient || !comment) {
-      return null;
-    }
-
+  static async addComment(patient: Patient, comment: CommentAdd) {
     const response = await httpClient({
       method: 'POST',
       path: ['patients', patient.pnumber, 'comments'],

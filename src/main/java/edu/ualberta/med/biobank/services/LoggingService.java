@@ -15,7 +15,10 @@ import edu.ualberta.med.biobank.applicationevents.PatientReadEvent;
 import edu.ualberta.med.biobank.applicationevents.PatientUpdatedEvent;
 import edu.ualberta.med.biobank.applicationevents.SpecimenReadEvent;
 import edu.ualberta.med.biobank.applicationevents.UserLoggedInEvent;
+import edu.ualberta.med.biobank.applicationevents.VisitCreatedEvent;
+import edu.ualberta.med.biobank.applicationevents.VisitDeletedEvent;
 import edu.ualberta.med.biobank.applicationevents.VisitReadEvent;
+import edu.ualberta.med.biobank.applicationevents.VisitUpdatedEvent;
 import edu.ualberta.med.biobank.domain.Log;
 import edu.ualberta.med.biobank.dtos.LoggingDTO;
 import edu.ualberta.med.biobank.repositories.LoggingRepository;
@@ -51,6 +54,7 @@ public class LoggingService {
 
     @EventListener
     void handleEmployeeEvent(UserLoggedInEvent event) {
+        logger.info("UserLoggedIn: {}", event.getUsername());
         Log logEvent = new Log.LogBuilder()
             .action("login")
             .username(event.getUsername())
@@ -60,6 +64,7 @@ public class LoggingService {
 
     @EventListener
     void handlePatientReadEvent(PatientReadEvent event) {
+        logger.info("PatientRead: {}", event.getPnumber());
         Log logEvent = new Log.LogBuilder()
             .action("select")
             .username(event.getUsername())
@@ -71,6 +76,7 @@ public class LoggingService {
 
     @EventListener
     void handlePatientCreatedEvent(PatientCreatedEvent event) {
+        logger.info("PatientCreated: {}", event.getPnumber());
         Log logEvent = new Log.LogBuilder()
             .action("insert")
             .username(event.getUsername())
@@ -82,6 +88,7 @@ public class LoggingService {
 
     @EventListener
     void handlePatientUpdatedEvent(PatientUpdatedEvent event) {
+        logger.info("PatientUpdated: {}", event.getPnumber());
         Log logEvent = new Log.LogBuilder()
             .action("update")
             .username(event.getUsername())
@@ -93,6 +100,7 @@ public class LoggingService {
 
     @EventListener
     void handleVisitReadEvent(VisitReadEvent event) {
+        logger.info("VisitRead: visit {} on patient {}", event.getVnumber(), event.getPnumber());
         Log logEvent = new Log.LogBuilder()
             .action("select")
             .username(event.getUsername())
@@ -104,7 +112,47 @@ public class LoggingService {
     }
 
     @EventListener
-    void handleVisitReadEvent(SpecimenReadEvent event) {
+    void handleVisitCreatedEvent(VisitCreatedEvent event) {
+        logger.info("VisitCreated: visit {} on patient {}", event.getVnumber(), event.getPnumber());
+        Log logEvent = new Log.LogBuilder()
+            .action("insert")
+            .username(event.getUsername())
+            .patientNumber(event.getPnumber())
+            .type("CollectionEvent")
+            .details("visit: %s".formatted(event.getVnumber()))
+            .build();
+        loggingRepository.save(logEvent);
+    }
+
+    @EventListener
+    void handleVisitUpdatedEvent(VisitUpdatedEvent event) {
+        logger.info("VisitUpdated: visit {} on patient {}", event.getVnumber(), event.getPnumber());
+        Log logEvent = new Log.LogBuilder()
+            .action("update")
+            .username(event.getUsername())
+            .patientNumber(event.getPnumber())
+            .type("CollectionEvent")
+            .details("visit: %s".formatted(event.getVnumber()))
+            .build();
+        loggingRepository.save(logEvent);
+    }
+
+    @EventListener
+    void handleVisitDeletedEvent(VisitDeletedEvent event) {
+        logger.info("VisitDeleted: visit {} on patient {}", event.getVnumber(), event.getPnumber());
+        Log logEvent = new Log.LogBuilder()
+            .action("delete")
+            .username(event.getUsername())
+            .patientNumber(event.getPnumber())
+            .type("CollectionEvent")
+            .details("visit: %s".formatted(event.getVnumber()))
+            .build();
+        loggingRepository.save(logEvent);
+    }
+
+    @EventListener
+    void handleSpecimenReadEvent(SpecimenReadEvent event) {
+        logger.info("SpecimenRead: specimen {} on patient {}", event.getInventoryId(), event.getPnumber());
         Log logEvent = new Log.LogBuilder()
             .action("select")
             .username(event.getUsername())

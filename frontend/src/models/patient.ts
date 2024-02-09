@@ -19,3 +19,11 @@ export type Patient = z.infer<typeof patientSchema>;
 export type PatientAdd = Pick<Patient, 'pnumber' | 'studyNameShort'>;
 
 export type PatientUpdate = PatientAdd;
+
+export function takenVisitNumbers(patient: Patient) {
+  return patient.collectionEvents.map((ce) => ce.visitNumber);
+}
+
+export function validVisitNumber(patient: Patient, vnumber: number) {
+  return patient.collectionEvents.find((ce) => ce.visitNumber === vnumber) === undefined;
+}

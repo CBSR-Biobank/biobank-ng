@@ -1,7 +1,15 @@
 package edu.ualberta.med.biobank.util;
 
+import java.util.regex.Pattern;
+
 public class StringUtil {
+
+    // Used in StudyEventAttr and EventAttr
+    public static final String MUTIPLE_VALUES_DELIMITER = ";";
+
     public static final String EMPTY_STRING = "";
+
+    private static final Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
 
     private StringUtil() {
         throw new AssertionError();
@@ -31,4 +39,13 @@ public class StringUtil {
         }
         return string;
     }
+
+
+    public static boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        return pattern.matcher(strNum).matches();
+    }
+
 }

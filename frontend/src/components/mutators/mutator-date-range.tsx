@@ -1,10 +1,19 @@
+import { DialogClose, DialogFooter } from '@app/components/ui/dialog';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { CancelButton } from '../cancel-button';
 import { LabelledInput } from '../forms/labelled-input';
-import { MutatorDateRangeProps } from './mutator';
-import { MutatorDialog } from './mutator-dialog';
+import { OkButton } from '../ok-button';
+import { MutatorProps } from './mutator';
+
+export type DateRange = {
+  startDate: Date;
+  endDate: Date;
+};
+
+export type MutatorDateRangeProps = MutatorProps<DateRange>;
 
 const schema = z
   .object({
@@ -23,7 +32,7 @@ const schema = z
     { message: 'must be later than start date' }
   );
 
-export function MutatorDateRange({ propertyName, title, value, required, open, onClose }: MutatorDateRangeProps) {
+export function MutatorDateRange({ value, onClose }: MutatorDateRangeProps) {
   const {
     register,
     getValues,
@@ -49,26 +58,14 @@ export function MutatorDateRange({ propertyName, title, value, required, open, o
 
   const handleOk = () => {
     const values = getValues();
-    onClose('ok', propertyName, {
+    onClose({
       startDate: new Date(values.startDate),
       endDate: new Date(values.endDate)
     });
   };
 
-  const handleCancel = () => {
-    onClose('cancel', propertyName, null);
-  };
-
   return (
-    <MutatorDialog
-      size="md"
-      title={title}
-      required={required}
-      open={open}
-      onOk={handleOk}
-      onCancel={handleCancel}
-      valid={isValid}
-    >
+    <>
       <form onSubmit={handleSubmit} className="grid-columns-1 grid gap-4">
         <LabelledInput
           type="date"
@@ -87,6 +84,14 @@ export function MutatorDateRange({ propertyName, title, value, required, open, o
           pattern="\d{4}-\d{2}-\d{2}"
         />
       </form>
-    </MutatorDialog>
+      <DialogFooter className="grid-cols-1 gap-3 lg:grid-cols-2">
+        <DialogClose asChild>
+          <CancelButton />
+        </DialogClose>
+        <DialogClose asChild>
+          <OkButton onClick={handleOk} disabled={!isValid} />
+        </DialogClose>
+      </DialogFooter>
+    </>
   );
 }

@@ -11,19 +11,19 @@ const menuItems: MenuItem[] = [
     title: 'Patients',
     icon: faUsers,
     route: '/patients',
-    //requiredGroups: [UserRole.SUPERUSER, UserRole.NORWEB_PEOPLE_ADMIN, UserRole.NORWEB_PEOPLE_USER],
+    //requiredGroups: [UserRole.SUPERUSER],
     submenu: [
       {
         title: 'Add',
         icon: faSquarePlus,
         route: '/patients/add'
-        //requiredRoles: [UserRole.SUPERUSER, UserRole.NORWEB_PEOPLE_ADMIN]
+        //requiredRoles: [UserRole.SUPERUSER]
       },
       {
         title: 'Visits',
         icon: faUserDoctor,
         route: '/patients'
-        //requiredRoles: [UserRole.SUPERUSER, UserRole.NORWEB_PEOPLE_ADMIN]
+        //requiredRoles: [UserRole.SUPERUSER]
       }
     ]
   },

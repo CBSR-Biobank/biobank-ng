@@ -33,20 +33,20 @@ public class PatientController {
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @GetMapping("/{pnumber}")
     public PatientDTO getPatient(@PathVariable String pnumber) {
-        return patientService.findByPnumber(pnumber).orElseThrow(err -> new AppErrorException(err));
+        return patientService.get(pnumber).orElseThrow(err -> new AppErrorException(err));
     }
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @GetMapping("/{pnumber}/comments")
     public Collection<CommentDTO> getPatientComments(@PathVariable String pnumber) {
-        return patientService.patientComments(pnumber).orElseThrow(err -> new AppErrorException(err));
+        return patientService.getComments(pnumber).orElseThrow(err -> new AppErrorException(err));
     }
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @PostMapping(consumes="application/json")
     @ResponseStatus(HttpStatus.CREATED)
     public PatientDTO postPatient(@RequestBody PatientAddDTO patient) {
-        return patientService.save(patient).orElseThrow(err -> new AppErrorException(err));
+        return patientService.add(patient).orElseThrow(err -> new AppErrorException(err));
     }
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
@@ -59,6 +59,6 @@ public class PatientController {
     @PostMapping(path = "/{pnumber}/comments", consumes="application/json")
     @ResponseStatus(HttpStatus.CREATED)
     public CommentDTO postPatientComment(@PathVariable String pnumber, @RequestBody CommentAddDTO comment) {
-        return patientService.addPatientComment(pnumber, comment).orElseThrow(err -> new AppErrorException(err));
+        return patientService.addComment(pnumber, comment).orElseThrow(err -> new AppErrorException(err));
     }
 }

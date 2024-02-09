@@ -1,38 +1,43 @@
 package edu.ualberta.med.biobank.dtos;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.domain.Status;
 import jakarta.persistence.Tuple;
-import java.util.List;
 
 public record CollectionEventDTO(
     Integer id,
-    Integer visitNumber,
+    Integer vnumber,
     String status,
     Integer patientId,
-    String patientNumber,
+    String pnumber,
     Integer studyId,
     String studyNameShort,
-    List<EventAttributeDTO> attributes,
-    List<CommentDTO> comments,
+    Long commentCount,
+    List<AnnotationDTO> annotations,
     List<SourceSpecimenDTO> sourceSpecimens
 ) {
+    @SuppressWarnings("unused")
+    private static final Logger logger = LoggerFactory.getLogger(CollectionEventDTO.class);
 
     public CollectionEventDTO withExtras(
-        List<EventAttributeDTO> attributes,
-        List<CommentDTO> comments,
+        List<AnnotationDTO> annotations,
         List<SourceSpecimenDTO> sourceSpecimens
     ) {
         return new CollectionEventDTO(
             id,
-            visitNumber,
+            vnumber,
             status,
             patientId,
-            patientNumber,
+            pnumber,
             studyId,
             studyNameShort,
-            attributes,
-            comments,
+            commentCount,
+            annotations,
             sourceSpecimens
         );
     }
@@ -46,25 +51,54 @@ public record CollectionEventDTO(
             data.get("patientNumber", String.class),
             data.get("studyId", Number.class).intValue(),
             data.get("studyNameShort", String.class),
-            List.of(),
+            data.get("commentCount", Long.class),
             List.of(),
             List.of()
         );
     }
-    public static CollectionEventDTO fromCollectionEvent(CollectionEvent data) {
+
+    public static CollectionEventDTO fromCollectionEvent(CollectionEvent cevent) {
+        Map<Integer, AnnotationDTO> attrsById = new HashMap<>();
+        cevent
+            .getPatient()
+            .getStudy()
+            .getStudyEventAttrs()
+            .forEach(attr -> {
+                attrsById.computeIfAbsent(
+                    attr.getId(),
+                    id ->
+                        new AnnotationDTO(
+                            attr.getGlobalEventAttr().getEventAttrType().getName(),
+                            attr.getGlobalEventAttr().getLabel(),
+                            ""
+                        )
+                );
+            });
+
+        cevent
+            .getEventAttrs()
+            .stream()
+            .forEach(attr -> {
+                Integer id = attr.getStudyEventAttr().getId();
+                attrsById.computeIfPresent(id, (k, v) -> v.withValue(attr.getValue()));
+            });
+
         return new CollectionEventDTO(
-            data.getId(),
-            data.getVisitNumber(),
-            data.getActivityStatus().name(),
-            data.getPatient().getId(),
-            data.getPatient().getPnumber(),
-            data.getPatient().getStudy().getId(),
-            data.getPatient().getStudy().getNameShort(),
-            data.getEventAttrs().stream().map(attr -> EventAttributeDTO.fromEventAttribute(attr)).toList(),
-            data.getComments().stream().map(comment -> CommentDTO.fromComment(comment)).toList(),
-            data.getOriginalSpecimens().stream()
+            cevent.getId(),
+            cevent.getVisitNumber(),
+            cevent.getActivityStatus().getName(),
+            cevent.getPatient().getId(),
+            cevent.getPatient().getPnumber(),
+            cevent.getPatient().getStudy().getId(),
+            cevent.getPatient().getStudy().getNameShort(),
+            Long.valueOf(cevent.getComments().size()),
+            attrsById.values().stream().toList(),
+            cevent
+                .getOriginalSpecimens()
+                .stream()
                 .filter(specimen -> specimen.getParentSpecimen() == null)
-                .map(specimen -> SourceSpecimenDTO.fromSpecimen(specimen)).toList()
+                .map(specimen -> SourceSpecimenDTO.fromSpecimen(specimen))
+                .toList()
         );
     }
 }

@@ -43,7 +43,7 @@ class PatientCommentsListTests extends ControllerTest {
     @WithMockUser(value = "testuser")
     void get_when_has_comments_is_ok() throws Exception {
         User testuser = userRepository.getReferenceById(2); // KLUDGE: ID 2 belongs to testuser - see V1__init.sql
-        var patient = new PatientFixtureBuilder().numComments(1).commentUsername(testuser).build(factory);
+        var patient = new PatientFixtureBuilder().numPatientComments(1).commentUsername(testuser).build(factory);
 
         MvcResult result =
             this.mvc.perform(get(new PatientCommentsListEndpoint(patient.getPnumber()).url()))
@@ -58,7 +58,7 @@ class PatientCommentsListTests extends ControllerTest {
 
     @Test
     void get_when_present_and_anonymous_is_unauthorized() throws Exception {
-        var patient = new PatientFixtureBuilder().numComments(1).build(factory);
+        var patient = new PatientFixtureBuilder().numPatientComments(1).build(factory);
         this.mvc.perform(get(new PatientCommentsListEndpoint(patient.getPnumber()).url()))
             .andExpect(status().isUnauthorized());
     }
@@ -67,7 +67,7 @@ class PatientCommentsListTests extends ControllerTest {
     @WithMockUser(value = "non_member_user")
     void get_when_present_and_not_member_is_forbidden() throws Exception {
         createSingleStudyUser("non_member_user");
-        var patient = new PatientFixtureBuilder().numComments(1).build(factory);
+        var patient = new PatientFixtureBuilder().numPatientComments(1).build(factory);
 
         this.mvc.perform(get(new PatientCommentsListEndpoint(patient.getPnumber()).url()))
             .andExpect(status().isForbidden())

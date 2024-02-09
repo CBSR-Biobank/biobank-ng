@@ -39,14 +39,14 @@ export function PatientSelect() {
         <AdminPage.Title hasBorder>
           <p className="text-4xl font-semibold text-sky-600">Select a Patient</p>
         </AdminPage.Title>
-        <form className="flex w-full max-w-sm items-center space-x-2 pt-8" onSubmit={handleSubmit} autoComplete="on">
+        <form className="grid grid-cols-1 gap-4 pt-8 md:grid-cols-2" onSubmit={handleSubmit} autoComplete="on">
           <Input
             id="patientNumber"
             placeholder="Patient Number"
             onChange={handleInputChange}
             onKeyUp={handleInputKeyUp}
           />
-          <Button type="submit" icon={faPaperPlane} disabled={input.trim() === ''}>
+          <Button type="submit" icon={faPaperPlane} disabled={input.trim() === ''} className="md:w-min">
             Submit
           </Button>
         </form>

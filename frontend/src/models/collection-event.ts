@@ -1,20 +1,12 @@
 import { z } from 'zod';
-import { commentSchema } from './comment';
+import { annotationSchema } from './annotation';
 import { domainEntitySchema } from './domain-entity';
 import { sourceSpecimenSchema } from './specimen';
 import { Status } from './status';
 
-/**
- *
- */
-export const eventAttributeSchema = z.object({
-  name: z.string(),
-  value: z.string()
-});
-
 export const collectionEventBriefSchema = domainEntitySchema.extend({
   id: z.number(),
-  createdAt: z.union([z.null(), z.string().pipe(z.coerce.date())]),
+  createdAt: z.union([z.null(), z.string().pipe(z.coerce.date())]).optional(),
   visitNumber: z.number(),
   specimenCount: z.number(),
   aliquotCount: z.number(),
@@ -29,10 +21,12 @@ export const collectionEventSchema = domainEntitySchema.extend({
   studyId: z.number(),
   studyNameShort: z.string(),
   status: z.nativeEnum(Status),
-  attributes: z.array(eventAttributeSchema),
-  comments: z.array(commentSchema),
+  commentCount: z.number(),
+  annotations: z.array(annotationSchema),
   sourceSpecimens: z.array(sourceSpecimenSchema)
 });
 
 export type CollectionEventBrief = z.infer<typeof collectionEventBriefSchema>;
 export type CollectionEvent = z.infer<typeof collectionEventSchema>;
+
+export type CollectionEventAdd = Pick<CollectionEvent, 'visitNumber'>;

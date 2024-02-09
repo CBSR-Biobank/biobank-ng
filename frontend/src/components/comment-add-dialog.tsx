@@ -4,13 +4,25 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { EntityAddDialog } from './entity-add-dialog';
 
-const schema = z.object({
-  message: z.string()
-});
+const schema = z
+  .object({
+    message: z.string()
+  })
+  .superRefine((data, ctx) => {
+    if (!data.message || data.message.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom
+        // path not assigned here since an error message would be displayed if the cancel button is pressed
+      });
+    }
+  });
 
 export type FormInputs = z.infer<typeof schema>;
 
-export const CommentAddDialog: React.FC<{ onSubmit: (newComment: string) => void }> = ({ onSubmit }) => {
+export const CommentAddDialog: React.FC<{ title?: string; onSubmit: (newComment: string) => void }> = ({
+  title,
+  onSubmit
+}) => {
   const {
     register,
     getValues,
@@ -33,14 +45,19 @@ export const CommentAddDialog: React.FC<{ onSubmit: (newComment: string) => void
     reset();
   };
 
+  const handleCancel = () => {
+    reset();
+  };
+
   return (
     <EntityAddDialog
-      title="Patient"
+      title={title ?? 'Entity'}
       message="Add a comment"
       buttonLabel="Add Comment"
       buttonIcon={faComment}
       okButtonEnabled={isValid}
       onOk={handleSubmit}
+      onCancel={handleCancel}
     >
       <form>
         <div className="grid grid-cols-1 gap-6">

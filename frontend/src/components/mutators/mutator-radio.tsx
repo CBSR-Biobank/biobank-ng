@@ -1,24 +1,18 @@
+import { DialogClose, DialogFooter } from '@app/components/ui/dialog';
 import { cn } from '@app/utils';
 import { useState } from 'react';
+import { CancelButton } from '../cancel-button';
+import { OkButton } from '../ok-button';
 import { Label } from '../ui/label';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { MutatorProps, PropertyOption } from './mutator';
-import { MutatorDialog } from './mutator-dialog';
 
-export function MutatorRadio({
-  propertyName,
-  title,
-  label,
-  value,
-  open,
-  onClose,
-  propertyOptions
-}: MutatorProps<unknown>) {
+export function MutatorRadio<T>({ label, value, onClose, propertyOptions }: MutatorProps<T>) {
   const selectedOption = propertyOptions?.find((option) => option.id === value);
-  const [input, setInput] = useState<PropertyOption<unknown> | undefined>(selectedOption);
+  const [input, setInput] = useState<PropertyOption<T> | undefined>(selectedOption);
 
   const handleChange = (newValue: string) => {
-    const opt = propertyOptions?.find((option) => option.id === newValue);
+    const opt = propertyOptions?.find((option) => `${option.id}` === newValue);
     if (!opt) {
       throw new Error('could not assign value from selection');
     }
@@ -26,34 +20,32 @@ export function MutatorRadio({
   };
 
   const handleOk = () => {
-    onClose('ok', propertyName, input?.id as string);
+    onClose(input?.id);
   };
 
-  const handleCancel = () => {
-    onClose('cancel', propertyName, undefined);
-  };
+  const defaultValue = propertyOptions?.find((opt) => opt.id === value);
 
   return (
-    <MutatorDialog
-      title={title}
-      required={false}
-      open={open}
-      size="md"
-      onOk={handleOk}
-      onCancel={handleCancel}
-      valid={!!input}
-    >
+    <>
       <p className={cn('text-sm font-semibold text-gray-500')}>{label}</p>
-      <RadioGroup defaultValue={value as string} onValueChange={handleChange}>
+      <RadioGroup defaultValue={`${defaultValue?.id}`} onValueChange={handleChange}>
         {(propertyOptions || []).map((option) => (
-          <div key={option.id as string} className="flex items-center space-x-2">
-            <RadioGroupItem value={option.id as string} className="border-primary-300 border-2" />
-            <Label htmlFor={option.id as string} className="text-md py-1">
+          <div key={`${option.id}`} className="flex items-center space-x-2">
+            <RadioGroupItem value={`${option.id}`} className="border-primary-300 border-2" />
+            <Label htmlFor={`${option.id}`} className="text-md py-1">
               {option.label}
             </Label>
           </div>
         ))}
       </RadioGroup>
-    </MutatorDialog>
+      <DialogFooter className="grid-cols-1 gap-3 lg:grid-cols-2">
+        <DialogClose asChild>
+          <CancelButton />
+        </DialogClose>
+        <DialogClose asChild>
+          <OkButton onClick={handleOk} />
+        </DialogClose>
+      </DialogFooter>
+    </>
   );
 }

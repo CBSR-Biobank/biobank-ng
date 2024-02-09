@@ -1,65 +1,87 @@
-import { PatientApi } from '@app/api/patient-api';
 import { CircularProgress } from '@app/components/circular-progress';
-import { EntityProperty } from '@app/components/entity-property';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@app/components/ui/collapsible';
-import { CommentAdd } from '@app/models/comment';
+import { usePatientCollectionEventAdd, usePatientCommentAdd, usePatientUpdate } from '@app/hooks/use-patient';
+import { PatientUpdate, takenVisitNumbers } from '@app/models/patient';
 import { AdminPage } from '@app/pages/admin-page';
 import { CollectionEventTable } from '@app/pages/collection-events/collection-event-table';
 import { usePatientStore } from '@app/store';
 import { cn } from '@app/utils';
-import { faChevronRight, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BackButton } from '../back-button';
 import { CommentAddDialog } from '../comment-add-dialog';
+import { EntityProperty } from '../entity-property';
+import { MutatorDialog } from '../mutators/mutator-dialog';
+import { MutatorText } from '../mutators/mutator-text';
+import { MutatorStudy } from '../studies/mutator-study';
 import { Button } from '../ui/button';
 import { PatientComments } from './patient-comments';
-import { PatientMutator } from './patient-mutator';
+import { VisitAddDialog } from './visit-add-dialog';
 
 export function PatientDetails() {
   const navigate = useNavigate();
-  const { patient, setCollectionEvent } = usePatientStore();
-  const [propertyToUpdate, setPropertyToUpdate] = useState<string | null>(null);
-  const [mutatorOpen, setMutatorOpen] = useState(false);
+  const { patient } = usePatientStore();
+  const collectionEventAddMutation = usePatientCollectionEventAdd();
+  const commentAddMutation = usePatientCommentAdd();
   const [commentsSectionIsOpen, setCommentsSectionIsOpen] = useState(false);
-
-  const queryClient = useQueryClient();
-  const addComment = useMutation(
-    (newComment: CommentAdd) => {
-      if (!patient) {
-        return Promise.reject();
-      }
-
-      return PatientApi.addComment(patient, newComment);
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['patients', patient?.pnumber]);
-      }
-    }
-  );
-
-  useEffect(() => {
-    setCollectionEvent(undefined);
-  }, []);
-
-  const handlePropChange = (propertyName: string) => {
-    setPropertyToUpdate(propertyName);
-    setMutatorOpen(true);
-  };
-
-  const handleUpdate = () => {
-    setMutatorOpen(false);
-  };
+  const updatePatientMutation = usePatientUpdate();
 
   const backClicked = () => {
     navigate('/patients');
   };
 
-  const handleCommentAdded = (newComment: string) => {
-    addComment.mutate({ message: newComment });
+  const handleVisitAdd = (newVisitNumber: number) => {
+    collectionEventAddMutation.mutate(
+      { visitNumber: newVisitNumber },
+      {
+        onSuccess: () => {
+          navigate(`${newVisitNumber}`);
+        }
+      }
+    );
+  };
+
+  const handleCommentAdd = (newComment: string) => {
+    if (newComment.trim().length <= 0) {
+      throw new Error('comment is empty');
+    }
+    commentAddMutation.mutate({ message: newComment });
+  };
+
+  const handleUpdate = (updated: PatientUpdate) => {
+    if (!patient) {
+      throw new Error('patient is invalid');
+    }
+
+    updatePatientMutation.mutate(updated, {
+      onSuccess: (updated) => {
+        if (updated.pnumber != patient.pnumber) {
+          navigate(`../${updated.pnumber}`);
+        }
+      }
+    });
+  };
+
+  const handlePnumberUpdated = (value?: string) => {
+    if (!value) {
+      throw new Error('new pnumber value is invalid');
+    }
+    if (!patient) {
+      throw new Error('patient is invalid');
+    }
+    handleUpdate({ pnumber: value, studyNameShort: patient.studyNameShort });
+  };
+
+  const handleStudyUpdated = (value?: string) => {
+    if (!value) {
+      throw new Error('new study name short value is invalid');
+    }
+    if (!patient) {
+      throw new Error('patient is invalid');
+    }
+    handleUpdate({ pnumber: patient.pnumber, studyNameShort: value });
   };
 
   if (!patient) {
@@ -75,11 +97,34 @@ export function PatientDetails() {
 
       <div className="bg-basic-100 border-top flex flex-col gap-8 rounded-md drop-shadow-md">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <EntityProperty propName="pnumber" label="Patient Number" allowChanges handleChange={handlePropChange}>
+          <EntityProperty
+            propName="pnumber"
+            label="Patient Number"
+            allowChanges={false}
+            mutator={
+              <MutatorDialog title="Update Patient">
+                <MutatorText
+                  label="Patient Number"
+                  value={patient.pnumber}
+                  required
+                  maxlen={80}
+                  onClose={handlePnumberUpdated}
+                />
+              </MutatorDialog>
+            }
+          >
             {patient.pnumber}
           </EntityProperty>
 
-          <EntityProperty propName="studyNameShort" label="Study" allowChanges handleChange={handlePropChange}>
+          <EntityProperty
+            propName="studyNameShort"
+            label="Study"
+            mutator={
+              <MutatorDialog title="Update Patient">
+                <MutatorStudy label="Study" value={patient.studyNameShort} required onClose={handleStudyUpdated} />
+              </MutatorDialog>
+            }
+          >
             {patient.studyNameShort}
           </EntityProperty>
         </div>
@@ -118,17 +163,11 @@ export function PatientDetails() {
 
         <CollectionEventTable collectionEvents={patient.collectionEvents} />
       </div>
-      <div className="flex gap-4 pt-8">
-        <BackButton onClick={backClicked} />
-        <Button variant="secondary" icon={faPlusCircle}>
-          Add Visit
-        </Button>
-        <CommentAddDialog onSubmit={handleCommentAdded} />
+      <div className="flex flex-col gap-3 pt-8 md:w-max md:flex-row">
+        <BackButton onClick={backClicked} className="md:w-min" />
+        <VisitAddDialog disallow={takenVisitNumbers(patient)} onSubmit={handleVisitAdd} />
+        <CommentAddDialog onSubmit={handleCommentAdd} />
       </div>
-
-      {mutatorOpen && propertyToUpdate && (
-        <PatientMutator patient={patient} propertyToUpdate={propertyToUpdate} onClose={handleUpdate} />
-      )}
     </AdminPage>
   );
 }
