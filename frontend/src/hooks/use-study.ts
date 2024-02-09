@@ -31,3 +31,18 @@ export function useStudyAnnotationTypes(nameshort: string) {
     error: query.error
   };
 }
+
+export function useStudySourceSpecimenTypes(nameshort: string) {
+  const query = useQuery({
+    queryKey: ['studies', nameshort, 'source-specimen-types'],
+    queryFn: async () => StudyApi.sourceSpecimenTypes(nameshort),
+    placeholderData: keepPreviousData
+  });
+
+  return {
+    sourceSpecimenTypes: query.data,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    error: query.error
+  };
+}

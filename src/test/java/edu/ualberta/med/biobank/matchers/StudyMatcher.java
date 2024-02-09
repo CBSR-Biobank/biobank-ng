@@ -4,10 +4,12 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hobsoft.hamcrest.compose.ComposeMatchers.compose;
 import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
-
+import edu.ualberta.med.biobank.domain.SourceSpecimen;
+import edu.ualberta.med.biobank.domain.SpecimenType;
 import edu.ualberta.med.biobank.domain.Study;
 import edu.ualberta.med.biobank.domain.StudyEventAttr;
 import edu.ualberta.med.biobank.dtos.AnnotationTypeDTO;
+import edu.ualberta.med.biobank.dtos.SourceSpecimenTypeDTO;
 import edu.ualberta.med.biobank.dtos.StudyDTO;
 import edu.ualberta.med.biobank.dtos.StudyNameDTO;
 import java.util.ArrayList;
@@ -76,6 +78,29 @@ public class StudyMatcher {
         List<Matcher<? super AnnotationTypeDTO>> matchers = new ArrayList<Matcher<? super AnnotationTypeDTO>>();
         for (StudyEventAttr attr : study.getStudyEventAttrs()) {
             matchers.add(matchesAnnotationType(attr));
+        }
+        return Matchers.contains(matchers);
+    }
+
+    public static Matcher<SourceSpecimenTypeDTO> matchesSourceSpecimenType(SourceSpecimen expected) {
+        var matchers = compose(
+            "an source specimen type with",
+            hasFeature(
+                "name",
+                SourceSpecimenTypeDTO::name,
+                equalTo(expected.getSpecimenType().getName())
+            )
+        )
+            .and(hasFeature("nameShort", SourceSpecimenTypeDTO::nameShort, equalTo(expected.getSpecimenType().getNameShort())))
+            .and(hasFeature("needOriginalVolume", SourceSpecimenTypeDTO::needOriginalVolume, equalTo(expected.getNeedOriginalVolume())));
+        return matchers;
+    }
+
+    // see https://stackoverflow.com/a/27590279
+    public static Matcher<Iterable<? extends SourceSpecimenTypeDTO>> containsSourceSpecimenTypes(Study study) {
+        List<Matcher<? super SourceSpecimenTypeDTO>> matchers = new ArrayList<Matcher<? super SourceSpecimenTypeDTO>>();
+        for (SourceSpecimen source : study.getSourceSpecimens()) {
+            matchers.add(matchesSourceSpecimenType(source));
         }
         return Matchers.contains(matchers);
     }

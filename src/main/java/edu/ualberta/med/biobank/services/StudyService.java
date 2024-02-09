@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.domain.Study;
 import edu.ualberta.med.biobank.dtos.AnnotationTypeDTO;
+import edu.ualberta.med.biobank.dtos.SourceSpecimenTypeDTO;
 import edu.ualberta.med.biobank.dtos.StudyDTO;
 import edu.ualberta.med.biobank.dtos.StudyNameDTO;
 import edu.ualberta.med.biobank.errors.AppError;
@@ -152,12 +153,29 @@ public class StudyService {
                 return statusStringsToIds(stringStatuses);
             })
             .flatMap(statusIds -> {
-                Collection<Tuple> attributeTypes = studyRepository.listStudyAttributes(nameshort, statusIds, Tuple.class);
-                if (attributeTypes.isEmpty()) {
-                    return Either.left(new EntityNotFound("attribute types not found"));
+                Collection<Tuple> attributeTypes = studyRepository.listAttributes(nameshort, statusIds, Tuple.class);
+                var dtos = attributeTypes.stream().map(s -> AnnotationTypeDTO.fromTuple(s)).toList();
+                return Either.right(dtos);
+            });
+    }
+
+    public Either<AppError, List<SourceSpecimenTypeDTO>> sourceSpecimens(String nameshort) {
+        var found = studyRepository.findByNameShort(nameshort, Tuple.class).stream().findFirst();
+
+        if (found.isEmpty()) {
+            return Either.left(new EntityNotFound("study"));
+        }
+
+        var study = StudyDTO.fromTuple(found.get());
+        return new StudyReadPermission(study.id())
+            .isAllowed()
+            .flatMap(allowed -> {
+                if (!allowed) {
+                    return Either.left(new PermissionError("study read permission"));
                 }
 
-                var dtos = attributeTypes.stream().map(s -> AnnotationTypeDTO.fromTuple(s)).toList();
+                Collection<Tuple> sourceSpecimenTypes = studyRepository.listSourceSpecimens(nameshort, Tuple.class);
+                var dtos = sourceSpecimenTypes.stream().map(s -> SourceSpecimenTypeDTO.fromTuple(s)).toList();
                 return Either.right(dtos);
             });
     }

@@ -1,25 +1,30 @@
 import { DialogClose, DialogFooter } from '@app/components/ui/dialog';
-import { useStudyNames } from '@app/hooks/use-study';
+import { useStudySourceSpecimenTypes } from '@app/hooks/use-study';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { CancelButton } from '../cancel-button';
 import { CircularProgress } from '../circular-progress';
-import { StudySelect } from '../forms/study-select';
+import { SourceSpecimenTypeSelect } from '../forms/source-specimen-type-select';
 import { MutatorProps } from '../mutators/mutator';
 import { OkButton } from '../ok-button';
 
 const requiredSchema = z.object({
-  studyNameShort: z.string()
+  nameShort: z.string()
 });
 
 const optionalSchema = z.object({
-  studyNameShort: z.string().or(z.literal(''))
+  nameShort: z.string().or(z.literal(''))
 });
 
-export function MutatorStudy({ value, required, onClose }: MutatorProps<string>) {
+export const MutatorSourceSpecimenType: React.FC<MutatorProps<string> & { studyNameShort: string }> = ({
+  studyNameShort,
+  value,
+  required,
+  onClose
+}) => {
   const schema = required ? requiredSchema : optionalSchema;
-  const studyNamesQuery = useStudyNames();
+  const query = useStudySourceSpecimenTypes(studyNameShort);
 
   const {
     control,
@@ -31,7 +36,7 @@ export function MutatorStudy({ value, required, onClose }: MutatorProps<string>)
     mode: 'all',
     reValidateMode: 'onChange',
     defaultValues: {
-      studyNameShort: value ?? ''
+      nameShort: value ?? ''
     }
   });
 
@@ -40,18 +45,18 @@ export function MutatorStudy({ value, required, onClose }: MutatorProps<string>)
   };
 
   const handleOk = () => {
-    const value = getValues().studyNameShort;
+    const value = getValues().nameShort;
     onClose(value ?? null);
   };
 
-  if (studyNamesQuery.isLoading || !studyNamesQuery.studyNames) {
+  if (query.isLoading || !query.sourceSpecimenTypes) {
     return <CircularProgress />;
   }
 
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <StudySelect control={control} name="studyNameShort" studies={studyNamesQuery.studyNames} />
+        <SourceSpecimenTypeSelect control={control} name="nameShort" specimenTypes={query.sourceSpecimenTypes} />
       </form>
       <DialogFooter className="grid-cols-1 gap-3 lg:grid-cols-2">
         <DialogClose asChild>
@@ -63,4 +68,4 @@ export function MutatorStudy({ value, required, onClose }: MutatorProps<string>)
       </DialogFooter>
     </>
   );
-}
+};

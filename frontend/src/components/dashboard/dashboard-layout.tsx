@@ -1,9 +1,11 @@
+import { fetchAuthenticated } from '@app/api/api';
+import { userSchema } from '@app/models/user';
 import { useUserStore } from '@app/store';
 import { cn } from '@app/utils';
 import { Button } from '@components/ui/button';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
-import { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { ReactNode, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { DashboardDrawer } from './dashboard-drawer';
 import { UserMenu } from './user-menu';
 
@@ -11,7 +13,31 @@ const logoClasses =
   'p-2 text-white transition duration-150 ease-in-out hover:rounded-md active:bg-primary-300 bg-gray-700 hover:bg-gray-600';
 
 export const DashboardLayout: React.FC<{ children?: ReactNode }> = ({ children }) => {
-  const { isDrawerOpen, setDrawerOpen, checkingAuth, loggedIn } = useUserStore();
+  const navigate = useNavigate();
+  const { isDrawerOpen, setDrawerOpen, checkingAuth, loggedIn, user, setCheckingAuth, setLoggedIn, setUser } =
+    useUserStore();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setCheckingAuth(true);
+      setLoggedIn(false);
+
+      try {
+        const result = await fetchAuthenticated();
+        setCheckingAuth(false);
+
+        if (result.username) {
+          setLoggedIn(true);
+          setUser(userSchema.parse({ ...user, ...result }));
+        } else {
+          navigate('/login');
+        }
+      } catch (e) {
+        // do nothing
+      }
+    };
+    fetchData();
+  }, []);
 
   const toggleDrawer = () => {
     setDrawerOpen(!isDrawerOpen);

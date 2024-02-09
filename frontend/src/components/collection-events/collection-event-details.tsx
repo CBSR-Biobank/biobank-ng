@@ -42,6 +42,7 @@ import { faChevronRight, faTrash, faTriangleExclamation } from '@fortawesome/fre
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SourceSpecimenAddDialog } from '../specimens/source-specimen-add-dialog';
 
 function DeleteNotAllowed() {
   return (
@@ -111,6 +112,8 @@ const Buttons: React.FC<{ collectionEvent: CollectionEvent }> = ({ collectionEve
   const deleteMutation = useCollectionEventDelete();
   const deleteAllowed = collectionEvent.sourceSpecimens.length <= 0;
 
+  // TODO: add mutation to add a source specimen
+
   const backClicked = () => {
     navigate('..');
   };
@@ -146,6 +149,11 @@ const Buttons: React.FC<{ collectionEvent: CollectionEvent }> = ({ collectionEve
       ) : (
         <DeleteNotAllowed />
       )}
+      <SourceSpecimenAddDialog
+        studyNameShort={collectionEvent.studyNameShort}
+        title="Visit"
+        onSubmit={() => console.log('here')}
+      />
       <CommentAddDialog title="Visit" onSubmit={handleCommentAdded} />
     </div>
   );
@@ -268,7 +276,7 @@ export const CollectionEventDetails: React.FC<{ patient: Patient; vnumber: numbe
             propName="status"
             label="Status"
             mutator={
-              <MutatorDialog title="Update Patient">
+              <MutatorDialog title="Update Visit">
                 <MutatorStatus label="Status" value={collectionEvent.status} onClose={handleStatusUpdated} required />
               </MutatorDialog>
             }

@@ -1,4 +1,71 @@
 #+title: Biobank-NG API Testing
+#+PROPERTY: header-args :engine mysql :database biobank :dbuser root :dbpassword root :cmdline --protocol=tcp :results replace
+
+* Study
+** Source Specimens
+
+#+begin_src sql
+SET @study_name_short := 'QPCS';
+
+select
+    ss.id,
+    stype.name,
+    stype.name_short,
+    ss.need_original_volume
+from source_specimen ss
+left join study on study.id = ss.STUDY_ID
+left join specimen_type stype on stype.id=ss.specimen_type_id
+where study.name_short = @study_name_short
+order by stype.name
+#+end_src
+
+#+RESULTS:
+|  id | name                        | name_short                  | need_original_volume |
+|-----+-----------------------------+-----------------------------+----------------------|
+| 152 | 10mL lavender top EDTA tube | 10mL lavender top EDTA tube |                    1 |
+| 147 | 10ml yellow top ACD tube    | 10ml yellow top ACD tube    |                    1 |
+| 146 | 2ml saliva DNA tube         | 2ml saliva DNA tube         |                    1 |
+| 153 | 4ml lavender top EDTA tube  | 4ml lavender top EDTA tube  |                    1 |
+| 162 | 6ml red top tube (serum)    | 6ml red top tube (serum)    |                    1 |
+| 167 | DNA (Lymphocytes)           | DNA (Lymphocytes)           |                    0 |
+| 166 | DNA (White blood cells)     | DNA (WBC)                   |                    0 |
+| 176 | F1 xeno                     | F1 xeno                     |                    1 |
+| 177 | F2 xeno                     | F2 xeno                     |                    1 |
+| 178 | F3 xeno                     | F3 xeno                     |                    0 |
+| 154 | Lymphocytes                 | Lymphocytes                 |                    0 |
+| 145 | Paraffin block pancreas     | Paraffin block pancreas     |                    0 |
+| 171 | PC normal                   | PC normal                   |                    0 |
+| 179 | PC normal FF                | PC normal FF                |                    0 |
+| 163 | PC tumour                   | PC tumour                   |                    0 |
+| 148 | White blood cells           | White blood cells           |                    1 |
+
+** Attributes
+*** Query
+
+#+begin_src sql
+SET @study_name_short := 'QPCS';
+select
+    st.id st_id,
+    sattr.id sattr_id,
+    gattr.id gattr_id,
+    gattr.label,
+    atype.name,
+    sattr.permissible
+from study_event_attr sattr
+left join global_event_attr gattr on gattr.id = sattr.global_event_attr_id
+left join event_attr_type atype on atype.id = gattr.event_attr_type_id
+left join study st on st.id = sattr.STUDY_ID
+where st.name_short = @study_name_short;
+#+end_src
+
+#+RESULTS:
+| st_id | sattr_id | gattr_id | label        | name            | permissible                                                                                                              |
+|-------+----------+----------+--------------+-----------------+--------------------------------------------------------------------------------------------------------------------------|
+|    31 |       56 |        4 | Phlebotomist | text            | NULL                                                                                                                     |
+|    31 |       57 |        3 | Consent      | select_multiple | Consented;Not consented;Pending consent                                                                                  |
+|    31 |       62 |        5 | Visit Type   | select_single   | Clinic;JGH;Other;RVH A2;RVH O.R.;RVH S9;RVH ward                                                                         |
+|    31 |       63 |        7 | Patient Type | select_single   | Biopsy diag;Cancer TBA;Collangial carcinoma;Control family;IPMN;Liver met;Not diagnosed;PC case;PNET;Path report pending |
+
 
 * Collection Events
 :PROPERTIES:
@@ -28,32 +95,6 @@ http --ignore-stdin \
 | {"id":58475 | vnumber:3 | status:"Active" | patientId:27307 | pnumber:"2016-0120" | studyId:31 | studyNameShort:"QPCS" | commentCount:0 | annotations:[{"type":"text" | name:"Phlebotomist" | value:"test"} | {"type":"select_multiple" | name:"Consent" | value:"Consented"} | {"type":"select_single" | name:"Visit Type" | value:"Clinic"} | {"type":"select_single" | name:"Patient Type" | value:"PNET"}] | sourceSpecimens:[]} |
 
 *** Query
-:PROPERTIES:
-:header-args: :engine mysql :database biobank :dbuser root :dbpassword root :cmdline --protocol=tcp :results replace
-:END:
-
-#+begin_src sql
-select
-    st.id st_id,
-    sattr.id sattr_id,
-    gattr.id gattr_id,
-    gattr.label,
-    atype.name,
-    sattr.permissible
-from study_event_attr sattr
-left join global_event_attr gattr on gattr.id = sattr.global_event_attr_id
-left join event_attr_type atype on atype.id = gattr.event_attr_type_id
-left join study st on st.id = sattr.STUDY_ID
-where st.name_short='QPCS';
-#+end_src
-
-#+RESULTS:
-| st_id | sattr_id | gattr_id | label        | name            | permissible                                                                                                              |
-|-------+----------+----------+--------------+-----------------+--------------------------------------------------------------------------------------------------------------------------|
-|    31 |       56 |        4 | Phlebotomist | text            | NULL                                                                                                                     |
-|    31 |       57 |        3 | Consent      | select_multiple | Consented;Not consented;Pending consent                                                                                  |
-|    31 |       62 |        5 | Visit Type   | select_single   | Clinic;JGH;Other;RVH A2;RVH O.R.;RVH S9;RVH ward                                                                         |
-|    31 |       63 |        7 | Patient Type | select_single   | Biopsy diag;Cancer TBA;Collangial carcinoma;Control family;IPMN;Liver met;Not diagnosed;PC case;PNET;Path report pending |
 
 #+begin_src sql
 SET @pnumber := '2016-0120';

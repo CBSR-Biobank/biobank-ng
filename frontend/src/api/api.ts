@@ -131,6 +131,13 @@ type StudyAnnotationTypes = {
   body: undefined;
 };
 
+type SourceSpecimenTypes = {
+  method: 'GET';
+  path: ['studies', string, 'source-specimen-types'];
+  query: undefined;
+  body: undefined;
+};
+
 export type Endpoint =
   | Auth
   | Logging
@@ -149,7 +156,8 @@ export type Endpoint =
   | CollectionEventAddComment
   | AliquotsGet
   | StudyNames
-  | StudyAnnotationTypes;
+  | StudyAnnotationTypes
+  | SourceSpecimenTypes;
 
 export type ApiError = {
   status: number;
@@ -245,9 +253,15 @@ async function handleServerResponse(response: Response) {
       useUserStore.getState().setUserToken(null);
     }
 
-    let error = await response.json();
+    let err: ApiError;
+    let body = await response.text();
+    if (body === '') {
+      err = { status: response.status, error: undefined };
+    } else {
+      const json = body === '' ? {} : JSON.parse(body);
+      err = { status: response.status, error: json };
+    }
 
-    const err: ApiError = { status: response.status, error };
     console.error(err);
     throw err;
   }

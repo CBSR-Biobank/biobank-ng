@@ -43,7 +43,7 @@ export function StudySelect<T extends FieldValues, U extends FieldPathByValue<T,
           </span>
         </PopoverTrigger>
         <PopoverContent className="w-full overflow-y-auto bg-gray-100 p-2" asChild align="start">
-          <ScrollArea className="w-full p-2 text-gray-700 md:h-[250px]">
+          <ScrollArea className="w-full p-2 text-gray-700 md:h-[450px]">
             <Command>
               <CommandInput placeholder="Search..." className="m-1" />
               <CommandEmpty className="bg-warning-600 text-basic-100 ml-5 mt-5 rounded-md px-3 py-2">

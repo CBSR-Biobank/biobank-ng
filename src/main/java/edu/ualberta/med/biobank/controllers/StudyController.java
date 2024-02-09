@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import edu.ualberta.med.biobank.dtos.AnnotationTypeDTO;
+import edu.ualberta.med.biobank.dtos.SourceSpecimenTypeDTO;
 import edu.ualberta.med.biobank.dtos.StudyDTO;
 import edu.ualberta.med.biobank.dtos.StudyNameDTO;
 import edu.ualberta.med.biobank.exception.AppErrorException;
@@ -61,6 +62,14 @@ public class StudyController {
     public List<AnnotationTypeDTO> annotationTypes(@PathVariable String nameshort, @RequestParam(required = false) String[] status) {
         return studyService
             .annotationTypes(nameshort, status)
+            .orElseThrow(err -> new AppErrorException(err));
+    }
+
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @GetMapping("/{nameshort}/source-specimen-types")
+    public List<SourceSpecimenTypeDTO> sourceSpecimens(@PathVariable String nameshort) {
+        return studyService
+            .sourceSpecimens(nameshort)
             .orElseThrow(err -> new AppErrorException(err));
     }
 }

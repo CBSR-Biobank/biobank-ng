@@ -61,7 +61,7 @@ export function Login() {
 
   return (
     <DashboardLayout>
-      <AdminPage className="grid justify-items-center gap-8">
+      <AdminPage className="grid justify-items-center gap-8 pb-20">
         <AdminPage.Title>Login</AdminPage.Title>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-1 gap-6 sm:w-[450px]">

@@ -2,10 +2,13 @@ package edu.ualberta.med.biobank.test.fixtures;
 
 import edu.ualberta.med.biobank.domain.EventAttrType;
 import edu.ualberta.med.biobank.domain.GlobalEventAttr;
+import edu.ualberta.med.biobank.domain.SourceSpecimen;
+import edu.ualberta.med.biobank.domain.SpecimenType;
 import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.domain.Study;
 import edu.ualberta.med.biobank.domain.StudyEventAttr;
 import edu.ualberta.med.biobank.dtos.AnnotationTypeDTO;
+import edu.ualberta.med.biobank.dtos.SourceSpecimenTypeDTO;
 import edu.ualberta.med.biobank.test.Factory;
 import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
@@ -15,10 +18,13 @@ public final class StudyFixtureBuilder {
 
     private List<StudyEventAttr> attributeTypes;
 
+    private List<SourceSpecimen> sourceSpecimenTypes;
+
     private EntityManager em;
 
     public StudyFixtureBuilder() {
         this.attributeTypes = new ArrayList<>();
+        this.sourceSpecimenTypes = new ArrayList<>();
         this.em = null;
     }
 
@@ -90,6 +96,27 @@ public final class StudyFixtureBuilder {
         return withAttributeType(dto.type(), dto.label(), dto.status(), dto.required(), dto.validValues());
     }
 
+    public StudyFixtureBuilder withSourceSpecimenType(
+        String name,
+        String nameShort,
+        boolean needOriginalVolume
+    ) {
+        SpecimenType type = new SpecimenType();
+        type.setName(name);
+        type.setNameShort(nameShort);
+
+        SourceSpecimen source = new SourceSpecimen();
+        source.setSpecimenType(type);
+        source.setNeedOriginalVolume(needOriginalVolume);
+
+        sourceSpecimenTypes.add(source);
+        return this;
+    }
+
+    public StudyFixtureBuilder withSourceSpecimenType(SourceSpecimenTypeDTO dto) {
+        return withSourceSpecimenType(dto.name(), dto.nameShort(), dto.needOriginalVolume());
+    }
+
     public Study build(Factory factory) {
         if (em == null) {
             throw new RuntimeException("entity manager not set");
@@ -105,6 +132,15 @@ public final class StudyFixtureBuilder {
                 em.persist(attrType);
             });
         study.getStudyEventAttrs().addAll(attributeTypes);
+
+        sourceSpecimenTypes
+            .stream()
+            .forEach(sourceType -> {
+                sourceType.setStudy(study);
+                em.persist(sourceType.getSpecimenType());
+                em.persist(sourceType);
+            });
+        study.getSourceSpecimens().addAll(sourceSpecimenTypes);
         em.flush();
         return study;
     }

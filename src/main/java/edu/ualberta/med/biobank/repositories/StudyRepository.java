@@ -103,5 +103,22 @@ public interface StudyRepository extends JpaRepository<Study, Integer> {
         """,
         nativeQuery = true
     )
-    <T> Collection<T> listStudyAttributes(String nameshort, Set<Integer> statusValues, Class<T> type);
+    <T> Collection<T> listAttributes(String nameshort, Set<Integer> statusValues, Class<T> type);
+
+    @Query(
+        value = """
+        select
+            ss.id,
+            stype.name,
+            stype.name_short nameShort,
+            ss.need_original_volume needOriginalVolume
+        from source_specimen ss
+        left join study on study.id = ss.STUDY_ID
+        left join specimen_type stype on stype.id=ss.specimen_type_id
+        where study.name_short = :nameshort
+        order by stype.name
+        """,
+        nativeQuery = true
+    )
+    <T> Collection<T> listSourceSpecimens(String nameshort, Class<T> type);
 }

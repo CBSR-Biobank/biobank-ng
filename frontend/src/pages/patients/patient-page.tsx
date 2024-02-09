@@ -19,6 +19,7 @@ const PatientPageInternal: React.FC<{ pnumber: string }> = ({ pnumber }) => {
         return <ShowError message="You do not have the privileges to view this patient" />;
       }
     }
+    console.log(error);
     return <ShowError error={error} />;
   }
 
