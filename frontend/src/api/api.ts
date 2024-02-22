@@ -171,7 +171,7 @@ export async function httpClient(endpoint: Endpoint) {
   const headers = {
     Authorization: 'Bearer ' + useUserStore.getState().userToken,
     credentials: 'include',
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
   };
 
   let url = `/api/${path}`;
@@ -189,9 +189,9 @@ export async function httpClient(endpoint: Endpoint) {
 export async function login(username: string, password: string) {
   const response = await fetch('/api/token', {
     headers: {
-      authorization: 'Basic ' + window.btoa(username + ':' + password)
+      authorization: 'Basic ' + window.btoa(username + ':' + password),
     },
-    method: 'POST'
+    method: 'POST',
   });
 
   if (!response.ok) {
@@ -200,7 +200,7 @@ export async function login(username: string, password: string) {
     }
     const err: ApiError = {
       status: response.status,
-      error: response.status === 401 ? 'unauthrorized' : 'unknown'
+      error: response.status === 401 ? 'unauthrorized' : 'unknown',
     };
     console.error(err);
     throw err;
@@ -219,7 +219,7 @@ export async function fetchAuthenticated() {
     method: 'GET',
     path: ['auth'],
     body: undefined,
-    query: undefined
+    query: undefined,
   });
 
   if (!response.ok) {
@@ -240,8 +240,8 @@ export async function fetchApiFileUpload(route: string, file: File) {
     body: data,
     headers: {
       Authorization: 'Bearer ' + useUserStore.getState().userToken,
-      credentials: 'include'
-    }
+      credentials: 'include',
+    },
   });
 
   return handleServerResponse(response);

@@ -3,6 +3,7 @@ import { CollectionEventApi } from '@app/api/collection-event-api';
 import { CollectionEventAdd, CollectionEventUpdate } from '@app/models/collection-event';
 import { CommentAdd } from '@app/models/comment';
 import { usePatientStore } from '@app/store';
+
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
@@ -11,7 +12,7 @@ export function useCollectionEvent(pnumber: string, vnumber: number) {
   const query = useQuery({
     queryKey: ['patients', pnumber, 'collection-events', vnumber],
     queryFn: async () => CollectionEventApi.getCollectionEvent(pnumber, vnumber),
-    retry: (count, error: ApiError) => count <= 3 && error.status !== 404
+    retry: (count, error: ApiError) => count <= 3 && error.status !== 404,
   });
   const { data: collectionEvent } = query;
 
@@ -25,7 +26,7 @@ export function useCollectionEvent(pnumber: string, vnumber: number) {
     collectionEvent,
     isLoading: query.isLoading,
     isError: query.isError,
-    error: query.error
+    error: query.error,
   };
 }
 
@@ -33,7 +34,7 @@ export function useCollectionEventComments(pnumber: string, vnumber: number) {
   return useQuery({
     queryKey: ['patients', pnumber, 'collection-events', vnumber, 'comments'],
     queryFn: async () => CollectionEventApi.getComments(pnumber, vnumber),
-    retry: (count, error: ApiError) => count <= 3 && error.status !== 404 && error.status !== 400
+    retry: (count, error: ApiError) => count <= 3 && error.status !== 404 && error.status !== 400,
   });
 }
 
@@ -45,7 +46,7 @@ export function useCollectionEventAdd() {
       CollectionEventApi.add(pnumber, newVisit),
     onSuccess: (_data, variables, _context) => {
       queryClient.invalidateQueries({ queryKey: ['patients', variables.pnumber] });
-    }
+    },
   });
 
   return collectionEventMutation;
@@ -61,14 +62,14 @@ export function useCollectionEventUpdate() {
       // check if the visit number was updated
       if (variables.vnumber != data.vnumber) {
         queryClient.removeQueries({
-          queryKey: ['patients', variables.pnumber, 'collection-events', variables.vnumber]
+          queryKey: ['patients', variables.pnumber, 'collection-events', variables.vnumber],
         });
       } else {
         queryClient.setQueryData(['patients', variables.pnumber, 'collection-events', variables.vnumber], () => data);
       }
 
       queryClient.invalidateQueries({ queryKey: ['patients', variables.pnumber] });
-    }
+    },
   });
 
   return updateMutation;
@@ -83,7 +84,7 @@ export function useCollectionEventDelete() {
     onSuccess: (_data, variables, _context) => {
       queryClient.removeQueries({ queryKey: ['patients', variables.pnumber, 'collection-events', variables.vnumber] });
       queryClient.invalidateQueries({ queryKey: ['patients', variables.pnumber] });
-    }
+    },
   });
 }
 
@@ -102,7 +103,7 @@ export function useCeventCommentAdd() {
       if (cevent) {
         queryClient.invalidateQueries({ queryKey: ['patients', cevent.pnumber, 'collection-events', cevent.vnumber] });
       }
-    }
+    },
   });
 
   return commentMutation;

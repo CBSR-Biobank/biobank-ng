@@ -10,7 +10,7 @@ export const loggingSchema = z.object({
   locationLabel: z.string(),
   patientNumber: z.string(),
   type: z.string(),
-  username: z.string()
+  username: z.string(),
 });
 
 export type Logging = z.infer<typeof loggingSchema>;

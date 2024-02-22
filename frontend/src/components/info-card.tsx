@@ -1,5 +1,6 @@
 import { Alert, AlertDescription, AlertTitle } from '@app/components/alert';
 import { cn } from '@app/utils';
+
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

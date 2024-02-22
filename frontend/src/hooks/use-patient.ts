@@ -3,6 +3,7 @@ import { PatientApi } from '@app/api/patient-api';
 import { CommentAdd } from '@app/models/comment';
 import { PatientAdd, PatientUpdate } from '@app/models/patient';
 import { usePatientStore } from '@app/store';
+
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
@@ -11,7 +12,7 @@ export function usePatient(pnumber: string) {
   const query = useQuery({
     queryKey: ['patients', pnumber],
     queryFn: async () => PatientApi.getByPnumber(pnumber),
-    retry: (count, error: ApiError) => count <= 3 && error.status !== 404 && error.status !== 400
+    retry: (count, error: ApiError) => count <= 3 && error.status !== 404 && error.status !== 400,
   });
   const { data: patient } = query;
 
@@ -25,7 +26,7 @@ export function usePatient(pnumber: string) {
     patient,
     isLoading: query.isLoading,
     isError: query.isError,
-    error: query.error
+    error: query.error,
   };
 }
 
@@ -37,7 +38,7 @@ export function usePatientAdd() {
     onSuccess: (data, _variables, _context) => {
       queryClient.setQueryData(['patients', data.id], data);
       queryClient.invalidateQueries({ queryKey: ['patients'] });
-    }
+    },
   });
   return addPatientMutation;
 }
@@ -62,7 +63,7 @@ export function usePatientUpdate() {
       }
 
       queryClient.invalidateQueries({ queryKey: ['patients', variables.pnumber] });
-    }
+    },
   });
   return updatePatientMutation;
 }
@@ -71,7 +72,7 @@ export function usePatientComments(pnumber: string) {
   return useQuery({
     queryKey: ['patients', pnumber, 'comments'],
     queryFn: async () => PatientApi.getPatientComments(pnumber),
-    retry: (count, error: ApiError) => count <= 3 && error.status !== 404 && error.status !== 400
+    retry: (count, error: ApiError) => count <= 3 && error.status !== 404 && error.status !== 400,
   });
 }
 
@@ -89,7 +90,7 @@ export function usePatientCommentAdd() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['patients', patient?.pnumber] });
-    }
+    },
   });
 
   return commentMutation;

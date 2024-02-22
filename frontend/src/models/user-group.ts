@@ -1,4 +1,4 @@
 export enum UserGroup {
   GUEST = 'guest',
-  GLOBAL_ADMIN = 'Global Administrators'
+  GLOBAL_ADMIN = 'Global Administrators',
 }

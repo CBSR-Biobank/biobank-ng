@@ -1,6 +1,7 @@
 import { Button } from '@app/components/ui/button';
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@app/components/ui/card';
 import { useUserStore } from '@app/store';
+
 import { Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

@@ -1,8 +1,10 @@
 import { DialogClose, DialogFooter } from '@app/components/ui/dialog';
 import { Annotation, annotationValueAsDate } from '@app/models/annotation';
 import { AnnotationType } from '@app/models/annotation-type';
+
 import { faCirclePlus, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import { Chip } from '../chip';
 import { EntityProperty } from '../entity-property';
 import { MutatorDate } from '../mutators/mutator-date';
@@ -109,7 +111,7 @@ const AnnotationMutator: React.FC<{
 
 const SelectedValueChip: React.FC<{ value: string; onUnselected: (value: string) => void }> = ({
   value,
-  onUnselected
+  onUnselected,
 }) => {
   const handleUnselect = () => {
     onUnselected(value);
@@ -174,7 +176,7 @@ export const Annotations: React.FC<{
         if (annotation.type === 'select_multiple') {
           extraProps = {
             icon: faCirclePlus,
-            tooltip: 'Add'
+            tooltip: 'Add',
           };
         }
 

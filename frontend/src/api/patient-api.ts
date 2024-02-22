@@ -1,6 +1,8 @@
 import { CommentAdd, commentSchema } from '@app/models/comment';
 import { Patient, PatientAdd, PatientUpdate, patientSchema } from '@app/models/patient';
+
 import { z } from 'zod';
+
 import { httpClient } from './api';
 
 export class PatientApi {
@@ -9,7 +11,7 @@ export class PatientApi {
       method: 'GET',
       path: ['patients', pnumber],
       body: undefined,
-      query: undefined
+      query: undefined,
     });
     const result = await response.json();
     const patient = patientSchema.parse(result);
@@ -21,7 +23,7 @@ export class PatientApi {
       method: 'GET',
       path: ['patients', pnumber, 'comments'],
       body: undefined,
-      query: undefined
+      query: undefined,
     });
     const result = await response.json();
     const cevent = z.array(commentSchema).parse(result);
@@ -33,7 +35,7 @@ export class PatientApi {
       method: 'POST',
       path: ['patients'],
       body: JSON.stringify(patient),
-      query: undefined
+      query: undefined,
     });
     const result = await response.json();
     return patientSchema.parse(result);
@@ -42,13 +44,13 @@ export class PatientApi {
   static async update(pnumber: string, newValues: PatientUpdate) {
     const data = {
       pnumber: newValues.pnumber,
-      studyNameShort: newValues.studyNameShort
+      studyNameShort: newValues.studyNameShort,
     };
     const response = await httpClient({
       method: 'PUT',
       path: ['patients', pnumber],
       body: JSON.stringify(data),
-      query: undefined
+      query: undefined,
     });
     const result = await response.json();
     return patientSchema.parse(result);
@@ -60,7 +62,7 @@ export class PatientApi {
       method: 'POST',
       path: ['patients', patient.pnumber, 'comments'],
       body: JSON.stringify(comment),
-      query: undefined
+      query: undefined,
     });
     const result = await response.json();
     return commentSchema.parse(result);

@@ -1,5 +1,6 @@
 import { useUserStore } from '@app/store';
 import { cn } from '@app/utils';
+
 import { Button } from '@components/ui/button';
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from '@components/ui/menubar';
 import { faAddressCard } from '@fortawesome/free-regular-svg-icons';

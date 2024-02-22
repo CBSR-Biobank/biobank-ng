@@ -1,18 +1,20 @@
 import { DialogClose, DialogFooter } from '@app/components/ui/dialog';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
 import { CancelButton } from '../cancel-button';
 import { LabelledInput } from '../forms/labelled-input';
 import { OkButton } from '../ok-button';
 import { MutatorProps } from './mutator';
 
 const requiredSchema = z.object({
-  value: z.string().trim().email()
+  value: z.string().trim().email(),
 });
 
 const optionalSchema = z.object({
-  value: z.union([z.literal(''), z.string().trim().email()])
+  value: z.union([z.literal(''), z.string().trim().email()]),
 });
 
 export const MutatorEmail: React.FC<MutatorProps<string>> = ({ label, value, required, onClose }) => {
@@ -21,12 +23,12 @@ export const MutatorEmail: React.FC<MutatorProps<string>> = ({ label, value, req
   const {
     register,
     getValues,
-    formState: { isValid, errors }
+    formState: { isValid, errors },
   } = useForm<z.infer<typeof schema>>({
     mode: 'all',
     reValidateMode: 'onChange',
     resolver: zodResolver(schema),
-    defaultValues: { value }
+    defaultValues: { value },
   });
 
   const handleSubmit = (event: React.SyntheticEvent) => {

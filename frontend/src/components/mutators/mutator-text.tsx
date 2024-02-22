@@ -1,8 +1,10 @@
 import { DialogClose, DialogFooter } from '@app/components/ui/dialog';
 import { cn } from '@app/utils';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
 import { CancelButton } from '../cancel-button';
 import { LabelledInput } from '../forms/labelled-input';
 import { OkButton } from '../ok-button';
@@ -29,12 +31,12 @@ function makeSchema(required: boolean, minlength?: number, maxlength?: number) {
 
   if (!required) {
     return z.object({
-      value: z.union([z.literal(''), valueSchema])
+      value: z.union([z.literal(''), valueSchema]),
     });
   }
 
   return z.object({
-    value: valueSchema
+    value: valueSchema,
   });
 }
 
@@ -44,12 +46,12 @@ export const MutatorText: React.FC<MutatorTextareaProps> = ({ label, value, requ
   const {
     register,
     getValues,
-    formState: { isValid, errors }
+    formState: { isValid, errors },
   } = useForm<z.infer<typeof schema>>({
     mode: 'all',
     reValidateMode: 'onChange',
     resolver: zodResolver(schema),
-    defaultValues: { value }
+    defaultValues: { value },
   });
 
   const handleSubmit = (event: React.SyntheticEvent) => {
@@ -75,7 +77,7 @@ export const MutatorText: React.FC<MutatorTextareaProps> = ({ label, value, requ
               {...register('value')}
               className={cn(classes, {
                 'min-h-[80px]': !value || value.length <= 200,
-                'min-h-[200px]': value && value.length > 200
+                'min-h-[200px]': value && value.length > 200,
               })}
             />
           )}

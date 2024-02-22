@@ -1,9 +1,11 @@
 import { useUserStore } from '@app/store';
 import { cn } from '@app/utils';
+
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { MenuItem } from './menu-item';
 import { PopupSubMenu } from './popup-submenu';
 import { SubMenu } from './sub-menu';
@@ -35,7 +37,7 @@ export const DrawerMenuItem: React.FC<{
     'flex items-center justify-between gap-4 overflow-x-hidden rounded px-2 text-sm text-slate-600',
     { ' hover:bg-basic-300': drawerOpen },
     { 'mt-9': item?.gap },
-    { 'mt-2': !item?.gap }
+    { 'mt-2': !item?.gap },
   ]);
 
   if (!user) {

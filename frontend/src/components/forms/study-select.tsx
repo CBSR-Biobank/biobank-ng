@@ -1,8 +1,10 @@
 import { StudyName } from '@app/models/study';
 import { cn } from '@app/utils';
+
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { useState } from 'react';
 import { Control, FieldPathByValue, FieldValues, useController } from 'react-hook-form';
+
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { ScrollArea } from '../ui/scroll-area';
@@ -25,7 +27,7 @@ export interface StudySelectProps<T extends FieldValues, U extends FieldPathByVa
 export function StudySelect<T extends FieldValues, U extends FieldPathByValue<T, string>>({
   control,
   name,
-  studies
+  studies,
 }: StudySelectProps<T, U>) {
   const { field } = useController({ control, name });
   const [popoverOpen, setPopoverOpen] = useState(false);

@@ -1,8 +1,10 @@
 import { DialogClose, DialogFooter } from '@app/components/ui/dialog';
 import { useStudyNames } from '@app/hooks/use-study';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
+
 import { CancelButton } from '../cancel-button';
 import { CircularProgress } from '../circular-progress';
 import { StudySelect } from '../forms/study-select';
@@ -10,11 +12,11 @@ import { MutatorProps } from '../mutators/mutator';
 import { OkButton } from '../ok-button';
 
 const requiredSchema = z.object({
-  studyNameShort: z.string()
+  studyNameShort: z.string(),
 });
 
 const optionalSchema = z.object({
-  studyNameShort: z.string().or(z.literal(''))
+  studyNameShort: z.string().or(z.literal('')),
 });
 
 export function MutatorStudy({ value, required, onClose }: MutatorProps<string>) {
@@ -25,14 +27,14 @@ export function MutatorStudy({ value, required, onClose }: MutatorProps<string>)
     control,
     getValues,
     handleSubmit,
-    formState: { isValid }
+    formState: { isValid },
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     mode: 'all',
     reValidateMode: 'onChange',
     defaultValues: {
-      studyNameShort: value ?? ''
-    }
+      studyNameShort: value ?? '',
+    },
   });
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = () => {

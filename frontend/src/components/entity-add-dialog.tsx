@@ -6,10 +6,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from '@app/components/ui/dialog';
+
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+
 import { CancelButton } from './cancel-button';
 import { OkButton } from './ok-button';
 import { Button } from './ui/button';

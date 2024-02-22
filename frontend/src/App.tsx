@@ -1,6 +1,8 @@
 import { Login } from '@app/components/login';
 import { HomePage } from '@app/pages/homepage';
+
 import { Link, RouterProvider, createBrowserRouter, useRouteError } from 'react-router-dom';
+
 import { BasicPage } from './pages/basic-page';
 
 const router = createBrowserRouter([
@@ -11,7 +13,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <HomePage />
+        element: <HomePage />,
       },
       {
         path: 'logging',
@@ -21,9 +23,9 @@ const router = createBrowserRouter([
             async lazy() {
               let { LoggingPage } = await import('@app/pages/logging/logging-page');
               return { Component: LoggingPage };
-            }
-          }
-        ]
+            },
+          },
+        ],
       },
       {
         path: 'patients',
@@ -33,14 +35,14 @@ const router = createBrowserRouter([
             async lazy() {
               let { PatientSelect } = await import('@app/pages/patients/patient-select');
               return { Component: PatientSelect };
-            }
+            },
           },
           {
             path: 'add',
             async lazy() {
               let { PatientAddPage } = await import('@app/pages/patients/patient-add');
               return { Component: PatientAddPage };
-            }
+            },
           },
           {
             path: ':pnumber',
@@ -54,18 +56,18 @@ const router = createBrowserRouter([
                 async lazy() {
                   let { PatientDetails } = await import('@app/components/patients/patient-details');
                   return { Component: PatientDetails };
-                }
+                },
               },
               {
                 path: ':vnumber',
                 async lazy() {
                   let { CollectionEventView } = await import('@app/pages/collection-events/collection-event-view');
                   return { Component: CollectionEventView };
-                }
-              }
-            ]
-          }
-        ]
+                },
+              },
+            ],
+          },
+        ],
       },
       {
         path: 'profile',
@@ -75,25 +77,25 @@ const router = createBrowserRouter([
             async lazy() {
               let { UserProfile } = await import('@app/pages/user/user-profile');
               return { Component: UserProfile };
-            }
-          }
-        ]
+            },
+          },
+        ],
       },
       {
         path: '*',
-        element: <NoMatch />
-      }
-    ]
+        element: <NoMatch />,
+      },
+    ],
   },
   {
     path: 'login',
-    element: <Login />
+    element: <Login />,
   },
   {
     path: '*',
     element: <NoMatch />,
-    errorElement: <ErrorBoundary />
-  }
+    errorElement: <ErrorBoundary />,
+  },
 ]);
 
 function NoMatch() {

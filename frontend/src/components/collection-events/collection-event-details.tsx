@@ -23,13 +23,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from '@app/components/ui/dialog';
 import {
   useCeventCommentAdd,
   useCollectionEvent,
   useCollectionEventDelete,
-  useCollectionEventUpdate
+  useCollectionEventUpdate,
 } from '@app/hooks/use-collection-event';
 import { useStudyAnnotationTypes } from '@app/hooks/use-study';
 import { Annotation } from '@app/models/annotation';
@@ -38,10 +38,12 @@ import { Patient, takenVisitNumbers } from '@app/models/patient';
 import { Status } from '@app/models/status';
 import { AdminPage } from '@app/pages/admin-page';
 import { cn } from '@app/utils';
+
 import { faChevronRight, faTrash, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { SourceSpecimenAddDialog } from '../specimens/source-specimen-add-dialog';
 
 function DeleteNotAllowed() {
@@ -76,7 +78,7 @@ function DeleteNotAllowed() {
 const CommentsCollapsible: React.FC<{ pnumber: string; vnumber: number; count: number }> = ({
   pnumber,
   vnumber,
-  count
+  count,
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -130,7 +132,7 @@ const Buttons: React.FC<{ collectionEvent: CollectionEvent }> = ({ collectionEve
     deleteMutation.mutate(collectionEvent, {
       onSuccess: () => {
         navigate('..');
-      }
+      },
     });
   };
 
@@ -205,12 +207,12 @@ export const CollectionEventDetails: React.FC<{ patient: Patient; vnumber: numbe
       {
         pnumber: collectionEvent.pnumber,
         vnumber: collectionEvent.vnumber,
-        cevent: { ...collectionEvent, vnumber: value }
+        cevent: { ...collectionEvent, vnumber: value },
       },
       {
         onSuccess: () => {
           navigate(`../${value}`);
-        }
+        },
       }
     );
   };
@@ -223,7 +225,7 @@ export const CollectionEventDetails: React.FC<{ patient: Patient; vnumber: numbe
     updateMutation.mutate({
       pnumber: collectionEvent.pnumber,
       vnumber: collectionEvent.vnumber,
-      cevent: { ...collectionEvent, status: value }
+      cevent: { ...collectionEvent, status: value },
     });
   };
 
@@ -233,7 +235,7 @@ export const CollectionEventDetails: React.FC<{ patient: Patient; vnumber: numbe
     updateMutation.mutate({
       pnumber: collectionEvent.pnumber,
       vnumber: collectionEvent.vnumber,
-      cevent: { ...collectionEvent, annotations }
+      cevent: { ...collectionEvent, annotations },
     });
   };
 

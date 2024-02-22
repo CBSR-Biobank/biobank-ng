@@ -1,7 +1,9 @@
 import { DialogClose, DialogFooter } from '@app/components/ui/dialog';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
 import { CancelButton } from '../cancel-button';
 import { LabelledInput } from '../forms/labelled-input';
 import { OkButton } from '../ok-button';
@@ -18,14 +20,14 @@ export const MutatorNumber: React.FC<MutatorNumberProps> = ({
   required,
   onClose,
   min = 0,
-  max = Number.MAX_SAFE_INTEGER
+  max = Number.MAX_SAFE_INTEGER,
 }) => {
   const requiredSchema = z.object({
-    value: z.coerce.number().gte(min).lte(max)
+    value: z.coerce.number().gte(min).lte(max),
   });
 
   const optionalSchema = z.object({
-    value: z.union([z.literal(''), z.coerce.number().gte(min).lte(max)])
+    value: z.union([z.literal(''), z.coerce.number().gte(min).lte(max)]),
   });
 
   const schema = required ? requiredSchema : optionalSchema;
@@ -33,12 +35,12 @@ export const MutatorNumber: React.FC<MutatorNumberProps> = ({
   const {
     register,
     getValues,
-    formState: { isValid, errors }
+    formState: { isValid, errors },
   } = useForm<z.infer<typeof schema>>({
     mode: 'all',
     reValidateMode: 'onChange',
     resolver: zodResolver(schema),
-    defaultValues: { value }
+    defaultValues: { value },
   });
 
   const handleSubmit = (event: React.SyntheticEvent) => {

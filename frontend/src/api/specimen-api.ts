@@ -1,5 +1,7 @@
 import { aliquotSchema } from '@app/models/specimen';
+
 import { z } from 'zod';
+
 import { httpClient } from './api';
 
 export class SpecimenApi {
@@ -8,7 +10,7 @@ export class SpecimenApi {
       method: 'GET',
       path: ['specimens', inventoryId, 'aliquots'],
       body: undefined,
-      query: undefined
+      query: undefined,
     });
     const result = await response.json();
     const specimens = z.array(aliquotSchema).parse(result);

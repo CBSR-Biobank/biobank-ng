@@ -1,7 +1,9 @@
 import { DialogClose, DialogFooter } from '@app/components/ui/dialog';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
 import { CancelButton } from '../cancel-button';
 import { LabelledInput } from '../forms/labelled-input';
 import { OkButton } from '../ok-button';
@@ -13,12 +15,12 @@ export const MutatorVisitNumber: React.FC<{
 }> = ({ vnumber, disallow, onClose }) => {
   const schema = z
     .object({
-      vnumber: z.union([z.number().int().min(1, { message: 'should be 1 or greater' }), z.nan()])
+      vnumber: z.union([z.number().int().min(1, { message: 'should be 1 or greater' }), z.nan()]),
     })
     .superRefine((data, ctx) => {
       if (!data.vnumber) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom
+          code: z.ZodIssueCode.custom,
           // path not assigned here since an error message would be displayed if the cancel button is pressed
         });
       }
@@ -27,7 +29,7 @@ export const MutatorVisitNumber: React.FC<{
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['vnumber'],
-          message: 'already taken'
+          message: 'already taken',
         });
       }
     });
@@ -35,12 +37,12 @@ export const MutatorVisitNumber: React.FC<{
   const {
     register,
     getValues,
-    formState: { isValid, errors }
+    formState: { isValid, errors },
   } = useForm<z.infer<typeof schema>>({
     mode: 'all',
     reValidateMode: 'onChange',
     resolver: zodResolver(schema),
-    defaultValues: { vnumber }
+    defaultValues: { vnumber },
   });
 
   const handleSubmit = (event: React.SyntheticEvent) => {

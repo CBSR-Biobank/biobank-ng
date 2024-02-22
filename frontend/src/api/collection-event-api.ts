@@ -1,6 +1,8 @@
 import { CollectionEventAdd, CollectionEventUpdate, collectionEventSchema } from '@app/models/collection-event';
 import { CommentAdd, commentSchema } from '@app/models/comment';
+
 import { z } from 'zod';
+
 import { httpClient } from './api';
 
 export class CollectionEventApi {
@@ -9,7 +11,7 @@ export class CollectionEventApi {
       method: 'GET',
       path: ['patients', pnumber, 'collection-events', vnumber],
       body: undefined,
-      query: undefined
+      query: undefined,
     });
     const result = await response.json();
     const cevent = collectionEventSchema.parse(result);
@@ -21,9 +23,9 @@ export class CollectionEventApi {
       method: 'POST',
       path: ['patients', pnumber, 'collection-events'],
       body: JSON.stringify({
-        vnumber: cevent.vnumber
+        vnumber: cevent.vnumber,
       }),
-      query: undefined
+      query: undefined,
     });
     const result = await response.json();
     return collectionEventSchema.parse(result);
@@ -34,7 +36,7 @@ export class CollectionEventApi {
       method: 'PUT',
       path: ['patients', pnumber, 'collection-events', vnumber],
       body: JSON.stringify(cevent),
-      query: undefined
+      query: undefined,
     });
     const result = await response.json();
     return collectionEventSchema.parse(result);
@@ -45,7 +47,7 @@ export class CollectionEventApi {
       method: 'DELETE',
       path: ['patients', pnumber, 'collection-events', visitNumber],
       body: undefined,
-      query: undefined
+      query: undefined,
     });
   }
 
@@ -55,7 +57,7 @@ export class CollectionEventApi {
       method: 'GET',
       path: ['patients', pnumber, 'collection-events', vnumber, 'comments'],
       body: undefined,
-      query: undefined
+      query: undefined,
     });
     const result = await response.json();
     return z.array(commentSchema).parse(result);
@@ -67,7 +69,7 @@ export class CollectionEventApi {
       method: 'POST',
       path: ['patients', pnumber, 'collection-events', vnumber, 'comments'],
       body: JSON.stringify(comment),
-      query: undefined
+      query: undefined,
     });
     const result = await response.json();
     return commentSchema.parse(result);

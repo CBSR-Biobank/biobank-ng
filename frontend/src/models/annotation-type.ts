@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { Status } from './status';
 
 export const annotationTypeNameSchema = z.union([
@@ -6,7 +7,7 @@ export const annotationTypeNameSchema = z.union([
   z.literal('text'),
   z.literal('date_time'),
   z.literal('select_single'),
-  z.literal('select_multiple')
+  z.literal('select_multiple'),
 ]);
 
 export const annotationTypeSchema = z.object({
@@ -14,7 +15,7 @@ export const annotationTypeSchema = z.object({
   label: z.string(),
   status: z.nativeEnum(Status),
   required: z.boolean(),
-  validValues: z.array(z.string()).nullable()
+  validValues: z.array(z.string()).nullable(),
 });
 
 export type AnnotationTypeName = z.infer<typeof annotationTypeNameSchema>;

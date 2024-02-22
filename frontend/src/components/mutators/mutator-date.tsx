@@ -1,8 +1,10 @@
 import { DialogClose, DialogFooter } from '@app/components/ui/dialog';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
 import { CancelButton } from '../cancel-button';
 import { LabelledInput } from '../forms/labelled-input';
 import { OkButton } from '../ok-button';
@@ -15,18 +17,18 @@ export type MutatorDateProps = MutatorProps<Date> & {
 
 export const MutatorDate = ({ label, value, onClose }: MutatorDateProps) => {
   const schema = z.object({
-    value: z.string()
+    value: z.string(),
   });
 
   const {
     register,
     getValues,
-    formState: { isValid, errors }
+    formState: { isValid, errors },
   } = useForm<z.infer<typeof schema>>({
     mode: 'all',
     reValidateMode: 'onChange',
     resolver: zodResolver(schema),
-    defaultValues: { value: value ? format(value, 'yyyy-MM-dd') : '' }
+    defaultValues: { value: value ? format(value, 'yyyy-MM-dd') : '' },
   });
 
   const handleOk = () => {

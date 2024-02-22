@@ -1,6 +1,7 @@
 import { CollectionEventDetails } from '@app/components//collection-events/collection-event-details';
 import { CircularProgress } from '@app/components/circular-progress';
 import { usePatientStore } from '@app/store';
+
 import { useParams } from 'react-router-dom';
 
 export function CollectionEventView() {

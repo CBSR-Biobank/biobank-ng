@@ -7,10 +7,12 @@ import { PatientUpdate, takenVisitNumbers } from '@app/models/patient';
 import { AdminPage } from '@app/pages/admin-page';
 import { usePatientStore } from '@app/store';
 import { cn } from '@app/utils';
+
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { BackButton } from '../back-button';
 import { CollectionEventTable } from '../collection-events/collection-event-table';
 import { CommentAddDialog } from '../comment-add-dialog';
@@ -47,7 +49,7 @@ export function PatientDetails() {
       {
         onSuccess: () => {
           navigate(`${newVisitNumber}`);
-        }
+        },
       }
     );
   };
@@ -69,7 +71,7 @@ export function PatientDetails() {
         if (updated.pnumber != patient.pnumber) {
           navigate(`../${updated.pnumber}`);
         }
-      }
+      },
     });
   };
 

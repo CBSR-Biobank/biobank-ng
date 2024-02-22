@@ -1,9 +1,11 @@
 import { useStudySourceSpecimenTypes } from '@app/hooks/use-study';
 import { Status } from '@app/models/status';
+
 import { faVial } from '@fortawesome/free-solid-svg-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
 import { CircularProgress } from '../circular-progress';
 import { EntityAddDialog } from '../entity-add-dialog';
 import { FormLabel } from '../forms/form-label';
@@ -17,7 +19,7 @@ const schema = z.object({
   typeNameShort: z.string(),
   timeDrawn: z.string().min(1, { message: 'a time is required' }),
   status: z.nativeEnum(Status),
-  comment: z.string().optional()
+  comment: z.string().optional(),
 });
 
 export type FormInputs = z.infer<typeof schema>;
@@ -37,7 +39,7 @@ export const SourceSpecimenAddDialog: React.FC<{
     register,
     getValues,
     reset,
-    formState: { isValid, errors }
+    formState: { isValid, errors },
   } = useForm<FormInputs>({
     mode: 'all',
     reValidateMode: 'onChange',
@@ -45,8 +47,8 @@ export const SourceSpecimenAddDialog: React.FC<{
     defaultValues: {
       typeNameShort: '',
       status: Status.ACTIVE,
-      timeDrawn: now.toISOString().substring(0, 16)
-    }
+      timeDrawn: now.toISOString().substring(0, 16),
+    },
   });
 
   const handleSubmit = () => {

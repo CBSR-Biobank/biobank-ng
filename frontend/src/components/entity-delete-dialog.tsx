@@ -5,11 +5,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from '@app/components/ui/dialog';
+
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { PropsWithChildren } from 'react';
+
 import { CancelButton } from './cancel-button';
 import { Button } from './ui/button';
 

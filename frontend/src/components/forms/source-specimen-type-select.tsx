@@ -1,5 +1,7 @@
 import { SourceSpecimenType } from '@app/models/source-specimen-type';
+
 import { Control, FieldPathByValue, FieldValues, useController } from 'react-hook-form';
+
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select';
 import { FormLabel } from './form-label';
 
@@ -20,7 +22,7 @@ export interface StudySelectProps<T extends FieldValues, U extends FieldPathByVa
 export function SourceSpecimenTypeSelect<T extends FieldValues, U extends FieldPathByValue<T, string>>({
   control,
   name,
-  specimenTypes
+  specimenTypes,
 }: StudySelectProps<T, U>) {
   const { field } = useController({ control, name });
 

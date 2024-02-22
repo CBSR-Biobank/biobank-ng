@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { annotationSchema } from './annotation';
 import { domainEntitySchema } from './domain-entity';
 import { sourceSpecimenSchema } from './specimen';
@@ -10,7 +11,7 @@ export const collectionEventBriefSchema = domainEntitySchema.extend({
   visitNumber: z.number(),
   specimenCount: z.number(),
   aliquotCount: z.number(),
-  status: z.nativeEnum(Status)
+  status: z.nativeEnum(Status),
 });
 
 export const collectionEventSchema = domainEntitySchema.extend({
@@ -23,7 +24,7 @@ export const collectionEventSchema = domainEntitySchema.extend({
   status: z.nativeEnum(Status),
   commentCount: z.number(),
   annotations: z.array(annotationSchema),
-  sourceSpecimens: z.array(sourceSpecimenSchema)
+  sourceSpecimens: z.array(sourceSpecimenSchema),
 });
 
 export type CollectionEventBrief = z.infer<typeof collectionEventBriefSchema>;

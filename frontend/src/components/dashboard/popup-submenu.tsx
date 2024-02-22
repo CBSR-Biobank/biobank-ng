@@ -3,15 +3,17 @@ import {
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuSeparator,
-  ContextMenuTrigger
+  ContextMenuTrigger,
 } from '@app/components/ui/context-menu';
 import { userHasGroups } from '@app/models/user';
 import { useUserStore } from '@app/store';
 import { cn } from '@app/utils';
+
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { MenuItem } from './menu-item';
 
 export const PopupSubMenu: React.FC<{

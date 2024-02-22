@@ -1,6 +1,8 @@
 import { usePatientStore } from '@app/store';
 import { capitalizeWord } from '@app/utils';
+
 import { matchPath, useLocation } from 'react-router-dom';
+
 import { Breadcrumb, Breadcrumbs } from './breadcrumbs';
 
 export const PatientBreadcrumbs: React.FC = () => {

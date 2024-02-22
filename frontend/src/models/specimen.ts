@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { domainEntitySchema } from './domain-entity';
 import { Status } from './status';
 
@@ -15,7 +16,7 @@ export const sourceSpecimenSchema = domainEntitySchema.extend({
   currentCenterNameShort: z.string(),
   position: z.string().nullable(),
   worksheet: z.string().nullable(),
-  hasComments: z.boolean().optional()
+  hasComments: z.boolean().optional(),
 });
 
 export type SourceSpecimen = z.infer<typeof sourceSpecimenSchema>;
@@ -38,7 +39,7 @@ export const aliquotSchema = domainEntitySchema.extend({
   studyId: z.number().min(1),
   studyNameShort: z.string(),
   processingEventId: z.number().min(1),
-  worksheet: z.string()
+  worksheet: z.string(),
 });
 
 export type Aliquot = z.infer<typeof aliquotSchema>;

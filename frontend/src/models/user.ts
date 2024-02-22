@@ -1,9 +1,10 @@
 import { z } from 'zod';
+
 import { UserGroup } from './user-group';
 
 export const groupSchema = z.object({
   groupId: z.number(),
-  name: z.string()
+  name: z.string(),
 });
 
 export const userSchema = z.object({
@@ -11,7 +12,7 @@ export const userSchema = z.object({
   fullname: z.string(),
   username: z.string(),
   isGlobalAdmin: z.boolean(),
-  groups: z.array(groupSchema)
+  groups: z.array(groupSchema),
 });
 
 export type Group = z.infer<typeof groupSchema>;

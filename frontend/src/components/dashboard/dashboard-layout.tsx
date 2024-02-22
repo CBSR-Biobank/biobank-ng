@@ -2,10 +2,12 @@ import { fetchAuthenticated } from '@app/api/api';
 import { userSchema } from '@app/models/user';
 import { useUserStore } from '@app/store';
 import { cn } from '@app/utils';
+
 import { Button } from '@components/ui/button';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { ReactNode, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+
 import { DashboardDrawer } from './dashboard-drawer';
 import { UserMenu } from './user-menu';
 

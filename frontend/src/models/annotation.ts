@@ -1,10 +1,11 @@
 import { z } from 'zod';
+
 import { annotationTypeNameSchema } from './annotation-type';
 
 export const annotationSchema = z.object({
   type: annotationTypeNameSchema,
   name: z.string(),
-  value: z.string().nullable()
+  value: z.string().nullable(),
 });
 
 export type Annotation = z.infer<typeof annotationSchema>;

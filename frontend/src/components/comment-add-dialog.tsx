@@ -2,16 +2,17 @@ import { faComment } from '@fortawesome/free-solid-svg-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
 import { EntityAddDialog } from './entity-add-dialog';
 
 const schema = z
   .object({
-    message: z.string()
+    message: z.string(),
   })
   .superRefine((data, ctx) => {
     if (!data.message || data.message.trim().length === 0) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom
+        code: z.ZodIssueCode.custom,
         // path not assigned here since an error message would be displayed if the cancel button is pressed
       });
     }
@@ -21,20 +22,20 @@ export type FormInputs = z.infer<typeof schema>;
 
 export const CommentAddDialog: React.FC<{ title?: string; onSubmit: (newComment: string) => void }> = ({
   title,
-  onSubmit
+  onSubmit,
 }) => {
   const {
     register,
     getValues,
     reset,
-    formState: { isValid, errors }
+    formState: { isValid, errors },
   } = useForm<FormInputs>({
     mode: 'all',
     reValidateMode: 'onChange',
     resolver: zodResolver(schema),
     defaultValues: {
-      message: ''
-    }
+      message: '',
+    },
   });
 
   const errorMessage = errors?.message?.message;

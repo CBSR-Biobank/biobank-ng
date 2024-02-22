@@ -4,10 +4,12 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@app/compon
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@app/components/ui/table';
 import { SourceSpecimen } from '@app/models/specimen';
 import { cn } from '@app/utils';
+
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { format } from 'date-fns';
 import { useState } from 'react';
+
 import { AliquotsTable } from './aliquots-table';
 
 type SpecimenState = Record<string, boolean>;
@@ -55,7 +57,7 @@ export const SourceSpecimenTable: React.FC<{ specimens: SourceSpecimen[] }> = ({
                         <FontAwesomeIcon
                           icon={faChevronRight}
                           className={cn('text-sky-600 duration-300 ease-in-out', {
-                            'rotate-90': sourceSpecimenOpen[specimen.inventoryId]
+                            'rotate-90': sourceSpecimenOpen[specimen.inventoryId],
                           })}
                         />
                         <span className="sr-only">Toggle</span>

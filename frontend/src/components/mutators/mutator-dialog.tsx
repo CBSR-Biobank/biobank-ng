@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@app/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@app/components/ui/tooltip';
 import { cn } from '@app/utils';
+
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { faPencil } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,12 +12,12 @@ const mutatorVariants = cva('', {
     size: {
       sm: 'md:w-[425px]',
       md: 'md:w-[600px]',
-      lg: 'md:w-[800px]'
-    }
+      lg: 'md:w-[800px]',
+    },
   },
   defaultVariants: {
-    size: 'md'
-  }
+    size: 'md',
+  },
 });
 
 type MutatorVariantProps = VariantProps<typeof mutatorVariants>;

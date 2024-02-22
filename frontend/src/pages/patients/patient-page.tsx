@@ -3,6 +3,7 @@ import { CircularProgress } from '@app/components/circular-progress';
 import { PatientNotExist } from '@app/components/patients/patient-not-exist';
 import { ShowError } from '@app/components/show-error';
 import { usePatient } from '@app/hooks/use-patient';
+
 import { Outlet, useParams } from 'react-router-dom';
 
 const PatientPageInternal: React.FC<{ pnumber: string }> = ({ pnumber }) => {

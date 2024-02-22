@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+
 import { CollectionEvent } from './models/collection-event';
 import { Patient } from './models/patient';
 import { User } from './models/user';
@@ -75,7 +76,7 @@ export const useUserStore = create<UserState>((set) => ({
       openMenus = openMenus.replace(item, '');
     }
     localStorage.setItem(DRAWER_MENU_OPEN_KEY, openMenus);
-  }
+  },
 }));
 
 interface PatientState {
@@ -89,5 +90,5 @@ export const usePatientStore = create<PatientState>((set) => ({
   patient: undefined,
   collectionEvent: undefined,
   setPatient: (patient) => set((state) => ({ ...state, patient, collectionEvent: undefined })),
-  setCollectionEvent: (collectionEvent) => set((state) => ({ ...state, collectionEvent }))
+  setCollectionEvent: (collectionEvent) => set((state) => ({ ...state, collectionEvent })),
 }));

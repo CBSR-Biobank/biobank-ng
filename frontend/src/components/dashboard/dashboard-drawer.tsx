@@ -1,6 +1,8 @@
 import { useUserStore } from '@app/store';
 import { cn } from '@app/utils';
+
 import { faFileLines, faSquarePlus, faUserDoctor, faUsers } from '@fortawesome/free-solid-svg-icons';
+
 import { DrawerMenuItem } from './drawer-menu-item';
 import { MenuItem } from './menu-item';
 
@@ -16,23 +18,23 @@ const menuItems: MenuItem[] = [
       {
         title: 'Add',
         icon: faSquarePlus,
-        route: '/patients/add'
+        route: '/patients/add',
         //requiredRoles: [UserRole.SUPERUSER]
       },
       {
         title: 'Visits',
         icon: faUserDoctor,
-        route: '/patients'
+        route: '/patients',
         //requiredRoles: [UserRole.SUPERUSER]
-      }
-    ]
+      },
+    ],
   },
   {
     title: 'Logging',
     icon: faFileLines,
     route: '/logging',
-    submenu: []
-  }
+    submenu: [],
+  },
 ];
 
 export const DashboardDrawer: React.FC<{ open: boolean }> = ({ open }) => {

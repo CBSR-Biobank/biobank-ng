@@ -2,6 +2,7 @@ import { CircularProgress } from '@app/components/circular-progress';
 import { LoggingTable } from '@app/components/logging/logging-table';
 import { ShowError } from '@app/components/show-error';
 import { useLoggingLatest } from '@app/hooks/use-logging';
+
 import { AdminPage } from '../admin-page';
 
 export function LoggingPage() {

@@ -1,11 +1,13 @@
 import { ApiError, login } from '@app/api/api';
 import { AdminPage } from '@app/pages/admin-page';
 import { useUserStore } from '@app/store';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
+
 import { Alert } from './alert';
 import { DashboardLayout } from './dashboard/dashboard-layout';
 import { LabelledInput } from './forms/labelled-input';
@@ -13,7 +15,7 @@ import { OkButton } from './ok-button';
 
 const schema = z.object({
   username: z.string().min(1, { message: 'A username is required' }),
-  password: z.string().min(1, { message: 'A password is required' })
+  password: z.string().min(1, { message: 'A password is required' }),
 });
 
 type FormInputs = z.infer<typeof schema>;
@@ -27,14 +29,14 @@ export function Login() {
   const {
     register,
     handleSubmit,
-    formState: { isValid, errors }
+    formState: { isValid, errors },
   } = useForm<FormInputs>({
     mode: 'all',
     resolver: zodResolver(schema),
     defaultValues: {
       username: '',
-      password: ''
-    }
+      password: '',
+    },
   });
 
   useEffect(() => {

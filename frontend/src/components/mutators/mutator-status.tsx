@@ -7,7 +7,7 @@ export function MutatorStatus({ value, required, onClose }: MutatorProps<Status>
     .filter((key) => key !== 'NONE')
     .map((key) => ({
       id: Status[key],
-      label: StatusLabels[Status[key]]
+      label: StatusLabels[Status[key]],
     }));
 
   return (

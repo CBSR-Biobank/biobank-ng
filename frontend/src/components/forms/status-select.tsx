@@ -1,5 +1,7 @@
 import { Status, StatusLabels } from '@app/models/status';
+
 import { FieldPathByValue, FieldValues, PathValue, UseControllerProps, useController } from 'react-hook-form';
+
 import { Label } from '../ui/label';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { FormLabel } from './form-label';
@@ -11,14 +13,14 @@ import { FormLabel } from './form-label';
  */
 export function StatusSelect<T extends FieldValues, U extends FieldPathByValue<T, Status>>({
   control,
-  name
+  name,
 }: UseControllerProps<T, U>) {
   const { field } = useController({ control, name });
   const statusOptions = (Object.keys(Status) as Array<keyof typeof Status>)
     .filter((key) => key !== 'NONE')
     .map((key) => ({
       id: Status[key],
-      label: StatusLabels[Status[key]]
+      label: StatusLabels[Status[key]],
     }));
 
   return (

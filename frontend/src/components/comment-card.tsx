@@ -1,5 +1,7 @@
 import { Comment } from '@app/models/comment';
+
 import { format } from 'date-fns';
+
 import { Card } from './ui/card';
 
 export const CommentCard: React.FC<{ comment: Comment }> = ({ comment }) => {

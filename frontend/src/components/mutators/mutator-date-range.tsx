@@ -1,8 +1,10 @@
 import { DialogClose, DialogFooter } from '@app/components/ui/dialog';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
 import { CancelButton } from '../cancel-button';
 import { LabelledInput } from '../forms/labelled-input';
 import { OkButton } from '../ok-button';
@@ -18,7 +20,7 @@ export type MutatorDateRangeProps = MutatorProps<DateRange>;
 const schema = z
   .object({
     startDate: z.string(),
-    endDate: z.string().or(z.literal('')) // allows empty string for endDate
+    endDate: z.string().or(z.literal('')), // allows empty string for endDate
   })
   .refine(
     (data) => {
@@ -37,15 +39,15 @@ export function MutatorDateRange({ value, onClose }: MutatorDateRangeProps) {
     register,
     getValues,
     watch,
-    formState: { isValid, errors }
+    formState: { isValid, errors },
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     mode: 'all',
     reValidateMode: 'onChange',
     defaultValues: {
       startDate: value?.startDate ? format(value.startDate, 'yyyy-MM-dd') : '',
-      endDate: value?.endDate ? format(value.endDate, 'yyyy-MM-dd') : ''
-    }
+      endDate: value?.endDate ? format(value.endDate, 'yyyy-MM-dd') : '',
+    },
   });
 
   const watchStartDate = watch('startDate', undefined);
@@ -60,7 +62,7 @@ export function MutatorDateRange({ value, onClose }: MutatorDateRangeProps) {
     const values = getValues();
     onClose({
       startDate: new Date(values.startDate),
-      endDate: new Date(values.endDate)
+      endDate: new Date(values.endDate),
     });
   };
 

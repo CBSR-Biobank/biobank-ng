@@ -2,9 +2,11 @@ import { PatientBreadcrumbs } from '@app/components/breadcrumbs/patients-breadcr
 import { Button } from '@app/components/ui/button';
 import { Input } from '@app/components/ui/input';
 import { usePatientStore } from '@app/store';
+
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { AdminPage } from '../admin-page';
 
 export function PatientSelect() {

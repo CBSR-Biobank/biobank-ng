@@ -1,7 +1,9 @@
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@app/components/ui/dialog';
+
 import { faCircleXmark, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { DialogTrigger } from '@radix-ui/react-dialog';
+
 import { CancelButton } from '../cancel-button';
 import { Chip } from '../chip';
 import { Button } from '../ui/button';

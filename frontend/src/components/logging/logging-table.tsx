@@ -1,4 +1,5 @@
 import { Logging } from '@app/models/logging';
+
 import { format } from 'date-fns';
 
 export const LoggingTable: React.FC<{ logging: Logging[] }> = ({ logging }) => {

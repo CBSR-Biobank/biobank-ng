@@ -60,9 +60,9 @@ export function stringAvatar(name: string, fontSize: number = 12, width: number 
       bgcolor: stringToColor(name),
       fontSize,
       width,
-      height
+      height,
     },
-    children: `${upper.split(' ')[0][0]}${upper.split(' ')[1][0]}`
+    children: `${upper.split(' ')[0][0]}${upper.split(' ')[1][0]}`,
   };
 }
 
