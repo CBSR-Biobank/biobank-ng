@@ -1,5 +1,10 @@
-package edu.ualberta.med.biobank.permission.patient;
+package edu.ualberta.med.biobank.permission.patients;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import edu.ualberta.med.biobank.ApplicationContextProvider;
 import edu.ualberta.med.biobank.domain.PermissionEnum;
 import edu.ualberta.med.biobank.errors.AppError;
@@ -7,22 +12,17 @@ import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.services.StudyService;
 import edu.ualberta.med.biobank.services.UserService;
 import io.jbock.util.Either;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
-public class CollectionEventDeletePermission implements Permission {
+public class SpecimenReadPermission implements Permission {
 
     @SuppressWarnings("unused")
-    private final Logger logger = LoggerFactory.getLogger(CollectionEventDeletePermission.class);
+    private final Logger logger = LoggerFactory.getLogger(SpecimenReadPermission.class);
 
-    private static final PermissionEnum PERMISSION = PermissionEnum.COLLECTION_EVENT_DELETE;
+    private static final PermissionEnum PERMISSION = PermissionEnum.SPECIMEN_READ;
 
     private Integer studyId;
 
-    public CollectionEventDeletePermission(Integer studyId) {
+    public SpecimenReadPermission(Integer studyId) {
         this.studyId = studyId;
     }
 

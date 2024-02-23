@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.controllers.studies;
+package edu.ualberta.med.biobank.controllers.clinics;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -16,16 +16,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
-import edu.ualberta.med.biobank.controllers.endpoints.StudyNamesEndpoint;
+import edu.ualberta.med.biobank.controllers.endpoints.ClinicNamesEndpoint;
 import edu.ualberta.med.biobank.domain.Status;
-import edu.ualberta.med.biobank.dtos.StudyNameDTO;
-import edu.ualberta.med.biobank.matchers.StudyMatcher;
+import edu.ualberta.med.biobank.dtos.ClinicNameDTO;
+import edu.ualberta.med.biobank.matchers.ClinicMatcher;
 import edu.ualberta.med.biobank.test.ControllerTest;
 
-class StudyNameListTests extends ControllerTest {
+class ClinicNameListTests extends ControllerTest {
 
     @SuppressWarnings("unused")
-    private final Logger logger = LoggerFactory.getLogger(StudyNameListTests.class);
+    private final Logger logger = LoggerFactory.getLogger(ClinicNameListTests.class);
 
     private static ResultMatcher[] paginationMatchers(int numElements, int totalElements, int totalPages) {
         return new ResultMatcher[] {
@@ -38,10 +38,11 @@ class StudyNameListTests extends ControllerTest {
     }
 
     @ParameterizedTest
+
     @MethodSource("provideStatus")
     @WithMockUser(value = "testuser")
     void get_when_none_present_is_not_found(List<String> statuses) throws Exception {
-        StudyNamesEndpoint endpoint = new StudyNamesEndpoint(statuses.toArray(new String[0]));
+        ClinicNamesEndpoint endpoint = new ClinicNamesEndpoint(statuses.toArray(new String[0]));
         this.mvc.perform(get(endpoint.url())).andExpect(status().isNotFound());
     }
 
@@ -49,41 +50,41 @@ class StudyNameListTests extends ControllerTest {
     @MethodSource("provideStatus")
     @WithMockUser(value = "testuser")
     void get_when_present_is_ok(List<String> statuses) throws Exception {
-        var study = factory.createStudy();
-        StudyNamesEndpoint endpoint = new StudyNamesEndpoint(statuses.toArray(new String[0]));
+        var clinic = factory.createClinic();
+        ClinicNamesEndpoint endpoint = new ClinicNamesEndpoint(statuses.toArray(new String[0]));
 
         if (statuses.size() == 1) {
-            study.setActivityStatus(Status.fromName(statuses.getFirst()));
-            em.persist(study);
+            clinic.setActivityStatus(Status.fromName(statuses.getFirst()));
+            em.persist(clinic);
             em.flush();
         }
 
         MvcResult result = this.mvc.perform(get(endpoint.url())).andExpect(status().isOk()).andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
-        List<StudyNameDTO> dtos = List.of(mapper.readValue(result.getResponse().getContentAsString(), StudyNameDTO[].class));
-        assertThat(dtos, StudyMatcher.containsNames(List.of(study)));
+        List<ClinicNameDTO> dtos = List.of(mapper.readValue(result.getResponse().getContentAsString(), ClinicNameDTO[].class));
+        assertThat(dtos, ClinicMatcher.containsNames(List.of(clinic)));
     }
 
     @ParameterizedTest
     @MethodSource("provideStatus")
-    @WithMockUser(value = "single_study_user")
-    void get_when_present_and_is_single_study_user_is_ok(List<String> statuses) throws Exception {
-        var study = factory.createStudy();
-        createSingleStudyUser("single_study_user");
-        StudyNamesEndpoint endpoint = new StudyNamesEndpoint(statuses.toArray(new String[0]));
+    @WithMockUser(value = "single_clinic_user")
+    void get_when_present_and_is_single_clinic_user_is_ok(List<String> statuses) throws Exception {
+        var clinic = factory.createClinic();
+        createSingleStudyUser("single_clinic_user");
+        ClinicNamesEndpoint endpoint = new ClinicNamesEndpoint(statuses.toArray(new String[0]));
 
         if (statuses.size() == 1) {
-            study.setActivityStatus(Status.fromName(statuses.getFirst()));
-            em.persist(study);
+            clinic.setActivityStatus(Status.fromName(statuses.getFirst()));
+            em.persist(clinic);
             em.flush();
         }
 
         MvcResult result = this.mvc.perform(get(endpoint.url())).andExpect(status().isOk()).andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
-        List<StudyNameDTO> dtos = List.of(mapper.readValue(result.getResponse().getContentAsString(), StudyNameDTO[].class));
-        assertThat(dtos, StudyMatcher.containsNames(List.of(study)));
+        List<ClinicNameDTO> dtos = List.of(mapper.readValue(result.getResponse().getContentAsString(), ClinicNameDTO[].class));
+        assertThat(dtos, ClinicMatcher.containsNames(List.of(clinic)));
     }
 
     private static List<List<String>> provideStatus() {

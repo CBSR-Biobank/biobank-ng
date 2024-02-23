@@ -240,8 +240,8 @@ export const CollectionEventDetails: React.FC<{ patient: Patient; vnumber: numbe
   };
 
   return (
-    <AdminPage>
-      <AdminPage.Title hasBorder>
+    <>
+      <AdminPage.Title>
         <p className="text-sm font-semibold text-gray-400">
           {collectionEvent.studyNameShort} Patient: {patient.pnumber}
         </p>
@@ -304,6 +304,6 @@ export const CollectionEventDetails: React.FC<{ patient: Patient; vnumber: numbe
       </div>
 
       <Buttons collectionEvent={collectionEvent} />
-    </AdminPage>
+    </>
   );
 };

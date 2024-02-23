@@ -1,5 +1,16 @@
 package edu.ualberta.med.biobank.services;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.applicationevents.BiobankEventPublisher;
 import edu.ualberta.med.biobank.domain.Comment;
 import edu.ualberta.med.biobank.domain.Patient;
@@ -14,9 +25,9 @@ import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.errors.PermissionError;
 import edu.ualberta.med.biobank.errors.ValidationError;
-import edu.ualberta.med.biobank.permission.patient.PatientCreatePermission;
-import edu.ualberta.med.biobank.permission.patient.PatientReadPermission;
-import edu.ualberta.med.biobank.permission.patient.PatientUpdatePermission;
+import edu.ualberta.med.biobank.permission.patients.PatientCreatePermission;
+import edu.ualberta.med.biobank.permission.patients.PatientReadPermission;
+import edu.ualberta.med.biobank.permission.patients.PatientUpdatePermission;
 import edu.ualberta.med.biobank.repositories.CollectionEventRepository;
 import edu.ualberta.med.biobank.repositories.PatientRepository;
 import edu.ualberta.med.biobank.repositories.StudyRepository;
@@ -24,18 +35,6 @@ import io.jbock.util.Either;
 import jakarta.persistence.Tuple;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 
 @Service
 public class PatientService {

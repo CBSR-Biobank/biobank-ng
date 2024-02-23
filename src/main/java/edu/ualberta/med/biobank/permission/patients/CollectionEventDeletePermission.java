@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.permission.patient;
+package edu.ualberta.med.biobank.permission.patients;
 
 import edu.ualberta.med.biobank.ApplicationContextProvider;
 import edu.ualberta.med.biobank.domain.PermissionEnum;
@@ -13,16 +13,16 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-public class CollectionEventUpdatePermission implements Permission {
+public class CollectionEventDeletePermission implements Permission {
 
     @SuppressWarnings("unused")
-    private final Logger logger = LoggerFactory.getLogger(CollectionEventUpdatePermission.class);
+    private final Logger logger = LoggerFactory.getLogger(CollectionEventDeletePermission.class);
 
-    private static final PermissionEnum PERMISSION = PermissionEnum.COLLECTION_EVENT_CREATE;
+    private static final PermissionEnum PERMISSION = PermissionEnum.COLLECTION_EVENT_DELETE;
 
     private Integer studyId;
 
-    public CollectionEventUpdatePermission(Integer studyId) {
+    public CollectionEventDeletePermission(Integer studyId) {
         this.studyId = studyId;
     }
 

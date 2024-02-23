@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.permission.patient;
+package edu.ualberta.med.biobank.permission.patients;
 
 import edu.ualberta.med.biobank.ApplicationContextProvider;
 import edu.ualberta.med.biobank.domain.PermissionEnum;

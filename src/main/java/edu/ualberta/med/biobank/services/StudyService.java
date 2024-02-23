@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.services;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +23,7 @@ import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.errors.Forbidden;
 import edu.ualberta.med.biobank.errors.PermissionError;
-import edu.ualberta.med.biobank.errors.Unauthorized;
-import edu.ualberta.med.biobank.errors.ValidationError;
-import edu.ualberta.med.biobank.permission.patient.StudyReadPermission;
+import edu.ualberta.med.biobank.permission.patients.StudyReadPermission;
 import edu.ualberta.med.biobank.repositories.StudyRepository;
 import edu.ualberta.med.biobank.util.LoggingUtils;
 import io.jbock.util.Either;
@@ -114,7 +111,7 @@ public class StudyService {
      * @see {@link StudyNameDTO}
      */
     public Either<AppError, List<StudyNameDTO>> studyNames(String... stringStatuses) {
-        return statusStringsToIds(stringStatuses)
+        return Status.statusStringsToIds(stringStatuses)
             .flatMap(statusIds -> {
                 Collection<Tuple> names = studyRepository.listNames(statusIds, Tuple.class);
                 if (names.isEmpty()) {
@@ -150,7 +147,7 @@ public class StudyService {
                 if (!allowed) {
                     return Either.left(new PermissionError("study read permission"));
                 }
-                return statusStringsToIds(stringStatuses);
+                return Status.statusStringsToIds(stringStatuses);
             })
             .flatMap(statusIds -> {
                 Collection<Tuple> attributeTypes = studyRepository.listAttributes(nameshort, statusIds, Tuple.class);
@@ -177,20 +174,6 @@ public class StudyService {
                 Collection<Tuple> sourceSpecimenTypes = studyRepository.listSourceSpecimens(nameshort, Tuple.class);
                 var dtos = sourceSpecimenTypes.stream().map(s -> SourceSpecimenTypeDTO.fromTuple(s)).toList();
                 return Either.right(dtos);
-            });
-    }
-
-    private Either<AppError, Set<Integer>> statusStringsToIds(String... stringStatuses) {
-        return Status
-            .fromStrings(stringStatuses)
-            .map(statuses -> {
-                Set<Integer> statusIds = new HashSet<>();
-                if (stringStatuses != null) {
-                    statusIds.addAll(statuses.stream().map(s -> s.getId()).toList());
-                } else {
-                    statusIds.addAll(Status.valuesList().stream().map(s -> s.getId()).toList());
-                }
-                return statusIds;
             });
     }
 }

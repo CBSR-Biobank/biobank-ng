@@ -12,7 +12,7 @@ export function usePatient(pnumber: string) {
   const query = useQuery({
     queryKey: ['patients', pnumber],
     queryFn: async () => PatientApi.getByPnumber(pnumber),
-    retry: (count, error: ApiError) => count <= 3 && error.status !== 404 && error.status !== 400,
+    retry: (count, error: ApiError) => count <= 3 && error.status !== 403 && error.status !== 404,
   });
   const { data: patient } = query;
 

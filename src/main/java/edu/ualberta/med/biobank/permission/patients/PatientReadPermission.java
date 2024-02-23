@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.permission.patient;
+package edu.ualberta.med.biobank.permission.patients;
 
 import edu.ualberta.med.biobank.ApplicationContextProvider;
 import edu.ualberta.med.biobank.domain.PermissionEnum;
@@ -13,16 +13,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-public class PatientUpdatePermission implements Permission {
+public class PatientReadPermission implements Permission {
 
     @SuppressWarnings("unused")
-    private final Logger logger = LoggerFactory.getLogger(PatientUpdatePermission.class);
-
-    private static final PermissionEnum PERMISSION = PermissionEnum.PATIENT_UPDATE;
+    private final Logger logger = LoggerFactory.getLogger(PatientReadPermission.class);
 
     private Integer studyId;
 
-    public PatientUpdatePermission(Integer studyId) {
+    public PatientReadPermission(Integer studyId) {
         this.studyId = studyId;
     }
 
@@ -36,13 +34,14 @@ public class PatientUpdatePermission implements Permission {
             .findOneWithMemberships(auth.getName())
             .flatMap(user -> {
                 if (studyId == null) {
-                    return Either.right(user.hasPermission(PERMISSION, null, null));
+                    return Either.right(user.hasPermission(PermissionEnum.PATIENT_READ, null, null));
                 }
 
                 var studyService = applicationContext.getBean(StudyService.class);
+
                 return studyService
                     .getByStudyId(studyId)
-                    .flatMap(study -> Either.right(user.hasPermission(PERMISSION, null, studyId)));
+                    .flatMap(study -> Either.right(user.hasPermission(PermissionEnum.PATIENT_READ, null, studyId)));
             });
     }
 }

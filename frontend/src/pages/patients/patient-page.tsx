@@ -1,33 +1,37 @@
 import { PatientBreadcrumbs } from '@app/components/breadcrumbs/patients-breadcrubms';
 import { CircularProgress } from '@app/components/circular-progress';
-import { PatientNotExist } from '@app/components/patients/patient-not-exist';
 import { ShowError } from '@app/components/show-error';
 import { usePatient } from '@app/hooks/use-patient';
 
-import { Outlet, useParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
+
+import { AdminPage } from '../admin-page';
 
 const PatientPageInternal: React.FC<{ pnumber: string }> = ({ pnumber }) => {
+  const navigate = useNavigate();
   const { isLoading, isError, error } = usePatient(pnumber);
-  const doesNotExist = isError && error?.status === 404;
+
+  useEffect(() => {
+    if (isError && error) {
+      if (error.error?.message && error.error.message.includes('permission')) {
+        navigate('./no-privileges');
+      } else if (error?.status === 404) {
+        navigate('./not-exits');
+      }
+    }
+  }, [isError, error]);
 
   if (isLoading) {
     return <CircularProgress />;
   }
 
-  if (isError && error && !doesNotExist) {
-    if (error.error?.message) {
-      if (error.error.message.includes('permission')) {
-        return <ShowError message="You do not have the privileges to view this patient" />;
-      }
-    }
-    console.log(error);
-    return <ShowError error={error} />;
-  }
-
   return (
     <>
       <PatientBreadcrumbs />
-      {doesNotExist ? <PatientNotExist pnumber={pnumber} /> : <Outlet />}
+      <AdminPage>
+        <Outlet />
+      </AdminPage>
     </>
   );
 };

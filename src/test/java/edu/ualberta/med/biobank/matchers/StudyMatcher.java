@@ -1,22 +1,20 @@
 package edu.ualberta.med.biobank.matchers;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hobsoft.hamcrest.compose.ComposeMatchers.compose;
 import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
+import java.util.ArrayList;
+import java.util.List;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
+import org.hamcrest.collection.ArrayMatching;
 import edu.ualberta.med.biobank.domain.SourceSpecimen;
-import edu.ualberta.med.biobank.domain.SpecimenType;
 import edu.ualberta.med.biobank.domain.Study;
 import edu.ualberta.med.biobank.domain.StudyEventAttr;
 import edu.ualberta.med.biobank.dtos.AnnotationTypeDTO;
 import edu.ualberta.med.biobank.dtos.SourceSpecimenTypeDTO;
 import edu.ualberta.med.biobank.dtos.StudyDTO;
 import edu.ualberta.med.biobank.dtos.StudyNameDTO;
-import java.util.ArrayList;
-import java.util.List;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
-import org.hamcrest.collection.ArrayMatching;
 
 public class StudyMatcher {
 

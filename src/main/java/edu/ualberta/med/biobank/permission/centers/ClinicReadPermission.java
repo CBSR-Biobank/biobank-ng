@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.permission.patient;
+package edu.ualberta.med.biobank.permission.centers;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.Authentication;
@@ -10,12 +10,12 @@ import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.services.UserService;
 import io.jbock.util.Either;
 
-public class StudyReadPermission implements Permission {
+public class ClinicReadPermission implements Permission {
 
-    private Integer studyId = null;
+    private Integer ClinicId = null;
 
-    public StudyReadPermission(Integer studyId) {
-        this.studyId = studyId;
+    public ClinicReadPermission(Integer ClinicId) {
+        this.ClinicId = ClinicId;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class StudyReadPermission implements Permission {
         return userService
             .findOneWithMemberships(auth.getName())
             .flatMap(user -> {
-                return Either.right(user.hasPermission(PermissionEnum.STUDY_READ, null, studyId));
+                return Either.right(user.hasPermission(PermissionEnum.CLINIC_READ, null, ClinicId));
             });
     }
 }

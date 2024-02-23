@@ -100,7 +100,7 @@ export function PatientDetails() {
   }
 
   return (
-    <AdminPage>
+    <>
       <AdminPage.Title hasBorder>
         <p className="text-sm font-semibold text-gray-400">{patient.studyNameShort} Patient</p>
         <p className="text-4xl font-semibold text-sky-600">{patient.pnumber}</p>
@@ -178,6 +178,6 @@ export function PatientDetails() {
         <VisitAddDialog disallow={takenVisitNumbers(patient)} onSubmit={handleVisitAdd} />
         <CommentAddDialog onSubmit={handleCommentAdd} />
       </div>
-    </AdminPage>
+    </>
   );
 }

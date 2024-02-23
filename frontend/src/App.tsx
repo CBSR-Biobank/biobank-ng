@@ -65,6 +65,20 @@ const router = createBrowserRouter([
                   return { Component: CollectionEventView };
                 },
               },
+              {
+                path: 'not-exits',
+                async lazy() {
+                  let { PatientNotExist } = await import('@app/components/patients/patient-not-exist');
+                  return { Component: PatientNotExist };
+                },
+              },
+              {
+                path: 'no-privileges',
+                async lazy() {
+                  let { NoPrivileges } = await import('@app/components/patients/no-privileges');
+                  return { Component: NoPrivileges };
+                },
+              },
             ],
           },
         ],

@@ -1,21 +1,23 @@
-import { Alert, AlertDescription } from '@app/components/alert';
+import { Alert, AlertDescription } from '@app/components/ui/alert';
 import { AdminPage } from '@app/pages/admin-page';
 
 import { faPlusCircle, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 import { BackButton } from '../back-button';
 import { Button } from '../ui/button';
 
-export const PatientNotExist: React.FC<{ pnumber: string }> = ({ pnumber }) => {
+export const PatientNotExist: React.FC = () => {
+  const { pnumber } = useParams();
+
   return (
-    <AdminPage>
+    <>
       <AdminPage.Title hasBorder>
         <p className="text-4xl font-semibold text-sky-600">Patient Does Not Exist</p>
       </AdminPage.Title>
       <div className="grid grid-cols-1 gap-8">
-        <Alert className="border-orange-500 bg-yellow-300 text-slate-600">
+        <Alert variant="warning">
           <FontAwesomeIcon icon={faWarning} />
           <AlertDescription>
             The patient with number <b>{pnumber}</b> is not on record
@@ -32,6 +34,6 @@ export const PatientNotExist: React.FC<{ pnumber: string }> = ({ pnumber }) => {
           </Link>
         </div>
       </div>
-    </AdminPage>
+    </>
   );
 };

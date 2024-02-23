@@ -1,19 +1,5 @@
 package edu.ualberta.med.biobank.services;
 
-import edu.ualberta.med.biobank.applicationevents.BiobankEventPublisher;
-import edu.ualberta.med.biobank.domain.SourceSpecimen;
-import edu.ualberta.med.biobank.domain.Specimen;
-import edu.ualberta.med.biobank.dtos.AliquotSpecimenDTO;
-import edu.ualberta.med.biobank.dtos.SpecimenDTO;
-import edu.ualberta.med.biobank.errors.AppError;
-import edu.ualberta.med.biobank.errors.EntityNotFound;
-import edu.ualberta.med.biobank.errors.PermissionError;
-import edu.ualberta.med.biobank.errors.ValidationError;
-import edu.ualberta.med.biobank.permission.patient.SpecimenReadPermission;
-import edu.ualberta.med.biobank.repositories.SpecimenRepository;
-import edu.ualberta.med.biobank.util.LoggingUtils;
-import io.jbock.util.Either;
-import jakarta.persistence.Tuple;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +8,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import edu.ualberta.med.biobank.applicationevents.BiobankEventPublisher;
+import edu.ualberta.med.biobank.domain.Specimen;
+import edu.ualberta.med.biobank.dtos.AliquotSpecimenDTO;
+import edu.ualberta.med.biobank.dtos.SpecimenDTO;
+import edu.ualberta.med.biobank.errors.AppError;
+import edu.ualberta.med.biobank.errors.EntityNotFound;
+import edu.ualberta.med.biobank.errors.PermissionError;
+import edu.ualberta.med.biobank.errors.ValidationError;
+import edu.ualberta.med.biobank.permission.patients.SpecimenReadPermission;
+import edu.ualberta.med.biobank.repositories.SpecimenRepository;
+import edu.ualberta.med.biobank.util.LoggingUtils;
+import io.jbock.util.Either;
+import jakarta.persistence.Tuple;
 
 @Service
 public class SpecimenService {

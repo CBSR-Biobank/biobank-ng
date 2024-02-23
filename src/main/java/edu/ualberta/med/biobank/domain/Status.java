@@ -3,7 +3,9 @@ package edu.ualberta.med.biobank.domain;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.ValidationError;
 import io.jbock.util.Either;
@@ -83,5 +85,18 @@ public enum Status {
         } catch (IllegalArgumentException err) {
             return Either.left(new ValidationError("invalid status(es): %s".formatted(String.join(", ", status))));
         }
+    }
+
+    public static Either<AppError, Set<Integer>> statusStringsToIds(String... stringStatuses) {
+        return fromStrings(stringStatuses)
+            .map(statuses -> {
+                Set<Integer> statusIds = new HashSet<>();
+                if (stringStatuses != null) {
+                    statusIds.addAll(statuses.stream().map(s -> s.getId()).toList());
+                } else {
+                    statusIds.addAll(Status.valuesList().stream().map(s -> s.getId()).toList());
+                }
+                return statusIds;
+            });
     }
 }

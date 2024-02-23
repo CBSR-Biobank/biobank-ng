@@ -8,10 +8,10 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
-import { Alert } from './alert';
 import { DashboardLayout } from './dashboard/dashboard-layout';
 import { LabelledInput } from './forms/labelled-input';
 import { OkButton } from './ok-button';
+import { Alert, AlertDescription } from './ui/alert';
 
 const schema = z.object({
   username: z.string().min(1, { message: 'A username is required' }),
@@ -77,7 +77,7 @@ export function Login() {
             {loginError && (
               <div className="flex items-center justify-center">
                 <Alert variant="destructive" className="border-2 border-red-600 bg-red-200 p-2 text-red-600">
-                  {loginErrorMessage}
+                  <AlertDescription>{loginErrorMessage}</AlertDescription>
                 </Alert>
               </div>
             )}
