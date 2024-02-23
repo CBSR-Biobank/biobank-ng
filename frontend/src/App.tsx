@@ -3,6 +3,7 @@ import { HomePage } from '@app/pages/homepage';
 
 import { Link, RouterProvider, createBrowserRouter, useRouteError } from 'react-router-dom';
 
+import { ShowError } from './components/show-error';
 import { BasicPage } from './pages/basic-page';
 
 const router = createBrowserRouter([
@@ -59,14 +60,7 @@ const router = createBrowserRouter([
                 },
               },
               {
-                path: ':vnumber',
-                async lazy() {
-                  let { CollectionEventView } = await import('@app/pages/collection-events/collection-event-view');
-                  return { Component: CollectionEventView };
-                },
-              },
-              {
-                path: 'not-exits',
+                path: 'not-exist',
                 async lazy() {
                   let { PatientNotExist } = await import('@app/components/patients/patient-not-exist');
                   return { Component: PatientNotExist };
@@ -78,6 +72,34 @@ const router = createBrowserRouter([
                   let { NoPrivileges } = await import('@app/components/patients/no-privileges');
                   return { Component: NoPrivileges };
                 },
+              },
+              {
+                path: ':vnumber',
+                children: [
+                  {
+                    index: true,
+                    async lazy() {
+                      let { CollectionEventView } = await import('@app/pages/collection-events/collection-event-view');
+                      return { Component: CollectionEventView };
+                    },
+                  },
+                  {
+                    path: 'not-exist',
+                    async lazy() {
+                      let { VisitNotExist } = await import('@app/components/patients/visit-not-exist');
+                      return { Component: VisitNotExist };
+                    },
+                  },
+                  {
+                    path: 'delete-no-privileges',
+                    async lazy() {
+                      let { VisitDeleteNoPrivileges } = await import(
+                        '@app/components/patients/visit-delete-no-privileges'
+                      );
+                      return { Component: VisitDeleteNoPrivileges };
+                    },
+                  },
+                ],
               },
             ],
           },
@@ -126,7 +148,11 @@ function NoMatch() {
 function ErrorBoundary() {
   let error = useRouteError();
   console.error(error);
-  return <div>Error!</div>;
+  return (
+    <div className="container pt-8">
+      <ShowError error={error}></ShowError>
+    </div>
+  );
 }
 
 export function App() {

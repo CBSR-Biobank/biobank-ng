@@ -28,6 +28,7 @@ export const UserMenu = () => {
     try {
       setLoggedIn(false);
       setUserToken(null);
+      navigate('/');
     } catch (e) {
       console.error(e);
     }

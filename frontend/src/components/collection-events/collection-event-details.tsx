@@ -41,8 +41,8 @@ import { cn } from '@app/utils';
 
 import { faChevronRight, faTrash, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 import { SourceSpecimenAddDialog } from '../specimens/source-specimen-add-dialog';
 
@@ -133,6 +133,10 @@ const Buttons: React.FC<{ collectionEvent: CollectionEvent }> = ({ collectionEve
       onSuccess: () => {
         navigate('..');
       },
+      onError: () => {
+        console.log('>>>>>>>>> here');
+        navigate('./delete-no-privileges');
+      },
     });
   };
 
@@ -190,12 +194,26 @@ export const CollectionEventDetails: React.FC<{ patient: Patient; vnumber: numbe
   const { collectionEvent, isLoading, isError, error } = useCollectionEvent(patient.pnumber, vnumber);
   const updateMutation = useCollectionEventUpdate();
 
-  if (isError) {
-    return <ShowError error={error} />;
+  useEffect(() => {
+    if (isError && error) {
+      if (error?.status === 404) {
+        navigate('./not-exist');
+      }
+    }
+  }, [isError, error]);
+
+  if (isError && error) {
+    if (error?.status !== 404) {
+      return <ShowError error={error} />;
+    }
   }
 
-  if (isLoading || !collectionEvent) {
+  if (isLoading) {
     return <CircularProgress />;
+  }
+
+  if (!collectionEvent) {
+    return <Outlet />;
   }
 
   const handleVnumberUpdated = (value?: number) => {

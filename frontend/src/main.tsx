@@ -8,7 +8,12 @@ import './index.css';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false,
+      throwOnError: (error) => {
+        if ('status' in error && error.status === 401) {
+          window.location.replace('/login');
+        }
+        return false;
+      },
     },
   },
 });

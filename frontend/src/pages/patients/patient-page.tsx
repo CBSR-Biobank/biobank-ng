@@ -17,7 +17,7 @@ const PatientPageInternal: React.FC<{ pnumber: string }> = ({ pnumber }) => {
       if (error.error?.message && error.error.message.includes('permission')) {
         navigate('./no-privileges');
       } else if (error?.status === 404) {
-        navigate('./not-exits');
+        navigate('./not-exist');
       }
     }
   }, [isError, error]);
@@ -25,6 +25,10 @@ const PatientPageInternal: React.FC<{ pnumber: string }> = ({ pnumber }) => {
   if (isLoading) {
     return <CircularProgress />;
   }
+
+  // if (isError && error) {
+  //   return <ShowError error={error} />;
+  // }
 
   return (
     <>
