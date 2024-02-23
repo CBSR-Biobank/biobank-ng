@@ -1,18 +1,5 @@
 package edu.ualberta.med.biobank.services;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.domain.Study;
 import edu.ualberta.med.biobank.dtos.AnnotationTypeDTO;
@@ -28,6 +15,19 @@ import edu.ualberta.med.biobank.repositories.StudyRepository;
 import edu.ualberta.med.biobank.util.LoggingUtils;
 import io.jbock.util.Either;
 import jakarta.persistence.Tuple;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
 @Service
 public class StudyService {
@@ -111,26 +111,25 @@ public class StudyService {
      * @see {@link StudyNameDTO}
      */
     public Either<AppError, List<StudyNameDTO>> studyNames(String... stringStatuses) {
-        return Status.statusStringsToIds(stringStatuses)
-            .flatMap(statusIds -> {
-                Collection<Tuple> names = studyRepository.listNames(statusIds, Tuple.class);
-                if (names.isEmpty()) {
-                    return Either.left(new EntityNotFound("study names not found"));
-                }
+        return Status.statusStringsToIds(stringStatuses).flatMap(statusIds -> {
+            Collection<Tuple> names = studyRepository.listNames(statusIds, Tuple.class);
+            if (names.isEmpty()) {
+                return Either.left(new EntityNotFound("study names not found"));
+            }
 
-                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                var user = userService.findOneWithMemberships(auth.getName()).getRight().get();
-                var dtos = names.stream().map(s -> StudyNameDTO.fromTuple(s));
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            var user = userService.findOneWithMemberships(auth.getName()).getRight().get();
+            var dtos = names.stream().map(s -> StudyNameDTO.fromTuple(s));
 
-                if (!user.hasAllStudies()) {
-                    var userStudyIds = user.studyIds();
-                    dtos = dtos.filter(s -> userStudyIds.contains(s.id()));
-                }
+            if (!user.hasAllStudies()) {
+                var userStudyIds = user.studyIds();
+                dtos = dtos.filter(s -> userStudyIds.contains(s.id()));
+            }
 
-                var result = dtos.toList();
-                logger.debug("studyNames: user: {}, num_studies: {}", auth.getName(), result.size());
-                return Either.right(result);
-            });
+            var result = dtos.toList();
+            logger.debug("studyNames: user: {}, num_studies: {}", auth.getName(), result.size());
+            return Either.right(result);
+        });
     }
 
     public Either<AppError, List<AnnotationTypeDTO>> annotationTypes(String nameshort, String... stringStatuses) {

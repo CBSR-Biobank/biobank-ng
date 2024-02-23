@@ -102,6 +102,7 @@ class CollectionEventUpdateTests extends ControllerTest {
             .andReturn();
 
         CollectionEventDTO resultDto = objectMapper().readValue(result.getResponse().getContentAsString(), CollectionEventDTO.class);
+        // FIXME: check for match
         logger.debug("HTTP Response: {}", LoggingUtils.prettyPrintJson(resultDto));
     }
 

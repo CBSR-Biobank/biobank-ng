@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * Uses to capture specimen information when we do not know if this is a source spcecimen or an aliquot.
+ * Used to capture specimen information when we do not know if this is a source spcecimen or an aliquot.
  */
 public record SpecimenDTO(
     Integer id,

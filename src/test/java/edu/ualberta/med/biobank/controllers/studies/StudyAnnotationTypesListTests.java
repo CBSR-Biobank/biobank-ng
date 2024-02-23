@@ -58,9 +58,13 @@ class StudyAnnotationTypesListTests extends ControllerTest {
             statuses.toArray(new String[0])
         );
 
-        this.mvc.perform(get(endpoint.url()))
-            .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message", Matchers.matchesRegex(".*attribute types.*")));
+        MvcResult result =  this.mvc.perform(get(endpoint.url())).andExpect(status().isOk()).andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<AnnotationTypeDTO> dtos = List.of(
+            mapper.readValue(result.getResponse().getContentAsString(), AnnotationTypeDTO[].class)
+        );
+        assertThat(dtos, Matchers.hasSize(0));
     }
 
     @ParameterizedTest

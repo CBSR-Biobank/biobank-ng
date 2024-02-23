@@ -1,10 +1,11 @@
 package edu.ualberta.med.biobank.controllers;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.hamcrest.core.IsNot;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -34,6 +35,6 @@ class AuthControllerTest {
                 .andReturn();
 
         // FIXME: compare using a matcher
-        assertThat(result.getResponse().getContentAsString()).isNotEmpty();
+        MatcherAssert.assertThat(result.getResponse().getContentAsString(), IsNot.not(Matchers.emptyString()));
     }
 }

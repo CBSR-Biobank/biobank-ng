@@ -1,13 +1,14 @@
+import { useClinicNames } from '@app/hooks/use-clinic';
 import { useStudySourceSpecimenTypes } from '@app/hooks/use-study';
+import { SourceSpecimenAdd } from '@app/models/specimen';
 import { Status } from '@app/models/status';
-
 import { faVial } from '@fortawesome/free-solid-svg-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
 import { CircularProgress } from '../circular-progress';
 import { EntityAddDialog } from '../entity-add-dialog';
+import { ClinicSelect } from '../forms/clinic-select';
 import { FormLabel } from '../forms/form-label';
 import { LabelledInput } from '../forms/labelled-input';
 import { SourceSpecimenTypeSelect } from '../forms/source-specimen-type-select';
@@ -15,8 +16,9 @@ import { StatusSelect } from '../forms/status-select';
 import { ShowError } from '../show-error';
 
 const schema = z.object({
+  clinicNameShort: z.string().or(z.literal('')),
   inventoryId: z.string().min(1, { message: 'an ID is required' }),
-  typeNameShort: z.string(),
+  typeNameShort: z.string().or(z.literal('')),
   timeDrawn: z.string().min(1, { message: 'a time is required' }),
   status: z.nativeEnum(Status),
   comment: z.string().optional(),
@@ -27,8 +29,9 @@ export type FormInputs = z.infer<typeof schema>;
 export const SourceSpecimenAddDialog: React.FC<{
   studyNameShort: string;
   title?: string;
-  onSubmit: (newComment: string) => void;
+  onSubmit: (newSpecimen: SourceSpecimenAdd) => void;
 }> = ({ studyNameShort, title, onSubmit }) => {
+  const clinicNamesQry = useClinicNames();
   const query = useStudySourceSpecimenTypes(studyNameShort);
 
   const now = new Date();
@@ -45,6 +48,7 @@ export const SourceSpecimenAddDialog: React.FC<{
     reValidateMode: 'onChange',
     resolver: zodResolver(schema),
     defaultValues: {
+      clinicNameShort: '',
       typeNameShort: '',
       status: Status.ACTIVE,
       timeDrawn: now.toISOString().substring(0, 16),
@@ -53,13 +57,23 @@ export const SourceSpecimenAddDialog: React.FC<{
 
   const handleSubmit = () => {
     const values = getValues();
-    onSubmit(values.typeNameShort);
+    onSubmit({
+      inventoryId: values.inventoryId,
+      timeDrawn: new Date(values.timeDrawn),
+      status: values.status,
+      specimenTypeNameShort: values.typeNameShort,
+      originCenterNameShort: values.clinicNameShort,
+    });
     reset();
   };
 
   const handleCancel = () => {
     reset();
   };
+
+  if (clinicNamesQry.isLoading || !clinicNamesQry.clinicNames) {
+    return <CircularProgress />;
+  }
 
   return (
     <EntityAddDialog
@@ -77,6 +91,12 @@ export const SourceSpecimenAddDialog: React.FC<{
             <ShowError error={query.error} />
           ) : (
             <>
+              {clinicNamesQry.isLoading || !clinicNamesQry.clinicNames ? (
+                <CircularProgress />
+              ) : (
+                <ClinicSelect control={control} name="clinicNameShort" clinics={clinicNamesQry.clinicNames} />
+              )}
+
               <LabelledInput
                 id="inventoryId"
                 label="Inventory ID"

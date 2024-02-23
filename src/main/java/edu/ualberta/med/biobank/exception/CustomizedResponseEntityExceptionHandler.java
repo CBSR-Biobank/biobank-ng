@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import edu.ualberta.med.biobank.errors.BadRequest;
 import edu.ualberta.med.biobank.errors.EntityNotFound;
 import edu.ualberta.med.biobank.errors.Forbidden;
 import edu.ualberta.med.biobank.errors.PermissionError;
@@ -41,23 +42,15 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
         AppErrorException appErrorException,
         WebRequest request
     ) {
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-
-        if (appErrorException.appError instanceof EntityNotFound) {
-            status = HttpStatus.NOT_FOUND;
-        }
-
-        if (appErrorException.appError instanceof Forbidden || appErrorException.appError instanceof PermissionError) {
-            status = HttpStatus.FORBIDDEN;
-        }
-
-        if (appErrorException.appError instanceof Unauthorized) {
-            status = HttpStatus.UNAUTHORIZED;
-        }
-
-        if (appErrorException.appError instanceof ValidationError) {
-            status = HttpStatus.BAD_REQUEST;
-        }
+        HttpStatus status = switch (appErrorException.appError) {
+            case BadRequest e -> HttpStatus.BAD_REQUEST;
+            case ValidationError e -> HttpStatus.BAD_REQUEST;
+            case EntityNotFound e -> HttpStatus.NOT_FOUND;
+            case Forbidden e -> HttpStatus.FORBIDDEN;
+            case PermissionError e -> HttpStatus.FORBIDDEN;
+            case Unauthorized e -> HttpStatus.UNAUTHORIZED;
+            default -> HttpStatus.INTERNAL_SERVER_ERROR;
+        };
 
         ExceptionResponse exceptionResponse = new ExceptionResponse(
             LocalDateTime.now(),

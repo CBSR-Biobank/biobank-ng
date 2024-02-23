@@ -41,13 +41,17 @@ class StudySourceSpecimenTypesListTests extends ControllerTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    void get_whith_none_present_is_not_found() throws Exception {
+    void get_whith_none_present_is_ok_and_empty_result() throws Exception {
         Study study = new StudyFixtureBuilder().setEntityManger(em).build(factory);
         StudySourceSpecimenTypesEndpoint endpoint = new StudySourceSpecimenTypesEndpoint(study.getNameShort());
 
-        this.mvc.perform(get(endpoint.url()))
-            .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message", Matchers.matchesRegex(".*source specimen types.*")));
+        MvcResult result = this.mvc.perform(get(endpoint.url())).andExpect(status().isOk()).andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<SourceSpecimenTypeDTO> dtos = List.of(
+            mapper.readValue(result.getResponse().getContentAsString(), SourceSpecimenTypeDTO[].class)
+        );
+        assertThat(dtos, Matchers.hasSize(0));
     }
 
     @Test

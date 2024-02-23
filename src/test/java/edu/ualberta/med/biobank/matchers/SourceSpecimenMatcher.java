@@ -38,7 +38,7 @@ public class SourceSpecimenMatcher {
             .and(
                 hasFeature(
                     "createdAt",
-                    SourceSpecimenDTO::createdAt,
+                    SourceSpecimenDTO::timeDrawn,
                     DateMatchers.within(1, ChronoUnit.SECONDS, expected.getCreatedAt())
                 )
             )

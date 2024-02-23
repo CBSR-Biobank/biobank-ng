@@ -2,8 +2,11 @@ package edu.ualberta.med.biobank.permission.patients;
 
 import edu.ualberta.med.biobank.ApplicationContextProvider;
 import edu.ualberta.med.biobank.domain.PermissionEnum;
+import edu.ualberta.med.biobank.dtos.ClinicDTO;
+import edu.ualberta.med.biobank.dtos.StudyDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.permission.Permission;
+import edu.ualberta.med.biobank.services.ClinicService;
 import edu.ualberta.med.biobank.services.StudyService;
 import edu.ualberta.med.biobank.services.UserService;
 import io.jbock.util.Either;
@@ -22,8 +25,15 @@ public class CollectionEventUpdatePermission implements Permission {
 
     private Integer studyId;
 
+    private Integer centerId;
+
     public CollectionEventUpdatePermission(Integer studyId) {
         this.studyId = studyId;
+    }
+
+    public CollectionEventUpdatePermission(Integer studyId, Integer centerId) {
+        this.studyId = studyId;
+        this.centerId = centerId;
     }
 
     @Override
@@ -40,10 +50,24 @@ public class CollectionEventUpdatePermission implements Permission {
                     return Either.right(user.hasPermission(PERMISSION, null, null));
                 }
 
-                var studyService = applicationContext.getBean(StudyService.class);
-                return studyService
-                    .getByStudyId(studyId)
-                    .flatMap(study -> Either.right(user.hasPermission(PERMISSION, null, studyId)));
+                StudyService studyService = applicationContext.getBean(StudyService.class);
+                ClinicService clinicService = applicationContext.getBean(ClinicService.class);
+
+                Either<AppError, StudyDTO> studyMaybe = studyService.getByStudyId(studyId);
+                if (studyMaybe.isLeft()) {
+                    return studyMaybe.map(null);
+                }
+
+                if (centerId != null) {
+                    Either<AppError, ClinicDTO> centerMaybe = clinicService.getByClinicId(centerId);
+
+                    if (centerMaybe.isLeft()) {
+                        return centerMaybe.map(null);
+                    }
+                    return Either.right(user.hasPermission(PERMISSION, centerId, studyId));
+                }
+
+                return Either.right(user.hasPermission(PERMISSION, null, studyId));
             });
     }
 }

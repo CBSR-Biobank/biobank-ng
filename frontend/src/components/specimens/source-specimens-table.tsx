@@ -78,7 +78,7 @@ export const SourceSpecimenTable: React.FC<{ specimens: SourceSpecimen[] }> = ({
                     {specimen.worksheet}
                   </TableCell>
                   <TableCell className=" text-sm font-normal leading-normal text-slate-700">
-                    {format(specimen.createdAt, 'yyyy-MM-dd hh:mm')}
+                    {format(specimen.timeDrawn, 'yyyy-MM-dd hh:mm')}
                   </TableCell>
                   <TableCell className=" text-sm font-normal leading-normal text-slate-700">
                     <StatusChip status={specimen.status} variant="table" />

@@ -26,7 +26,7 @@ export function SourceSpecimenTypeSelect<T extends FieldValues, U extends FieldP
   return (
     <div className="grid grid-cols-1 gap-2">
       <FormLabel>Specimen Type</FormLabel>
-      <Select>
+      <Select defaultValue={field.value ?? undefined} onValueChange={(value) => field.onChange(value)}>
         <SelectTrigger className="w-full overflow-y-auto">
           <SelectValue placeholder="Select a specimen type" />
         </SelectTrigger>
@@ -34,13 +34,7 @@ export function SourceSpecimenTypeSelect<T extends FieldValues, U extends FieldP
           <SelectGroup>
             <SelectLabel>Specimen Type</SelectLabel>
             {specimenTypes.map((option) => (
-              <SelectItem
-                key={option.nameShort}
-                value={option.nameShort}
-                onSelect={() => {
-                  field.onChange(option.nameShort);
-                }}
-              >
+              <SelectItem key={option.nameShort} value={option.nameShort}>
                 {option.nameShort}
               </SelectItem>
             ))}

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.controllers;
+package edu.ualberta.med.biobank.controllers.specimens;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -26,14 +26,14 @@ import jakarta.transaction.Transactional;
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-class SpecimenControllerTest extends ControllerTest {
+class SpecimenGetTest extends ControllerTest {
 
     @SuppressWarnings("unused")
-    private final Logger logger = LoggerFactory.getLogger(SpecimenControllerTest.class);
+    private final Logger logger = LoggerFactory.getLogger(SpecimenGetTest.class);
 
     @Test
     @WithMockUser
-    void get_when_empty_table_is404() throws Exception {
+    void when_empty_table_is404() throws Exception {
         var patient = factory.createPatient();
 
         this.mvc.perform(get(new VisitNumberEndpoint(patient.getPnumber(), 9999).url()))
@@ -41,7 +41,7 @@ class SpecimenControllerTest extends ControllerTest {
     }
 
     @Test
-    void get_when_present_and_unauthorized() throws Exception {
+    void when_present_and_unauthorized() throws Exception {
         var patient = new PatientFixtureBuilder()
             .numCollectionEvents(1)
             .numSpecimens(1)
@@ -56,7 +56,7 @@ class SpecimenControllerTest extends ControllerTest {
     @Test
     @WithMockUser(value = "testuser")
     @DisplayName("When source specimen is present returns OK")
-    void get_when_present_is_ok() throws Exception {
+    void when_present_is_ok() throws Exception {
         var patient = new PatientFixtureBuilder()
             .numCollectionEvents(1)
             .numSpecimens(1)
@@ -89,7 +89,7 @@ class SpecimenControllerTest extends ControllerTest {
     @Test
     @WithMockUser(value = "non_member_user")
     @DisplayName("When source specimen is present returns OK")
-    void get_when_present_and_not_member_is_forbidden() throws Exception {
+    void when_present_and_not_member_is_forbidden() throws Exception {
         createSingleStudyUser("non_member_user");
 
         var patient = new PatientFixtureBuilder()
@@ -107,7 +107,7 @@ class SpecimenControllerTest extends ControllerTest {
 
     @Test
     @WithMockUser(value = "testuser")
-    void get_when_not_source_specimen_is_bad_request() throws Exception {
+    void when_not_source_specimen_is_bad_request() throws Exception {
         var patient = new PatientFixtureBuilder()
             .numCollectionEvents(1)
             .numSpecimens(1)
@@ -130,7 +130,7 @@ class SpecimenControllerTest extends ControllerTest {
     @Test
     @WithMockUser(value = "testuser")
     @DisplayName("When source specimen inventory ID is invalid returns 404")
-    void get_when_not_present_is_not_found() throws Exception {
+    void when_not_present_is_not_found() throws Exception {
         var patient = new PatientFixtureBuilder()
             .numCollectionEvents(1)
             .numSpecimens(1)

@@ -44,6 +44,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
+import { SourceSpecimenAdd } from '@app/models/specimen';
 import { SourceSpecimenAddDialog } from '../specimens/source-specimen-add-dialog';
 
 function DeleteNotAllowed() {
@@ -134,10 +135,13 @@ const Buttons: React.FC<{ collectionEvent: CollectionEvent }> = ({ collectionEve
         navigate('..');
       },
       onError: () => {
-        console.log('>>>>>>>>> here');
         navigate('./delete-no-privileges');
       },
     });
+  };
+
+  const handleSpecimenAdd = (specimen: SourceSpecimenAdd) => {
+    console.log(specimen);
   };
 
   return (
@@ -158,7 +162,7 @@ const Buttons: React.FC<{ collectionEvent: CollectionEvent }> = ({ collectionEve
       <SourceSpecimenAddDialog
         studyNameShort={collectionEvent.studyNameShort}
         title="Visit"
-        onSubmit={() => console.log('here')}
+        onSubmit={handleSpecimenAdd}
       />
       <CommentAddDialog title="Visit" onSubmit={handleCommentAdded} />
     </div>

@@ -1,16 +1,5 @@
 package edu.ualberta.med.biobank.services;
 
-import java.util.Collection;
-import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.domain.Clinic;
 import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.dtos.ClinicDTO;
@@ -23,6 +12,17 @@ import edu.ualberta.med.biobank.repositories.ClinicRepository;
 import edu.ualberta.med.biobank.util.LoggingUtils;
 import io.jbock.util.Either;
 import jakarta.persistence.Tuple;
+import java.util.Collection;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ClinicService {
@@ -57,16 +57,11 @@ public class ClinicService {
     }
 
     public Either<AppError, ClinicDTO> findByNameShort(String nameshort) {
-        var found = clinicRepository.findClinicByNameShort(nameshort, Tuple.class).stream().findFirst();
-
-        if (found.isEmpty()) {
-            return Either.left(new EntityNotFound("clinic"));
-        }
-
-        ClinicDTO clinic = ClinicDTO.fromTuple(found.get());
-        ClinicReadPermission permission = new ClinicReadPermission(clinic.id());
-        var allowed = permission.isAllowed();
-        return allowed.map(a -> clinic);
+        return findByNameShortInternal(nameshort).flatMap(clinic -> {
+            ClinicReadPermission permission = new ClinicReadPermission(clinic.id());
+            var allowed = permission.isAllowed();
+            return allowed.map(a -> clinic);
+        });
     }
 
     public Either<AppError, Page<ClinicDTO>> clinicPagination(Integer pageNumber, Integer pageSize, String sort) {
@@ -104,25 +99,34 @@ public class ClinicService {
      * @see {@link ClinicNameDTO}
      */
     public Either<AppError, List<ClinicNameDTO>> clinicNames(String... stringStatuses) {
-        return Status.statusStringsToIds(stringStatuses)
-            .flatMap(statusIds -> {
-                Collection<Tuple> names = clinicRepository.listClinicNames(statusIds, Tuple.class);
-                if (names.isEmpty()) {
-                    return Either.left(new EntityNotFound("clinic names not found"));
-                }
+        return Status.statusStringsToIds(stringStatuses).flatMap(statusIds -> {
+            Collection<Tuple> names = clinicRepository.listClinicNames(statusIds, Tuple.class);
+            if (names.isEmpty()) {
+                return Either.left(new EntityNotFound("clinic names not found"));
+            }
 
-                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                var user = userService.findOneWithMemberships(auth.getName()).getRight().get();
-                var dtos = names.stream().map(s -> ClinicNameDTO.fromTuple(s));
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            var user = userService.findOneWithMemberships(auth.getName()).getRight().get();
+            var dtos = names.stream().map(s -> ClinicNameDTO.fromTuple(s));
 
-                if (!user.hasAllStudies()) {
-                    var userClinicIds = user.centerIds();
-                    dtos = dtos.filter(s -> userClinicIds.contains(s.id()));
-                }
+            if (!user.hasAllStudies()) {
+                var userClinicIds = user.centerIds();
+                dtos = dtos.filter(s -> userClinicIds.contains(s.id()));
+            }
 
-                var result = dtos.toList();
-                logger.debug("clinicNames: user: {}, num_studies: {}", auth.getName(), result.size());
-                return Either.right(result);
-            });
+            var result = dtos.toList();
+            logger.debug("clinicNames: user: {}, num_studies: {}", auth.getName(), result.size());
+            return Either.right(result);
+        });
+    }
+
+    Either<AppError, ClinicDTO> findByNameShortInternal(String nameshort) {
+        var found = clinicRepository.findClinicByNameShort(nameshort, Tuple.class).stream().findFirst();
+
+        if (found.isEmpty()) {
+            return Either.left(new EntityNotFound("clinic short name not found"));
+        }
+
+        return Either.right(ClinicDTO.fromTuple(found.get()));
     }
 }

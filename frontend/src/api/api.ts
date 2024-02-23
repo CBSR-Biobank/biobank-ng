@@ -12,6 +12,13 @@ type Auth = {
   body: undefined;
 };
 
+type ClinicNames = {
+  method: 'GET';
+  path: ['clinics', 'names'];
+  query: { status?: Status | undefined };
+  body: undefined;
+};
+
 type Logging = {
   method: 'GET';
   path: ['logging'];
@@ -140,6 +147,7 @@ type SourceSpecimenTypes = {
 
 export type Endpoint =
   | Auth
+  | ClinicNames
   | Logging
   | LoggingLatest
   | PatientCreate
