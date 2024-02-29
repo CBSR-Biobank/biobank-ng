@@ -117,6 +117,13 @@ type CollectionEventAddComment = {
   body: string;
 };
 
+type SourceSpecimenCreate = {
+  method: 'POST';
+  path: ['specimens'];
+  query: undefined;
+  body: string;
+};
+
 type AliquotsGet = {
   method: 'GET';
   path: ['specimens', string, 'aliquots'];
@@ -162,6 +169,7 @@ export type Endpoint =
   | CollectionEventDelete
   | CollectionEventListComments
   | CollectionEventAddComment
+  | SourceSpecimenCreate
   | AliquotsGet
   | StudyNames
   | StudyAnnotationTypes

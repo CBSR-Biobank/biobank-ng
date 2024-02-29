@@ -192,7 +192,6 @@ public class SpecimenService {
 
                     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
                     eventPublisher.publishVisitUpdated(auth.getName(), dto.pnumber(), dto.vnumber());
-
                     return Either.right(SourceSpecimenDTO.fromSpecimen(specimen));
                 });
         });

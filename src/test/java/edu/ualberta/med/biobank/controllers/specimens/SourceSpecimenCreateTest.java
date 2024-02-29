@@ -121,7 +121,7 @@ class SourceSpecimenCreateTest extends ControllerTest {
             specimen.getSpecimenType().getNameShort(),
             specimen.getCreatedAt(),
             specimen.getQuantity(),
-            specimen.getActivityStatus().getName(),
+            specimen.getActivityStatus().toString(),
             patient.getPnumber(),
             collectionEvent.getVisitNumber(),
             specimen.getOriginInfo().getCenter().getNameShort()

@@ -58,7 +58,7 @@ class CollectionEventUpdateTests extends ControllerTest {
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var newData = new CollectionEventUpdateDTO(
             collectionEvent.getVisitNumber(),
-            collectionEvent.getActivityStatus().getName(),
+            collectionEvent.getActivityStatus().toString(),
             List.of()
         );
 
@@ -133,7 +133,7 @@ class CollectionEventUpdateTests extends ControllerTest {
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var newData = new CollectionEventUpdateDTO(
             collectionEvent.getVisitNumber() + 1,
-            collectionEvent.getActivityStatus().getName(),
+            collectionEvent.getActivityStatus().toString(),
             List.of()
         );
 
@@ -155,7 +155,7 @@ class CollectionEventUpdateTests extends ControllerTest {
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var newData = new CollectionEventUpdateDTO(
             collectionEvent.getVisitNumber(),
-            collectionEvent.getActivityStatus().getName(),
+            collectionEvent.getActivityStatus().toString(),
             List.of()
         );
 

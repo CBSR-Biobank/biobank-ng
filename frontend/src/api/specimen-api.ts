@@ -1,4 +1,4 @@
-import { aliquotSchema } from '@app/models/specimen';
+import { SourceSpecimenAdd, aliquotSchema, sourceSpecimenSchema } from '@app/models/specimen';
 
 import { z } from 'zod';
 
@@ -15,5 +15,16 @@ export class SpecimenApi {
     const result = await response.json();
     const specimens = z.array(aliquotSchema).parse(result);
     return specimens;
+  }
+
+  static async add(specimen: SourceSpecimenAdd) {
+    const response = await httpClient({
+      method: 'POST',
+      path: ['specimens'],
+      body: JSON.stringify(specimen),
+      query: undefined,
+    });
+    const result = await response.json();
+    return sourceSpecimenSchema.parse(result);
   }
 }

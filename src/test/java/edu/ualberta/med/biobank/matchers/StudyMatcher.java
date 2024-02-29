@@ -54,7 +54,7 @@ public class StudyMatcher {
             )
         )
             .and(hasFeature("label", AnnotationTypeDTO::label, equalTo(expected.getGlobalEventAttr().getLabel())))
-            .and(hasFeature("status", AnnotationTypeDTO::status, equalTo(expected.getActivityStatus().getName())))
+            .and(hasFeature("status", AnnotationTypeDTO::status, equalTo(expected.getActivityStatus().toString())))
             .and(hasFeature("required", AnnotationTypeDTO::required, equalTo(expected.getRequired())));
 
         String permissible = expected.getPermissible();

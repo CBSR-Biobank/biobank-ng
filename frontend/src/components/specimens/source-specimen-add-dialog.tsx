@@ -16,7 +16,7 @@ import { StatusSelect } from '../forms/status-select';
 import { ShowError } from '../show-error';
 
 const schema = z.object({
-  clinicNameShort: z.string().or(z.literal('')),
+  clinicNameShort: z.string().min(1, { message: 'an ID is required' }),
   inventoryId: z.string().min(1, { message: 'an ID is required' }),
   typeNameShort: z.string().or(z.literal('')),
   timeDrawn: z.string().min(1, { message: 'a time is required' }),

@@ -86,7 +86,7 @@ public record CollectionEventDTO(
         return new CollectionEventDTO(
             cevent.getId(),
             cevent.getVisitNumber(),
-            cevent.getActivityStatus().getName(),
+            cevent.getActivityStatus().toString(),
             cevent.getPatient().getId(),
             cevent.getPatient().getPnumber(),
             cevent.getPatient().getStudy().getId(),

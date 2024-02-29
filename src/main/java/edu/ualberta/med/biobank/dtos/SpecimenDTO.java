@@ -36,7 +36,7 @@ public record SpecimenDTO(
             data.get("specimenInventoryId", String.class),
             data.get("specimenCreatedAt", Date.class),
             data.get("specimenQuantity", BigDecimal.class),
-            Status.fromId(data.get("specimenActivityStatusId", Integer.class)).getName(),
+            Status.fromId(data.get("specimenActivityStatusId", Integer.class)).toString(),
             data.get("specimenTypeId", Number.class).intValue(),
             data.get("specimenTypeNameShort", String.class),
             data.get("originCenterId", Number.class).intValue(),

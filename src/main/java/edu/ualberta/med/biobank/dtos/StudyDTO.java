@@ -9,7 +9,7 @@ public record StudyDTO(Integer id, String name, String nameShort, String status,
             data.get("id", Number.class).intValue(),
             data.get("name", String.class),
             data.get("nameShort", String.class),
-            Status.fromId(data.get("activityStatusId", Integer.class)).getName(),
+            Status.fromId(data.get("activityStatusId", Integer.class)).toString(),
             data.get("version", Number.class).intValue()
 );
     }

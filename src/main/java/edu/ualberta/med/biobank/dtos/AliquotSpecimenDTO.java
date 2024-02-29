@@ -35,7 +35,7 @@ public record AliquotSpecimenDTO(
             data.get("specimenTypeNameShort", String.class),
             data.get("specimenCreatedAt", Date.class),
             data.get("specimenQuantity", BigDecimal.class),
-            Status.fromId(data.get("specimenActivityStatusId", Integer.class)).getName(),
+            Status.fromId(data.get("specimenActivityStatusId", Integer.class)).toString(),
             data.get("originCenterId", Number.class).intValue(),
             data.get("originCenterNameShort", String.class),
             data.get("currentCenterId", Number.class).intValue(),

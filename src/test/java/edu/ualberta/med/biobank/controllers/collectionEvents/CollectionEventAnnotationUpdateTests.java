@@ -86,7 +86,7 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var newData = new CollectionEventUpdateDTO(
             collectionEvent.getVisitNumber(),
-            collectionEvent.getActivityStatus().getName(),
+            collectionEvent.getActivityStatus().toString(),
             List.of(new AnnotationDTO(annotationType.type(), annotationType.label(), value))
         );
 
@@ -122,7 +122,7 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var newData = new CollectionEventUpdateDTO(
             collectionEvent.getVisitNumber(),
-            collectionEvent.getActivityStatus().getName(),
+            collectionEvent.getActivityStatus().toString(),
             List.of(new AnnotationDTO(annotationType.type(), faker.lorem().word(), faker.lorem().sentence()))
         );
 
@@ -156,7 +156,7 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var newData = new CollectionEventUpdateDTO(
             collectionEvent.getVisitNumber(),
-            collectionEvent.getActivityStatus().getName(),
+            collectionEvent.getActivityStatus().toString(),
             List.of(new AnnotationDTO(annotationType.type(), annotationType.label(), faker.lorem().sentence()))
         );
 
@@ -188,7 +188,7 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var newData = new CollectionEventUpdateDTO(
             collectionEvent.getVisitNumber(),
-            collectionEvent.getActivityStatus().getName(),
+            collectionEvent.getActivityStatus().toString(),
             List.of(new AnnotationDTO(annotationType.type(), annotationType.label(), faker.lorem().sentence()))
         );
 
@@ -221,7 +221,7 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
         var invalidValue = String.format("%s;%s", validValues[0], faker.lorem().word());
         var newData = new CollectionEventUpdateDTO(
             collectionEvent.getVisitNumber(),
-            collectionEvent.getActivityStatus().getName(),
+            collectionEvent.getActivityStatus().toString(),
             List.of(new AnnotationDTO(annotationType.type(), annotationType.label(), invalidValue))
         );
 
@@ -252,7 +252,7 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var newData = new CollectionEventUpdateDTO(
             collectionEvent.getVisitNumber(),
-            collectionEvent.getActivityStatus().getName(),
+            collectionEvent.getActivityStatus().toString(),
             List.of(new AnnotationDTO(annotationType.type(), annotationType.label(), faker.lorem().word()))
         );
 
@@ -283,7 +283,7 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var newData = new CollectionEventUpdateDTO(
             collectionEvent.getVisitNumber(),
-            collectionEvent.getActivityStatus().getName(),
+            collectionEvent.getActivityStatus().toString(),
             List.of(new AnnotationDTO(annotationType.type(), annotationType.label(), faker.lorem().word()))
         );
 
@@ -314,7 +314,7 @@ class CollectionEventAnnotationUpdateTests extends ControllerTest {
         var collectionEvent = patient.getCollectionEvents().stream().findFirst().get();
         var newData = new CollectionEventUpdateDTO(
             collectionEvent.getVisitNumber(),
-            collectionEvent.getActivityStatus().getName(),
+            collectionEvent.getActivityStatus().toString(),
             List.of(new AnnotationDTO(annotationType.type(), annotationType.label(), ""))
         );
 

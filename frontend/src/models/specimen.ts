@@ -23,7 +23,10 @@ export type SourceSpecimen = z.infer<typeof sourceSpecimenSchema>;
 export type SourceSpecimenAdd = Pick<
   SourceSpecimen,
   'inventoryId' | 'timeDrawn' | 'status' | 'specimenTypeNameShort' | 'originCenterNameShort'
->;
+> & {
+  pnumber: string;
+  vnumber: number;
+};
 
 export const aliquotSchema = domainEntitySchema.extend({
   parentId: z.number().min(1),
