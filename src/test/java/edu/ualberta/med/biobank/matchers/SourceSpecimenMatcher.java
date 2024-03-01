@@ -44,6 +44,8 @@ public class SourceSpecimenMatcher {
             )
             .and(hasFeature("quantity", SourceSpecimenDTO::quantity, equalTo(expected.getQuantity())))
             .and(hasFeature("status", SourceSpecimenDTO::status, equalTo(expected.getActivityStatus().toString())))
+            .and(hasFeature("pnumber", SourceSpecimenDTO::pnumber, equalTo(expected.getCollectionEvent().getPatient().getPnumber())))
+            .and(hasFeature("vnumber", SourceSpecimenDTO::vnumber, equalTo(expected.getCollectionEvent().getVisitNumber())))
             .and(
                 hasFeature(
                     "originCenterId",

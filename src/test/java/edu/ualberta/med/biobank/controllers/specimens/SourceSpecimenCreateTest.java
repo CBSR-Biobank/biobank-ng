@@ -12,7 +12,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.UUID;
 import java.util.stream.Stream;
-import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.reactor.IOSession.Status;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,6 +29,7 @@ import edu.ualberta.med.biobank.controllers.endpoints.VisitNumberEndpoint;
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.domain.Patient;
 import edu.ualberta.med.biobank.domain.Specimen;
+import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.dtos.SourceSpecimenAddDTO;
 import edu.ualberta.med.biobank.dtos.SourceSpecimenDTO;
 import edu.ualberta.med.biobank.matchers.SourceSpecimenMatcher;
@@ -160,7 +160,7 @@ class SourceSpecimenCreateTest extends ControllerTest {
             factory.getDefaultSourceSpecimenType().getNameShort(),
             new Date(),
             new BigDecimal(0),
-            Status.ACTIVE.name(),
+            Status.ACTIVE.toString(),
             patient.getPnumber(),
             collectionEvent.getVisitNumber(),
             factory.getDefaultClinic().getNameShort()

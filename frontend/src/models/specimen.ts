@@ -10,6 +10,8 @@ export const sourceSpecimenSchema = domainEntitySchema.extend({
   status: z.nativeEnum(Status),
   specimenTypeId: z.number(),
   specimenTypeNameShort: z.string(),
+  pnumber: z.string(),
+  vnumber: z.number(),
   originCenterId: z.number(),
   originCenterNameShort: z.string(),
   currentCenterId: z.number(),
@@ -22,11 +24,8 @@ export const sourceSpecimenSchema = domainEntitySchema.extend({
 export type SourceSpecimen = z.infer<typeof sourceSpecimenSchema>;
 export type SourceSpecimenAdd = Pick<
   SourceSpecimen,
-  'inventoryId' | 'timeDrawn' | 'status' | 'specimenTypeNameShort' | 'originCenterNameShort'
-> & {
-  pnumber: string;
-  vnumber: number;
-};
+  'inventoryId' | 'timeDrawn' | 'status' | 'specimenTypeNameShort' | 'pnumber' | 'vnumber' | 'originCenterNameShort'
+>;
 
 export const aliquotSchema = domainEntitySchema.extend({
   parentId: z.number().min(1),

@@ -424,7 +424,7 @@ public class CollectionEventService {
 
             String type = studyAttr.getGlobalEventAttr().getEventAttrType().getName();
 
-            if (!pair.value.isBlank()) {
+            if (pair.value != null &&  !pair.value.isBlank()) {
                 if (type.equals("number") && !StringUtil.isNumeric(pair.value)) {
                     return Either.left(new ValidationError("annotation value is not numeric: %s".formatted(label)));
                 }
