@@ -19,6 +19,8 @@ public interface SpecimenRepository extends JpaRepository<Specimen, Integer> {
             spc.ACTIVITY_STATUS_ID as specimenActivityStatusId,
             st.id as specimenTypeId,
             st.NAME_SHORT as specimenTypeNameShort,
+            p.pnumber as patientNumber,
+            ce.visit_number as visitNumber,
             oi.CENTER_ID as originCenterId,
             c.NAME_SHORT as originCenterNameShort,
             cc.ID as currentCenterId,

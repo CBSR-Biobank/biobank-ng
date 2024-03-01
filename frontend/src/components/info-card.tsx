@@ -9,17 +9,18 @@ import { forwardRef } from 'react';
 export const InfoCard = forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
-    title: String;
-    message: String;
+    variant: 'default' | 'info' | 'destructive' | 'warning';
+    title: string;
+    message: string;
     icon?: IconProp;
   }
->(({ className, title, message, icon }, ref) => {
+>(({ className, title, message, icon, variant = 'info' }, ref) => {
   return (
     <div ref={ref} className={cn('grid grid-cols-1 gap-8', className)}>
-      <Alert className="border-sky-500 bg-sky-200 text-slate-500">
+      <Alert variant={variant}>
         <FontAwesomeIcon icon={icon ?? faCircleInfo} />
         <AlertTitle>{title}</AlertTitle>
-        <AlertDescription className="text-sm text-muted-foreground">{message}</AlertDescription>
+        <AlertDescription className="text-sm">{message}</AlertDescription>
       </Alert>
     </div>
   );

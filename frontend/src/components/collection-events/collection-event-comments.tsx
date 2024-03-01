@@ -28,6 +28,7 @@ export const CollectionEventComments = forwardRef<
   if (comments.length <= 0) {
     return (
       <InfoCard
+        variant="default"
         ref={forwardedRef}
         className="m-4"
         title="No Comments"

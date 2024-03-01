@@ -47,9 +47,9 @@ services:
     #         - DB_USER=$DB_USER
     #         - DB_PASSWORD=$DB_PASSWORD
 
+        #user: '${uid}:${gid}'
     frontend:
         image: node:18-alpine
-        user: '${uid}:${gid}'
         working_dir: '/opt/biobank/frontend'
         volumes:
             - ../frontend:/opt/biobank/frontend

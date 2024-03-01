@@ -42,6 +42,7 @@ export const AliquotsTable = forwardRef<HTMLTableElement, AliquotsTableProps>(({
       <TableRow>
         <TableCell colSpan={10}>
           <InfoCard
+            variant="default"
             ref={forwardedRef}
             className="pl-8"
             title="No Aliquots"

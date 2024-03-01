@@ -58,6 +58,8 @@ export const SourceSpecimenAddDialog: React.FC<{
   const handleSubmit = () => {
     const values = getValues();
     onSubmit({
+      pnumber: '',
+      vnumber: 0,
       inventoryId: values.inventoryId,
       timeDrawn: new Date(values.timeDrawn),
       status: values.status,

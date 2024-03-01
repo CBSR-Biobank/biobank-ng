@@ -12,7 +12,7 @@ const buttonClass = 'transition ease-in-out delay-150 hover:scale-[1.15] duratio
 
 export const CollectionEventTable: React.FC<{ collectionEvents: CollectionEventBrief[] }> = ({ collectionEvents }) => {
   if (collectionEvents.length <= 0) {
-    return <InfoCard title="No Visits" message="This patient does not have any visits on record" />;
+    return <InfoCard variant="info" title="No Visits" message="This patient does not have any visits on record" />;
   }
 
   return (

@@ -11,7 +11,7 @@
 version: '3.9'
 services:
     db:
-        user: ${uid}:${gid}
+        #user: ${uid}:${gid}
         image: mariadb:11.0.3-jammy
         command: --default-authentication-plugin=mariadb_native_password --lower-case-table-names=1
         volumes:
@@ -20,8 +20,8 @@ services:
             - ../database/db_initial.sql.gz:/db_initial.sql.gz
             - ../database/_init.sh:/docker-entrypoint-initdb.d/_init.sh
         environment:
-            - MARIADB_CONTAINER_USER=${uid}
-            - MARIADB_CONTAINER_GROUP=${gid}
+            #- MARIADB_CONTAINER_USER=${uid}
+            #- MARIADB_CONTAINER_GROUP=${gid}
             - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
             - MARIADB_USER=${DB_USER}
             - MARIADB_PASSWORD=${DB_PASSWORD}

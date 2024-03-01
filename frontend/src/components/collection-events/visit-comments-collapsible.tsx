@@ -32,7 +32,12 @@ export const VisitCommentsCollapsible: React.FC<{ pnumber: string; vnumber: numb
       </div>
       <CollapsibleContent>
         {count <= 0 ? (
-          <InfoCard className="p-2" title="No Comments" message="This visit has no comments on record" />
+          <InfoCard
+            variant="default"
+            className="p-2"
+            title="No Comments"
+            message="This visit has no comments on record"
+          />
         ) : (
           <CollectionEventComments pnumber={pnumber} vnumber={vnumber} />
         )}

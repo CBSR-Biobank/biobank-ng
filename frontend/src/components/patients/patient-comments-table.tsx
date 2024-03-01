@@ -26,6 +26,7 @@ export const PatientCommentsTable = forwardRef<HTMLTableElement, CommentsTablePr
   if (comments.length <= 0) {
     return (
       <InfoCard
+        variant="default"
         ref={forwardedRef}
         className="pl-8"
         title="No Comments"
