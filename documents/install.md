@@ -137,3 +137,121 @@ Follow these steps:
     ```sh
     sudo journalctl -u biobank.service --no-pager
     ```
+
+# Install and Configure NGINX
+
+1. Change the Linux user NGINX will use to run the application. Edit `/etc/nginx/nginx.conf` and change the line:
+
+    ```
+    user www-data;
+    ```
+
+      to:
+
+    ```
+    user biobank;
+    ```
+
+1. Create a temporary configuration for a server to obtain a LetsEncrypt certificate by creating a file named `/etc/nginx/sites-available/my-default` with the following:
+
+    ```ini
+     server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        root /var/www/html;
+        server_name __server_name__;
+
+        location / {
+            try_files $uri $uri/ =404;
+        }
+    }
+    ```
+
+    Replace `__server_name__` with the DNS name for the server.
+
+1. Enable this configuration in NGINX
+
+    ```sh
+    cd /etc/nginx/sites-enabled
+    ln -s ../sites-available/my-default .
+    ```
+
+1. The check that the configuration is ok with this command:
+
+    ```sh
+    sudo nginx -t
+    ```
+
+1. Reload the NGINX configuration:
+
+    ```sh
+    sudo systemctl reload nginx
+    ```
+
+1. Install Certbot:
+
+    ```sh
+    sudo apt install certbot python3-certbot-nginx
+    ```
+
+1. Install the certificate:
+
+    ```sh
+    sudo certbot --nginx -d __server_name__
+    ```
+
+    Replace `__server_name__` with the DNS name for the server.
+
+1. Create the biobank-ng NGINX configuration by creating a file named `/etc/nginx/sites-available/biobank-dashboard` with the following:
+
+    ```sh
+    # -*- mode: conf -*-
+
+    server {
+        listen 8443 ssl; # managed by Certbot
+        server_name biobank-new.cbsr.ualberta.ca;
+        root /opt/biobank/biobank-ng/frontend/dist;
+        index index.html;
+        error_log  /var/log/nginx/biobank-dashboard-error.log;
+        access_log /var/log/nginx/biobank-dashboard-access.log;
+
+        ssl_certificate /etc/letsencrypt/live/biobank-new.cbsr.ualberta.ca/fullchain.pem; # managed by Certbot
+        ssl_certificate_key /etc/letsencrypt/live/biobank-new.cbsr.ualberta.ca/privkey.pem; # managed by Certbot
+        include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+        location / {
+            try_files $uri $uri/ /index.html;
+            add_header Cache-Control public;
+            expires 1d;
+        }
+        location /api {
+            proxy_set_header X-Forwarded-Host \$host;
+            proxy_set_header X-Forwarded-Server \$host;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_pass http://localhost:9000/api;
+        }
+        location /site {
+            proxy_set_header X-Forwarded-Host \$host;
+            proxy_set_header X-Forwarded-Server \$host;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_pass http://localhost:9000\$request_uri;
+        }
+    }
+
+    server {
+        if ($host = biobank-new.cbsr.ualberta.ca) {
+            return 301 https://$host$request_uri;
+        } # managed by Certbot
+
+
+        listen 80 default_server;
+
+        server_name biobank-new.cbsr.ualberta.ca;
+        return 404; # managed by Certbot
+
+
+    }
+    ```
+
+    Repalce `biobank-new.cbsr.ualberta.ca` with the name of the server.
