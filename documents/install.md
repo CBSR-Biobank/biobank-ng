@@ -30,6 +30,14 @@ sudo usermod -aG sudo biobank
     sdk install maven
     ```
 
+## Install MariaDB CLI
+
+1. Install:
+
+    ```sh
+    sudo apt install mariadb-client
+    ```
+
 ## Install NodeJS
 
 Follow these instructions to install NodeJS:
@@ -140,6 +148,8 @@ Follow these steps:
 
 # Install and Configure NGINX
 
+1. Install NGINX by following these instructions: https://ubuntuhandbook.org/index.php/2024/01/install-nginx-ubuntu-2204/
+
 1. Change the Linux user NGINX will use to run the application. Edit `/etc/nginx/nginx.conf` and change the line:
 
     ```
@@ -157,7 +167,6 @@ Follow these steps:
     ```ini
      server {
         listen 80 default_server;
-        listen [::]:80 default_server;
         root /var/www/html;
         server_name __server_name__;
 
@@ -204,7 +213,7 @@ Follow these steps:
 
 1. Create the biobank-ng NGINX configuration by creating a file named `/etc/nginx/sites-available/biobank-dashboard` with the following:
 
-    ```sh
+    ```ini
     # -*- mode: conf -*-
 
     server {
