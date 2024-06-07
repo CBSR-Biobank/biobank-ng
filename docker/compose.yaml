@@ -8,7 +8,6 @@
 # To populate the databse
 #     docker exec -i container_name mysql -uroot -ppassword db_name < db.sql
 
-version: '3.9'
 services:
     db:
         #user: ${uid}:${gid}
@@ -27,8 +26,9 @@ services:
             - MARIADB_PASSWORD=${DB_PASSWORD}
             - MARIADB_DATABASE=${DB_NAME}
         restart: unless-stopped
-        ports:
-            - 3306:3306
+        network_mode: host
+        #ports:
+        #    - 3306:3306
 
     jboss:
         image: nloyola/biobank:0.1
@@ -37,8 +37,8 @@ services:
         depends_on:
             - db
         environment:
-            - DB_HOST=db
-            - DB_PORT=3306
+            - DB_HOST=${DB_HOST}
+            - DB_PORT=${DB_PORT}
             - DB_USER=${DB_USER}
             - DB_PASSWORD=${DB_PASSWORD}
             - DB_NAME=${DB_NAME}
@@ -47,6 +47,7 @@ services:
             - JAVA=/opt/jdk/jdk1.6.0_45/bin/java
             - JBOSS_LOG_DIR=/var/log/jboss
             - ANT_HOME=/opt/apache-ant-1.9.0
+        network_mode: host
         restart: unless-stopped
 
     nginx:
@@ -60,6 +61,7 @@ services:
             - ../logs/nginx:/var/log/nginx
         depends_on:
             - jboss
-        ports:
-            - 443:8443
+        #ports:
+        #    - 443:8443
+        network_mode: host
         restart: unless-stopped

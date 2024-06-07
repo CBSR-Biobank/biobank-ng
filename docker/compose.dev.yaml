@@ -58,6 +58,7 @@ services:
             - BACKEND_SERVER=http://host.docker.internal:9000
         ports:
             - 3000:3000
+        network_mode: host
         restart: unless-stopped
         extra_hosts:
             - 'host.docker.internal:host-gateway'
