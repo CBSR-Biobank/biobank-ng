@@ -19,8 +19,17 @@ services:
             service: jboss
         depends_on:
             - db
-        ports:
-            - 8080:8080
+
+    frontend:
+        image: node:18-alpine
+        working_dir: '/opt/biobank/frontend'
+        volumes:
+            - ../frontend:/opt/biobank/frontend
+        command: sh -c "npm install && npm run dev"
+        environment:
+            - BACKEND_SERVER=http://localhost:9000
+        network_mode: host
+        restart: unless-stopped
 
     # app:
     #     build:
@@ -46,19 +55,3 @@ services:
     #         - DB_NAME=$DB_NAME
     #         - DB_USER=$DB_USER
     #         - DB_PASSWORD=$DB_PASSWORD
-
-        #user: '${uid}:${gid}'
-    frontend:
-        image: node:18-alpine
-        working_dir: '/opt/biobank/frontend'
-        volumes:
-            - ../frontend:/opt/biobank/frontend
-        command: sh -c "npm install && npm run dev"
-        environment:
-            - BACKEND_SERVER=http://host.docker.internal:9000
-        ports:
-            - 3000:3000
-        network_mode: host
-        restart: unless-stopped
-        extra_hosts:
-            - 'host.docker.internal:host-gateway'
