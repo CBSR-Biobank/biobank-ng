@@ -62,9 +62,6 @@ public class AuthController {
 
         var userInfo = UserDTOClient.fromUserDTO(userInfoMaybe.getRight().get());
         String token = tokenService.generateToken(authentication);
-        return ResponseEntity.ok().header(
-            HttpHeaders.AUTHORIZATION,
-            token
-        ).body(userInfo);
+        return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, token).body(userInfo);
     }
 }

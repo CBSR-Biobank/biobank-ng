@@ -1,187 +1,76 @@
-import { EntityProperty } from '@app/components/entity-property';
-import { Button } from '@app/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@app/components/ui/card';
 import { useUserStore } from '@app/store';
 
-import { faClipboardUser, faEnvelope, faFileMedical, faGear, faUserDoctor } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
+import { Tabs } from '@app/components/ui/tabs';
+import { User } from '@app/models/user';
+import { TabsList, TabsTrigger } from '@radix-ui/react-tabs';
+import { useEffect, useState } from 'react';
+import { Outlet, useNavigate, useOutletContext } from 'react-router-dom';
 import { AdminPage } from '../admin-page';
 
+const tabs = {
+  details: {
+    label: 'Details',
+    route: '',
+  },
+  studies: {
+    label: 'Studies',
+    route: 'studies',
+  },
+};
+
+type TabKeys = keyof typeof tabs;
+
+export function useRouterUser() {
+  return useOutletContext<{ user: User }>();
+}
+
 export function UserProfile() {
+  const navigate = useNavigate();
   const { user } = useUserStore();
+  const [currentTab, setCurrentTab] = useState('details');
+
+  useEffect(() => {
+    const newTab =
+      Object.keys(tabs).find((tabkey) => {
+        const tab = tabs[tabkey as TabKeys];
+        return tab.route !== '' && location.pathname.includes(tab.route);
+      }) || 'details';
+    setCurrentTab(newTab);
+  }, [location.pathname]);
+
+  const handleTabChange = (value: string) => {
+    setCurrentTab(value);
+    navigate(tabs[value as TabKeys].route);
+  };
+
+  if (!user) {
+    return <></>;
+  }
 
   return (
-    <>
-      {/* <UserBreadcrumbs /> */}
-      <AdminPage>
-        <AdminPage.Title hasBorder>
-          <p className="text-4xl font-semibold text-sky-600">User Profile</p>
-        </AdminPage.Title>
-        {/*****************************************************************/}
-        <div className="rounded-lg shadow-xl ">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <FontAwesomeIcon icon={faUserDoctor} size="3x" style={{ color: '#74C0FC', position: 'sticky' }} />
-                  <CardTitle>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="pl-4 text-3xl font-semibold text-sky-600">{user?.fullname}</p> {/* Test Name*/}
-                        <p className="pl-4 text-sm font-semibold text-gray-400">
-                          {user?.isGlobalAdmin ? ' Admin' : ''}
-                        </p>
-                      </div>
+    <AdminPage>
+      <AdminPage.Title>
+        <p className="text-sm font-semibold text-gray-400">User Profile</p>
+        <p className="text-4xl font-semibold text-sky-600">{user?.fullname}</p>
+      </AdminPage.Title>
 
-                      <div>
-                        <FontAwesomeIcon icon={faEnvelope} />
-                      </div>
-                    </div>
-                  </CardTitle>
-                </div>
-              </div>
-            </CardHeader>
+      <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full border-b-2">
+        <TabsList className="bg-basic-100 text-primary-600 h-auto p-0">
+          {Object.entries(tabs).map(([key, value]) => (
+            <TabsTrigger
+              key={key}
+              value={key}
+              className="px-3 px-4 py-1.5 text-sm  font-semibold text-slate-600 data-[state=active]:bg-slate-200"
+            >
+              {value.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
 
-            <CardContent>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {/* My Info Tab */}
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle>
-                        <p className="pl-4 text-2xl font-semibold text-sky-400">My Info</p>
-                        <p className="pl-4 text-sm font-semibold text-gray-400">Last log in: </p>
-                      </CardTitle>
-                      <Button className="flex">
-                        <FontAwesomeIcon icon={faGear} className={'flex size-6 hover:animate-spin'} />
-                      </Button>
-                    </div>
-                  </CardHeader>
-
-                  <CardContent>
-                    {/* {user?.username} */}
-                    <EntityProperty propName={'userName'} label={'User Name'}>
-                      {user?.username}
-                    </EntityProperty>
-                    {/* {user?.username} */}
-                    <EntityProperty propName={'fullName'} label={'Full Name'}>
-                      {user?.fullname}
-                    </EntityProperty>
-
-                    <EntityProperty propName={'userType'} label={'User Type'}>
-                      {user?.groups.map((group) => <p key={group.groupId}>{group.name}</p>)}
-                    </EntityProperty>
-                  </CardContent>
-                </Card>
-
-                {/* My Patient Studies Tab */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
-                      <p className="pl-4 text-2xl font-semibold text-sky-400">My Patient Studies</p>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <Card>
-                      <CardContent className=" flex items-center justify-between pb-0 pl-2 pr-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center pr-0">
-                            <FontAwesomeIcon icon={faClipboardUser} className="size-6 justify-center text-gray-400" />
-                            <div>
-                              <p className="pl-2 text-xl font-semibold text-sky-300"> Study 1</p>
-                              <p className="pl-2 text-sm font-semibold text-gray-400">Last updated: </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <Button>
-                          <p className="pr-2 text-sm font-semibold">View</p>
-                          <FontAwesomeIcon icon={faFileMedical} size="lg" />
-                        </Button>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardContent className=" flex items-center justify-between pb-0 pl-2 pr-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center ">
-                            <FontAwesomeIcon icon={faClipboardUser} className="size-6 justify-center text-gray-400" />
-                            <div>
-                              <p className="pl-2 text-xl font-semibold text-sky-300"> Study 2</p>
-                              <p className="pl-2 text-sm font-semibold text-gray-400">Last updated: </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <Button size={'icon'}>
-                          <FontAwesomeIcon icon={faFileMedical} size="lg" />
-                        </Button>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardContent className=" flex items-center justify-between pb-0 pl-2 pr-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center ">
-                            <FontAwesomeIcon icon={faClipboardUser} className="size-6 justify-center text-gray-400" />
-                            <div>
-                              <p className="pl-2 text-xl font-semibold text-sky-300"> Study 3</p>
-                              <p className="pl-2 text-sm font-semibold text-gray-400">Last updated: </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <Button size={'icon'}>
-                          <FontAwesomeIcon icon={faFileMedical} size="lg" />
-                        </Button>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardContent className=" flex items-center justify-between pb-0 pl-2 pr-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center ">
-                            <FontAwesomeIcon icon={faClipboardUser} className="size-6 justify-center text-gray-400" />
-                            <div>
-                              <p className="pl-2 text-xl font-semibold text-sky-300"> Study 4</p>
-                              <p className="pl-2 text-sm font-semibold text-gray-400">Last updated: </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <Button size={'icon'}>
-                          <FontAwesomeIcon icon={faFileMedical} size="lg" />
-                        </Button>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardContent className=" flex items-center justify-between pb-0 pl-2 pr-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center ">
-                            <FontAwesomeIcon icon={faClipboardUser} className="size-6 justify-center text-gray-400" />
-                            <div>
-                              <p className="pl-2 text-xl font-semibold text-sky-300"> Study 5</p>
-                              <p className="pl-2 text-sm font-semibold text-gray-400">Last updated: </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <Button size={'icon'}>
-                          <FontAwesomeIcon icon={faFileMedical} size="lg" />
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </CardContent>
-                </Card>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/*****************************************************************/}
-      </AdminPage>
-    </>
+      <div className="flex flex-col gap-8 p-4">
+        <Outlet context={{ user }} />
+      </div>
+    </AdminPage>
   );
 }

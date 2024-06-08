@@ -192,6 +192,30 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <id>db-apply-dump</id>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>bash</executable>
+              <arguments>
+                <argument>${project.basedir}/scripts/db-apply-dump.sh</argument>
+                <argument>-e</argument>
+                <argument>${project.basedir}/.env</argument>
+                <argument>${script.args}</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 

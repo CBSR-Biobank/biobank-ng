@@ -12,6 +12,7 @@ export const userSchema = z.object({
   fullname: z.string(),
   username: z.string(),
   isGlobalAdmin: z.boolean(),
+  apiKey: z.string().nullable(),
   groups: z.array(groupSchema),
 });
 

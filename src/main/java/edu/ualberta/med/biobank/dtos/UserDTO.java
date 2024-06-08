@@ -13,6 +13,7 @@ public record UserDTO(
     String username,
     String password,
     String status,
+    String apiKey,
     HashMap<Integer, GroupDTO> groups,
     HashMap<Integer, MembershipDTO> memberships
 ) {
@@ -23,6 +24,7 @@ public record UserDTO(
             data.get("LOGIN", String.class),
             data.get("PASSWORD", String.class),
             Status.fromId(data.get("ACTIVITY_STATUS_ID", Integer.class)).getName(),
+            data.get("API_KEY", String.class),
             new HashMap<>(),
             new HashMap<>()
         );

@@ -41,7 +41,7 @@ public class UserService {
     }
 
     public Either<AppError, UserDTO> findByLogin(String login) {
-        var users = userByLoginToDTO(login);
+        var users = userTuplesToDTO(userRepository.findByLogin(login, Tuple.class));
         if (users.size() <= 0) {
             return Either.left(new EntityNotFound("user by login"));
         }
@@ -51,8 +51,20 @@ public class UserService {
         return Either.right(user);
     }
 
+    public Either<AppError, UserDTO> findByApiKey(String apiKey) {
+        var users = userTuplesToDTO(userRepository.findByApiKey(apiKey, Tuple.class));
+        if (users.size() <= 0) {
+            return Either.left(new EntityNotFound("user by API key"));
+        }
+
+        var user = users.stream().findFirst().get();
+        logger.info(">>> users: %s".formatted(LoggingUtils.prettyPrintJson(user)));
+        logger.debug("user: {}", LoggingUtils.prettyPrintJson(user));
+        return Either.right(user);
+    }
+
     public Either<AppError, UserDTO> findOneWithMemberships(String username) {
-        var users = userByLoginToDTO(username);
+        var users = userTuplesToDTO(userRepository.findByLogin(username, Tuple.class));
         if (users.size() != 1) {
             return Either.left(new EntityNotFound("user by username"));
         }
@@ -60,39 +72,30 @@ public class UserService {
         return Either.right(user);
     }
 
-    private Collection<UserDTO> userByLoginToDTO(String login) {
+    private Collection<UserDTO> userTuplesToDTO(Collection<Tuple> tuples) {
         Map<Integer, UserDTO> users = new HashMap<>();
 
-        userRepository
-            .findByLogin(login, Tuple.class)
+        tuples
             .stream()
             .forEach(row -> {
                 var userId = row.get("ID", Integer.class);
-                users.computeIfAbsent(userId, id ->UserDTO.fromTuple(row));
+                users.computeIfAbsent(userId, id -> UserDTO.fromTuple(row));
 
                 var groupId = row.get("GROUP_ID", Integer.class);
                 if (groupId != null) {
-                    users
-                        .get(userId)
-                        .groups()
-                        .computeIfAbsent(groupId, id -> GroupDTO.fromTuple(row));
+                    users.get(userId).groups().computeIfAbsent(groupId, id -> GroupDTO.fromTuple(row));
                 }
 
                 var membershipId = row.get("MEMBERSHIP_ID", Integer.class);
                 if (membershipId == null) {
                     throw new RuntimeException("membership is null");
                 }
-                users
-                    .get(userId)
-                    .memberships()
-                    .computeIfAbsent(membershipId, id -> MembershipDTO.fromTuple(row));
+                users.get(userId).memberships().computeIfAbsent(membershipId, id -> MembershipDTO.fromTuple(row));
 
                 var membership = users.get(userId).memberships().get(membershipId);
                 var domainId = row.get("DOMAIN_ID", Integer.class);
                 if (domainId != null) {
-                    membership
-                        .domains()
-                        .computeIfAbsent(domainId, id -> DomainDTO.fromTuple(row));
+                    membership.domains().computeIfAbsent(domainId, id -> DomainDTO.fromTuple(row));
 
                     var domain = membership.domains().get(domainId);
                     var centerId = row.get("CENTER_ID", Integer.class);
@@ -108,9 +111,7 @@ public class UserService {
 
                 var roleId = row.get("ROLE_ID", Integer.class);
                 if (roleId != null) {
-                    membership
-                        .roles()
-                        .computeIfAbsent(roleId, id -> RoleDTO.fromTuple(row));
+                    membership.roles().computeIfAbsent(roleId, id -> RoleDTO.fromTuple(row));
 
                     var role = membership.roles().get(roleId);
                     var permissionId = row.get("ROLE_PERMISSION_ID", Integer.class);
@@ -123,7 +124,6 @@ public class UserService {
                 if (membershipPermissionId != null) {
                     membership.permissions().add(PermissionEnum.fromId(membershipPermissionId));
                 }
-
             });
 
         return users.values();

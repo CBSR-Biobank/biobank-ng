@@ -27,6 +27,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -41,12 +42,16 @@ public class SecurityConfiguration {
 
     private final CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint;
 
+    private ApiKeyAuthFilter apiKeyAuthFilter;
+
     public SecurityConfiguration(
         RsaKeyProperties jwtConfigProperties,
-        CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint
+        CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint,
+        ApiKeyAuthFilter apiKeyAuthFilter
     ) {
         this.jwtConfigProperties = jwtConfigProperties;
         this.customBasicAuthenticationEntryPoint = customBasicAuthenticationEntryPoint;
+        this.apiKeyAuthFilter = apiKeyAuthFilter;
     }
 
     @Bean
@@ -58,6 +63,7 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.jwt(jwt -> jwt.decoder(jwtDecoder())))
+	    .addFilterBefore(apiKeyAuthFilter, LogoutFilter.class)
             .exceptionHandling(ex -> {
                 ex.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint());
                 ex.accessDeniedHandler(new BearerTokenAccessDeniedHandler());

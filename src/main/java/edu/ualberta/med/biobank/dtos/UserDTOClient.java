@@ -12,6 +12,7 @@ public record UserDTOClient(
     String fullname,
     String username,
     Boolean isGlobalAdmin,
+    String apiKey,
     Collection<GroupDTO> groups
 ) {
     public static UserDTOClient fromUserDTO(UserDTO userDTO) {
@@ -20,6 +21,7 @@ public record UserDTOClient(
             userDTO.fullName(),
             userDTO.username(),
             userDTO.isGlobalAdmin(),
+            userDTO.apiKey(),
             userDTO.groups().values()
         );
     }

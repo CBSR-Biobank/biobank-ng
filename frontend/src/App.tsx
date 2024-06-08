@@ -107,12 +107,23 @@ const router = createBrowserRouter([
       },
       {
         path: 'profile',
+        async lazy() {
+          let { UserProfile } = await import('@app/pages/user/user-profile');
+          return { Component: UserProfile };
+        },
         children: [
           {
-            index: true,
+            path: '',
             async lazy() {
-              let { UserProfile } = await import('@app/pages/user/user-profile');
-              return { Component: UserProfile };
+              let { UserDetails } = await import('@app/components/users/user-details');
+              return { Component: UserDetails };
+            },
+          },
+          {
+            path: 'studies',
+            async lazy() {
+              let { UserStudies } = await import('@app/components/users/user-studies');
+              return { Component: UserStudies };
             },
           },
         ],

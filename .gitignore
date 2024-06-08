@@ -42,3 +42,4 @@ logs/
 /.sqls/
 *.svg
 /database.sql
+/create.sql
