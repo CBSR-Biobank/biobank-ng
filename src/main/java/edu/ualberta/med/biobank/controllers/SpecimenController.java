@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
-@RequestMapping("/specimens")
+@RequestMapping("/api/specimens")
 public class SpecimenController {
 
     @SuppressWarnings("unused")

@@ -27,6 +27,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -38,27 +39,22 @@ public class SecurityConfiguration {
 
     private final RsaKeyProperties jwtConfigProperties;
 
-    public SecurityConfiguration(RsaKeyProperties jwtConfigProperties) {
+    private final CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint;
+
+    public SecurityConfiguration(
+        RsaKeyProperties jwtConfigProperties,
+        CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint
+    ) {
         this.jwtConfigProperties = jwtConfigProperties;
+        this.customBasicAuthenticationEntryPoint = customBasicAuthenticationEntryPoint;
     }
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-            .securityMatchers(m ->
-                m.requestMatchers("/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/**")
-            )
-            .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-            .httpBasic(withDefaults())
-            .formLogin(withDefaults())
-            .logout(logout -> logout.permitAll())
-            .build();
-    }
-
-    @Bean
+    @Order(1)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
             .csrf(AbstractHttpConfigurer::disable)
+            .securityMatchers(m -> m.requestMatchers("/api", "/api/**"))
             .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.jwt(jwt -> jwt.decoder(jwtDecoder())))
@@ -66,6 +62,20 @@ public class SecurityConfiguration {
                 ex.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint());
                 ex.accessDeniedHandler(new BearerTokenAccessDeniedHandler());
             })
+            .build();
+    }
+
+    @Bean
+    @Order(2)
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+            .authorizeHttpRequests(auth -> {
+                auth.anyRequest().authenticated();
+            })
+            .httpBasic(withDefaults())
+            .formLogin(withDefaults())
+            .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+            .logout(logout -> logout.permitAll())
             .build();
     }
 
@@ -77,7 +87,7 @@ public class SecurityConfiguration {
     @Bean
     SecurityFilterChain tokenSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
-            .securityMatchers(m -> m.requestMatchers("/token"))
+            .securityMatchers(m -> m.requestMatchers("/api/token"))
             .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .csrf(AbstractHttpConfigurer::disable)
@@ -85,7 +95,7 @@ public class SecurityConfiguration {
                 ex.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint());
                 ex.accessDeniedHandler(new BearerTokenAccessDeniedHandler());
             })
-            .httpBasic(withDefaults())
+            .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(customBasicAuthenticationEntryPoint))
             .build();
     }
 

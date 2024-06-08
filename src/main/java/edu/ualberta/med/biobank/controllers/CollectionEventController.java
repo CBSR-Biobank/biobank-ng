@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/patients")
+@RequestMapping("/api/patients")
 public class CollectionEventController {
 
     @SuppressWarnings("unused")

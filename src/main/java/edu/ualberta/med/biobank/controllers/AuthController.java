@@ -14,8 +14,10 @@ import edu.ualberta.med.biobank.services.TokenService;
 import edu.ualberta.med.biobank.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestController
+@RequestMapping("/api")
 public class AuthController {
 
     @SuppressWarnings("unused")

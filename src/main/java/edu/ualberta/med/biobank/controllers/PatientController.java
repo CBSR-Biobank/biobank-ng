@@ -21,7 +21,7 @@ import java.util.Collection;
 import org.springframework.http.HttpStatus;
 
 @RestController
-@RequestMapping("/patients")
+@RequestMapping("/api/patients")
 public class PatientController {
 
     private final PatientService patientService;

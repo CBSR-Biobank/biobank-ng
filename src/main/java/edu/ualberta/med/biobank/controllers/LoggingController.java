@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
-@RequestMapping("/logging")
+@RequestMapping("/api/logging")
 public class LoggingController {
 
     Logger logger = LoggerFactory.getLogger(StudyController.class);

@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
-@RequestMapping(path = "/clinics", produces = "application/json")
+@RequestMapping(path = "/api/clinics", produces = "application/json")
 public class ClinicController {
 
     @SuppressWarnings("unused")
