@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 
 export const OkButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
   ({ className, ...props }, ref) => (
-    <Button ref={ref} variant="default" icon={faCheck} {...props}>
+    <Button ref={ref} variant="default" icon={faCheck} {...props} className={className}>
       OK
     </Button>
   )

@@ -3,15 +3,14 @@ import { AdminPage } from '@app/pages/admin-page';
 import { useUserStore } from '@app/store';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
-import { DashboardLayout } from './dashboard/dashboard-layout';
 import { LabelledInput } from './forms/labelled-input';
-import { OkButton } from './ok-button';
-import { Alert, AlertDescription } from './ui/alert';
+import { Alert } from './ui/alert';
+import { Button } from './ui/button';
 
 const schema = z.object({
   username: z.string().min(1, { message: 'A username is required' }),
@@ -22,9 +21,8 @@ type FormInputs = z.infer<typeof schema>;
 
 export function Login() {
   const navigate = useNavigate();
-  const { loggedIn } = useUserStore();
+  const { loggedIn, user } = useUserStore();
   const [loginError, setLoginError] = useState(false);
-  const [loginErrorMessage, setLoginErrorMessage] = useState('');
 
   const {
     register,
@@ -39,52 +37,50 @@ export function Login() {
     },
   });
 
-  useEffect(() => {
-    if (loggedIn) {
-      navigate('/');
-    }
-  }, [loggedIn]);
-
   const onSubmit = async (values: FormInputs) => {
     try {
-      await login(values.username, values.password);
-      navigate('/');
+      const user = await login(values.username, values.password);
+      if (user) {
+        navigate('/');
+      }
     } catch (e) {
       const apiError = e as ApiError;
       if (apiError.status === 401) {
-        setLoginErrorMessage('invalid username or password');
+        setLoginError(true);
       }
-      if (apiError.status === 500) {
-        setLoginErrorMessage('backend communication error');
-      }
-      setLoginError(true);
     }
   };
 
+  if (loggedIn && user !== undefined) {
+    return <Navigate to="/" />;
+  }
+
   return (
-    <DashboardLayout>
-      <AdminPage className="grid justify-items-center gap-8 pb-20">
-        <AdminPage.Title>Login</AdminPage.Title>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid grid-cols-1 gap-6 sm:w-[450px]">
-            <LabelledInput label="Username" errorMessage={errors?.username?.message} {...register('username')} />
-            <LabelledInput
-              type="password"
-              label="Password"
-              errorMessage={errors?.password?.message}
-              {...register('password')}
-            />
-            {loginError && (
-              <div className="flex items-center justify-center">
-                <Alert variant="destructive" className="border-2 border-red-600 bg-red-200 p-2 text-red-600">
-                  <AlertDescription>{loginErrorMessage}</AlertDescription>
-                </Alert>
-              </div>
-            )}
-            <OkButton type="submit" disabled={!isValid} />
+    <AdminPage className="grid h-screen content-center justify-items-center gap-8">
+      <AdminPage.Title className="flex items-center gap-2 font-bold tracking-tight">CBSR Biobank Login</AdminPage.Title>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="grid grid-cols-1 gap-6 sm:w-[450px]">
+          <LabelledInput label="Username" errorMessage={errors?.username?.message} {...register('username')} />
+          <LabelledInput
+            type="password"
+            label="Password"
+            errorMessage={errors?.password?.message}
+            {...register('password')}
+          />
+          {loginError && (
+            <div className="flex items-center justify-center">
+              <Alert variant="destructive" className="border-2 border-red-600 bg-red-200 p-2 text-red-600">
+                {'invalid username or password'}
+              </Alert>
+            </div>
+          )}
+          <div className="w-full pt-6">
+            <Button type="submit" disabled={!isValid} size="full">
+              OK
+            </Button>
           </div>
-        </form>
-      </AdminPage>
-    </DashboardLayout>
+        </div>
+      </form>
+    </AdminPage>
   );
 }
