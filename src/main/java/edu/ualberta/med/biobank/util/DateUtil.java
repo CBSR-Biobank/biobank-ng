@@ -29,6 +29,11 @@ public class DateUtil {
         return DATE_TIME_FORMAT.parse(timestring);
     }
 
+    public static String dateToString(Date date) {
+        DATE_TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return DATE_FORMAT.format(date);
+    }
+
     public static String datetimeToString(Date date) {
         DATE_TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
         return DATE_TIME_FORMAT.format(date);

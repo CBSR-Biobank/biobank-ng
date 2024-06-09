@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.services;
 
-import edu.ualberta.med.biobank.applicationevents.BiobankEventPublisher;
+import edu.ualberta.med.biobank.applicationevents.SpecimenReadEvent;
+import edu.ualberta.med.biobank.applicationevents.VisitUpdatedEvent;
 import edu.ualberta.med.biobank.domain.Clinic;
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.domain.OriginInfo;
@@ -43,6 +44,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -69,7 +71,7 @@ public class SpecimenService {
 
     private OriginInfoRepository originInfoRepository;
 
-    private BiobankEventPublisher eventPublisher;
+    private ApplicationEventPublisher eventPublisher;
 
     private Validator validator;
 
@@ -82,7 +84,7 @@ public class SpecimenService {
         SpecimenTypeService specimenTypeService,
         SpecimenTypeRepository specimenTypeRepository,
         OriginInfoRepository originInfoRepository,
-        BiobankEventPublisher eventPublisher,
+        ApplicationEventPublisher eventPublisher,
         Validator validator
     ) {
         this.specimenRepository = specimenRepository;
@@ -131,7 +133,8 @@ public class SpecimenService {
             })
             .map(aliquots -> {
                 Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                eventPublisher.publishSpecimenRead(auth.getName(), specimen.patientNumber(), inventoryId);
+                var event = new SpecimenReadEvent(auth.getName(), specimen.patientNumber(), inventoryId);
+                eventPublisher.publishEvent(event);
                 return specimen;
             });
     }
@@ -191,7 +194,9 @@ public class SpecimenService {
                     specimenRepository.save(specimen);
 
                     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                    eventPublisher.publishVisitUpdated(auth.getName(), dto.pnumber(), dto.vnumber());
+                    eventPublisher.publishEvent(
+                        new VisitUpdatedEvent(auth.getName(), dto.pnumber(), dto.vnumber())
+                    );
                     return Either.right(SourceSpecimenDTO.fromSpecimen(specimen));
                 });
         });

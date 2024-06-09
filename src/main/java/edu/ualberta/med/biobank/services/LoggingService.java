@@ -14,6 +14,8 @@ import edu.ualberta.med.biobank.applicationevents.PatientCreatedEvent;
 import edu.ualberta.med.biobank.applicationevents.PatientReadEvent;
 import edu.ualberta.med.biobank.applicationevents.PatientUpdatedEvent;
 import edu.ualberta.med.biobank.applicationevents.SpecimenReadEvent;
+import edu.ualberta.med.biobank.applicationevents.StudyCatalogueDownloadEvent;
+import edu.ualberta.med.biobank.applicationevents.StudyCatalogueRequestEvent;
 import edu.ualberta.med.biobank.applicationevents.UserLoggedInEvent;
 import edu.ualberta.med.biobank.applicationevents.VisitCreatedEvent;
 import edu.ualberta.med.biobank.applicationevents.VisitDeletedEvent;
@@ -159,6 +161,30 @@ public class LoggingService {
             .patientNumber(event.getPnumber())
             .inventoryId(event.getInventoryId())
             .type("Specimen")
+            .build();
+        loggingRepository.save(logEvent);
+    }
+
+    @EventListener
+    void handleStudyCatalougeRequestEvent(StudyCatalogueRequestEvent event) {
+        logger.info("StudyCatalogueRequestEvent: study {}", event.getStudyNameShort());
+        Log logEvent = new Log.LogBuilder()
+            .action("request")
+            .username(event.getUsername())
+            .type("StudyCatalogue")
+            .details("study: %s".formatted(event.getStudyNameShort()))
+            .build();
+        loggingRepository.save(logEvent);
+    }
+
+    @EventListener
+    void handleStudyCatalougeDownloadEvent(StudyCatalogueDownloadEvent event) {
+        logger.info("StudyCatalogueDownloadEvent: filename {}", event.getFilename());
+        Log logEvent = new Log.LogBuilder()
+            .action("download")
+            .username(event.getUsername())
+            .type("StudyCatalogue")
+            .details("filename: %s".formatted(event.getFilename()))
             .build();
         loggingRepository.save(logEvent);
     }

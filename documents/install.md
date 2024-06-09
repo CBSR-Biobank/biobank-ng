@@ -111,6 +111,7 @@ Follow these steps:
 
     [Service]
     User=biobank
+    WorkingDirectory=/opt/biobank/biobank-ng
     ExecStart=/usr/bin/java -jar /opt/biobank/biobank-ng/target/biobank-0.0.1-SNAPSHOT.jar
     SuccessExitStatus=143
 

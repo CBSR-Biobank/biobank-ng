@@ -1,33 +1,40 @@
 package edu.ualberta.med.biobank.services;
 
-import edu.ualberta.med.biobank.domain.Status;
-import edu.ualberta.med.biobank.domain.Study;
-import edu.ualberta.med.biobank.dtos.AnnotationTypeDTO;
-import edu.ualberta.med.biobank.dtos.SourceSpecimenTypeDTO;
-import edu.ualberta.med.biobank.dtos.StudyDTO;
-import edu.ualberta.med.biobank.dtos.StudyNameDTO;
-import edu.ualberta.med.biobank.errors.AppError;
-import edu.ualberta.med.biobank.errors.EntityNotFound;
-import edu.ualberta.med.biobank.errors.Forbidden;
-import edu.ualberta.med.biobank.errors.PermissionError;
-import edu.ualberta.med.biobank.permission.patients.StudyReadPermission;
-import edu.ualberta.med.biobank.repositories.StudyRepository;
-import edu.ualberta.med.biobank.util.LoggingUtils;
-import io.jbock.util.Either;
-import jakarta.persistence.Tuple;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import edu.ualberta.med.biobank.domain.Operation;
+import edu.ualberta.med.biobank.domain.Status;
+import edu.ualberta.med.biobank.domain.Study;
+import edu.ualberta.med.biobank.domain.Task;
+import edu.ualberta.med.biobank.dtos.AnnotationTypeDTO;
+import edu.ualberta.med.biobank.dtos.CatalogueTaskDTO;
+import edu.ualberta.med.biobank.dtos.SourceSpecimenTypeDTO;
+import edu.ualberta.med.biobank.dtos.StudyDTO;
+import edu.ualberta.med.biobank.dtos.StudyNameDTO;
+import edu.ualberta.med.biobank.errors.AppError;
+import edu.ualberta.med.biobank.errors.BadRequest;
+import edu.ualberta.med.biobank.errors.EntityNotFound;
+import edu.ualberta.med.biobank.errors.Forbidden;
+import edu.ualberta.med.biobank.errors.PermissionError;
+import edu.ualberta.med.biobank.exception.AppErrorException;
+import edu.ualberta.med.biobank.permission.patients.StudyReadPermission;
+import edu.ualberta.med.biobank.repositories.StudyRepository;
+import edu.ualberta.med.biobank.services.catalogue.CatalogueCreateOp;
+import edu.ualberta.med.biobank.util.LoggingUtils;
+import io.jbock.util.Either;
+import jakarta.persistence.Tuple;
 
 @Service
 public class StudyService {
@@ -35,12 +42,15 @@ public class StudyService {
     @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(StudyService.class);
 
-    StudyRepository studyRepository;
+    private StudyRepository studyRepository;
+
+    private final TaskService taskService;
 
     UserService userService;
 
-    public StudyService(StudyRepository studyRepository, UserService userService) {
+    public StudyService(StudyRepository studyRepository, TaskService taskService, UserService userService) {
         this.studyRepository = studyRepository;
+        this.taskService = taskService;
         this.userService = userService;
     }
 
@@ -174,5 +184,35 @@ public class StudyService {
                 var dtos = sourceSpecimenTypes.stream().map(s -> SourceSpecimenTypeDTO.fromTuple(s)).toList();
                 return Either.right(dtos);
             });
+    }
+
+    public CatalogueTaskDTO catalogueCreate(String nameShort) {
+        var studyMaybe = findByNameShort(nameShort);
+        if (studyMaybe.isLeft()) {
+            throw new AppErrorException(studyMaybe.getLeft().get());
+        }
+
+        var study = studyMaybe.getRight().get();
+        logger.info("catalogue requested for study %s".formatted(study.nameShort()));
+
+        var op = new CatalogueCreateOp(study.nameShort());
+        taskService.submit(op);
+        return CatalogueTaskDTO.fromTask(op.task(), nameShort);
+    }
+
+    public CatalogueTaskDTO catalogueTaskStatus(String nameShort, UUID id) {
+        var task = taskService.get(id);
+        if (task == null) {
+            throw new AppErrorException(new BadRequest("invalid task id"));
+        }
+        return CatalogueTaskDTO.fromTask(task, nameShort);
+    }
+
+    public void catalogueTaskDelete(UUID id) {
+        var task = taskService.get(id);
+        if (task == null) {
+            throw new AppErrorException(new BadRequest("invalid task id"));
+        }
+        taskService.cancel(id);
     }
 }

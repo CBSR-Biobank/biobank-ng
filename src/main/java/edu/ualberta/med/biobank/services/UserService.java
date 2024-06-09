@@ -58,7 +58,6 @@ public class UserService {
         }
 
         var user = users.stream().findFirst().get();
-        logger.info(">>> users: %s".formatted(LoggingUtils.prettyPrintJson(user)));
         logger.debug("user: {}", LoggingUtils.prettyPrintJson(user));
         return Either.right(user);
     }

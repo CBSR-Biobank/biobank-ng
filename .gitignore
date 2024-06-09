@@ -43,3 +43,4 @@ logs/
 *.svg
 /database.sql
 /create.sql
+/studies/catalogues/*.xlsx

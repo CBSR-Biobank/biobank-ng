@@ -100,4 +100,52 @@ public interface SpecimenRepository extends JpaRepository<Specimen, Integer> {
         nativeQuery = true
     )
     public <T> Collection<T> findByParentInventoryId(String inventoryId, Class<T> type);
+
+    @Query(
+        value = """
+        select
+          study.name_short study,
+          pt.pnumber pnumber,
+          spc.inventory_id,
+          spc.created_at,
+          pspc.created_at time_drawn,
+          spc.quantity,
+          center.name_short center,
+          ce.visit_number,
+          pe.worksheet worksheet,
+          pspc.inventory_id parent_inventory_id,
+          stype.name specimen_type,
+          top_cntr_type.name_short top_container,
+          cntr.label,
+          spos.position_string position
+        from
+          specimen spc
+          left join specimen pspc on pspc.id = spc.parent_specimen_id
+          join specimen_type stype on stype.id = spc.specimen_type_id
+          join collection_event ce on ce.id = spc.collection_event_id
+          left join processing_event pe on pe.id = pspc.processing_event_id
+          join patient pt on pt.id = ce.patient_id
+          join study on study.id = pt.study_id
+          join center on center.id = spc.current_center_id
+          join site_study on site_study.study_id = study.id
+          join center site on site.id = site_study.site_id
+          left join specimen_position spos on spos.specimen_id = spc.id
+          left join container cntr on cntr.id = spos.container_id
+          left join container top_cntr on top_cntr.id = cntr.top_container_id
+          left join container_type top_cntr_type on top_cntr_type.id = top_cntr.container_type_id
+        where
+          study.name_short = :nameShort
+          and top_cntr_type.name_short not like 'SS%'
+          and spc.activity_status_id = 1
+        order by
+          pt.pnumber,
+          ce.visit_number,
+          spc.inventory_id,
+          spc.created_at,
+          pspc.inventory_id,
+          stype.name
+        """,
+        nativeQuery = true
+    )
+    public <T> Collection<T> findByStudy(String nameShort, Class<T> type);
 }

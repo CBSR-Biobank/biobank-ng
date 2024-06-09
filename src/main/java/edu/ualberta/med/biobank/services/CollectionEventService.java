@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.services;
 
-import edu.ualberta.med.biobank.applicationevents.BiobankEventPublisher;
+import edu.ualberta.med.biobank.applicationevents.VisitCreatedEvent;
+import edu.ualberta.med.biobank.applicationevents.VisitDeletedEvent;
+import edu.ualberta.med.biobank.applicationevents.VisitReadEvent;
+import edu.ualberta.med.biobank.applicationevents.VisitUpdatedEvent;
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.domain.Comment;
 import edu.ualberta.med.biobank.domain.EventAttr;
@@ -48,6 +51,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -73,7 +77,7 @@ public class CollectionEventService {
 
     private UserService userService;
 
-    private BiobankEventPublisher eventPublisher;
+    private ApplicationEventPublisher eventPublisher;
 
     private Validator validator;
 
@@ -86,7 +90,7 @@ public class CollectionEventService {
         PatientService patientService,
         UserService userService,
         Validator validator,
-        BiobankEventPublisher eventPublisher
+        ApplicationEventPublisher eventPublisher
     ) {
         this.collectionEventRepository = collectionEventRepository;
         this.eventAttrRepository = eventAttrRepository;
@@ -108,21 +112,20 @@ public class CollectionEventService {
     }
 
     public Either<AppError, CollectionEventDTO> get(String pnumber, Integer vnumber) {
-        return getInternal(pnumber, vnumber)
-            .flatMap(cevent -> {
-                var permission = new CollectionEventReadPermission(cevent.studyId());
-                return permission
-                    .isAllowed()
-                    .flatMap(allowed -> {
-                        if (!allowed) {
-                            return Either.left(new PermissionError("study"));
-                        }
+        return getInternal(pnumber, vnumber).flatMap(cevent -> {
+            var permission = new CollectionEventReadPermission(cevent.studyId());
+            return permission
+                .isAllowed()
+                .flatMap(allowed -> {
+                    if (!allowed) {
+                        return Either.left(new PermissionError("study"));
+                    }
 
-                        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                        eventPublisher.publishVisitRead(auth.getName(), cevent.pnumber(), cevent.vnumber());
-                        return Either.right(cevent);
-                    });
-            });
+                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                    eventPublisher.publishEvent(new VisitReadEvent(auth.getName(), cevent.pnumber(), cevent.vnumber()));
+                    return Either.right(cevent);
+                });
+        });
     }
 
     public Either<AppError, CollectionEventDTO> add(String pnumber, CollectionEventAddDTO ceventInfo) {
@@ -173,7 +176,9 @@ public class CollectionEventService {
                         collectionEventRepository.save(newEvent);
 
                         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                        eventPublisher.publishVisitCreated(auth.getName(), pnumber, ceventInfo.vnumber());
+                        eventPublisher.publishEvent(
+                            new VisitCreatedEvent(auth.getName(), pnumber, ceventInfo.vnumber())
+                        );
 
                         return Either.right(CollectionEventDTO.fromCollectionEvent(newEvent));
                     });
@@ -196,103 +201,95 @@ public class CollectionEventService {
             return Either.left(new ValidationError(String.join(", ", errors)));
         }
 
-        return getInternal(pnumber, vnumber)
-            .flatMap(ceventDTO -> {
-                var permission = new CollectionEventUpdatePermission(ceventDTO.studyId());
-                return permission
-                    .isAllowed()
-                    .flatMap(allowed -> {
-                        logger.debug("ceventInfo: {}", LoggingUtils.prettyPrintJson(ceventInfo));
+        return getInternal(pnumber, vnumber).flatMap(ceventDTO -> {
+            var permission = new CollectionEventUpdatePermission(ceventDTO.studyId());
+            return permission
+                .isAllowed()
+                .flatMap(allowed -> {
+                    logger.debug("ceventInfo: {}", LoggingUtils.prettyPrintJson(ceventInfo));
 
-                        if (!allowed) {
-                            return Either.left(new PermissionError("study: %s".formatted(ceventDTO.studyNameShort())));
-                        }
+                    if (!allowed) {
+                        return Either.left(new PermissionError("study: %s".formatted(ceventDTO.studyNameShort())));
+                    }
 
-                        if (vnumber != ceventInfo.vnumber() && getInternal(pnumber, ceventInfo.vnumber()).isRight()) {
-                            return Either.left(
-                                new Forbidden("visit number exists: %d".formatted(ceventInfo.vnumber()))
-                            );
-                        }
+                    if (vnumber != ceventInfo.vnumber() && getInternal(pnumber, ceventInfo.vnumber()).isRight()) {
+                        return Either.left(new Forbidden("visit number exists: %d".formatted(ceventInfo.vnumber())));
+                    }
 
-                        Status newStatus = Status.fromName(ceventInfo.status());
-                        if (newStatus == null) {
-                            return Either.left(
-                                new ValidationError("invalid status: %s".formatted(ceventInfo.status()))
-                            );
-                        }
+                    Status newStatus = Status.fromName(ceventInfo.status());
+                    if (newStatus == null) {
+                        return Either.left(new ValidationError("invalid status: %s".formatted(ceventInfo.status())));
+                    }
 
-                        CollectionEvent cevent = collectionEventRepository.getReferenceById(ceventDTO.id());
-                        return validAnnotations(cevent, ceventInfo.annotations())
-                            .flatMap(annotations -> {
-                                Set<EventAttrValuePair> notPresent = updatePresentEventAttrs(cevent, annotations);
-                                Set<EventAttr> attrsToAdd = addEventAttrs(cevent, notPresent);
+                    CollectionEvent cevent = collectionEventRepository.getReferenceById(ceventDTO.id());
+                    return validAnnotations(cevent, ceventInfo.annotations()).flatMap(annotations -> {
+                        Set<EventAttrValuePair> notPresent = updatePresentEventAttrs(cevent, annotations);
+                        Set<EventAttr> attrsToAdd = addEventAttrs(cevent, notPresent);
 
-                                cevent.getEventAttrs().addAll(attrsToAdd);
-                                cevent.setVisitNumber(ceventInfo.vnumber());
-                                cevent.setActivityStatus(newStatus);
-                                CollectionEvent savedCevent = collectionEventRepository.saveAndFlush(cevent);
+                        cevent.getEventAttrs().addAll(attrsToAdd);
+                        cevent.setVisitNumber(ceventInfo.vnumber());
+                        cevent.setActivityStatus(newStatus);
+                        CollectionEvent savedCevent = collectionEventRepository.saveAndFlush(cevent);
 
-                                String username = SecurityContextHolder.getContext().getAuthentication().getName();
-                                eventPublisher.publishVisitUpdated(username, pnumber, vnumber);
-                                return Either.right(CollectionEventDTO.fromCollectionEvent(savedCevent));
-                            });
+                        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+                        eventPublisher.publishEvent(new VisitUpdatedEvent(username, pnumber, vnumber));
+                        return Either.right(CollectionEventDTO.fromCollectionEvent(savedCevent));
                     });
-            });
+                });
+        });
     }
 
     public Either<AppError, Boolean> delete(String pnumber, Integer vnumber) {
-        return getInternal(pnumber, vnumber)
-            .flatMap(ceventDTO -> {
-                CollectionEventDeletePermission permission = new CollectionEventDeletePermission(ceventDTO.studyId());
-                return permission
-                    .isAllowed()
-                    .flatMap(allowed -> {
-                        if (!allowed) {
-                            return Either.left(new PermissionError("collection event delete"));
-                        }
+        return getInternal(pnumber, vnumber).flatMap(ceventDTO -> {
+            CollectionEventDeletePermission permission = new CollectionEventDeletePermission(ceventDTO.studyId());
+            return permission
+                .isAllowed()
+                .flatMap(allowed -> {
+                    if (!allowed) {
+                        return Either.left(new PermissionError("collection event delete"));
+                    }
 
-                        if (!ceventDTO.sourceSpecimens().isEmpty()) {
-                            return Either.left(new Forbidden("collection event has specimens"));
-                        }
+                    if (!ceventDTO.sourceSpecimens().isEmpty()) {
+                        return Either.left(new Forbidden("collection event has specimens"));
+                    }
 
-                        collectionEventRepository.deleteById(ceventDTO.id());
+                    collectionEventRepository.deleteById(ceventDTO.id());
 
-                        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                        eventPublisher.publishVisitDeleted(auth.getName(), pnumber, vnumber);
+                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                    eventPublisher.publishEvent(new VisitDeletedEvent(auth.getName(), pnumber, vnumber));
 
-                        return Either.right(true);
-                    });
-            });
+                    return Either.right(true);
+                });
+        });
     }
 
     public Either<AppError, Collection<CommentDTO>> getComments(String pnumber, Integer vnumber) {
-        return getInternal(pnumber, vnumber)
-            .flatMap(cevent -> {
-                var permission = new CollectionEventReadPermission(cevent.studyId());
-                return permission
-                    .isAllowed()
-                    .flatMap(allowed -> {
-                        if (!allowed) {
-                            return Either.left(new PermissionError("collection event read"));
-                        }
+        return getInternal(pnumber, vnumber).flatMap(cevent -> {
+            var permission = new CollectionEventReadPermission(cevent.studyId());
+            return permission
+                .isAllowed()
+                .flatMap(allowed -> {
+                    if (!allowed) {
+                        return Either.left(new PermissionError("collection event read"));
+                    }
 
-                        Map<Integer, CommentDTO> comments = new LinkedHashMap<>();
+                    Map<Integer, CommentDTO> comments = new LinkedHashMap<>();
 
-                        collectionEventRepository
-                            .comments(pnumber, vnumber, Tuple.class)
-                            .stream()
-                            .forEach(row -> {
-                                var commentId = row.get("commentId", Integer.class);
-                                if (commentId != null) {
-                                    comments.computeIfAbsent(commentId, id -> CommentDTO.fromTuple(row));
-                                }
-                            });
+                    collectionEventRepository
+                        .comments(pnumber, vnumber, Tuple.class)
+                        .stream()
+                        .forEach(row -> {
+                            var commentId = row.get("commentId", Integer.class);
+                            if (commentId != null) {
+                                comments.computeIfAbsent(commentId, id -> CommentDTO.fromTuple(row));
+                            }
+                        });
 
-                        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                        eventPublisher.publishVisitRead(auth.getName(), cevent.pnumber(), cevent.vnumber());
-                        return Either.right(comments.values());
-                    });
-            });
+                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                    eventPublisher.publishEvent(new VisitReadEvent(auth.getName(), cevent.pnumber(), cevent.vnumber()));
+                    return Either.right(comments.values());
+                });
+        });
     }
 
     public Either<AppError, CommentDTO> addComment(String pnumber, Integer vnumber, CommentAddDTO commentDTO) {
@@ -306,34 +303,33 @@ public class CollectionEventService {
             return Either.left(new ValidationError(String.join(", ", errors)));
         }
 
-        return getInternal(pnumber, vnumber)
-            .flatMap(ceventDTO -> {
-                var permission = new CollectionEventUpdatePermission(ceventDTO.studyId());
-                return permission
-                    .isAllowed()
-                    .flatMap(allowed -> {
-                        if (!allowed) {
-                            return Either.left(new PermissionError("study"));
-                        }
-                        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                        return userService.findOneWithMemberships(auth.getName());
-                    })
-                    .flatMap(userDto -> {
-                        User user = userService.getById(userDto.userId());
+        return getInternal(pnumber, vnumber).flatMap(ceventDTO -> {
+            var permission = new CollectionEventUpdatePermission(ceventDTO.studyId());
+            return permission
+                .isAllowed()
+                .flatMap(allowed -> {
+                    if (!allowed) {
+                        return Either.left(new PermissionError("study"));
+                    }
+                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                    return userService.findOneWithMemberships(auth.getName());
+                })
+                .flatMap(userDto -> {
+                    User user = userService.getById(userDto.userId());
 
-                        Comment comment = new Comment();
-                        comment.setUser(user);
-                        comment.setCreatedAt(new Date());
-                        comment.setMessage(commentDTO.message().trim());
+                    Comment comment = new Comment();
+                    comment.setUser(user);
+                    comment.setCreatedAt(new Date());
+                    comment.setMessage(commentDTO.message().trim());
 
-                        CollectionEvent eventToUpdate = collectionEventRepository.getReferenceById(ceventDTO.id());
-                        eventToUpdate.getComments().add(comment);
-                        collectionEventRepository.save(eventToUpdate);
+                    CollectionEvent eventToUpdate = collectionEventRepository.getReferenceById(ceventDTO.id());
+                    eventToUpdate.getComments().add(comment);
+                    collectionEventRepository.save(eventToUpdate);
 
-                        eventPublisher.publishVisitUpdated(userDto.username(), pnumber, vnumber);
-                        return Either.right(CommentDTO.fromComment(comment));
-                    });
-            });
+                    eventPublisher.publishEvent(new VisitUpdatedEvent(userDto.username(), pnumber, vnumber));
+                    return Either.right(CommentDTO.fromComment(comment));
+                });
+        });
     }
 
     /**
@@ -424,7 +420,7 @@ public class CollectionEventService {
 
             String type = studyAttr.getGlobalEventAttr().getEventAttrType().getName();
 
-            if (pair.value != null &&  !pair.value.isBlank()) {
+            if (pair.value != null && !pair.value.isBlank()) {
                 if (type.equals("number") && !StringUtil.isNumeric(pair.value)) {
                     return Either.left(new ValidationError("annotation value is not numeric: %s".formatted(label)));
                 }

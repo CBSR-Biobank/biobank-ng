@@ -1,17 +1,8 @@
 package edu.ualberta.med.biobank.services;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import edu.ualberta.med.biobank.applicationevents.BiobankEventPublisher;
+import edu.ualberta.med.biobank.applicationevents.PatientCreatedEvent;
+import edu.ualberta.med.biobank.applicationevents.PatientReadEvent;
+import edu.ualberta.med.biobank.applicationevents.PatientUpdatedEvent;
 import edu.ualberta.med.biobank.domain.Comment;
 import edu.ualberta.med.biobank.domain.Patient;
 import edu.ualberta.med.biobank.domain.User;
@@ -35,6 +26,18 @@ import io.jbock.util.Either;
 import jakarta.persistence.Tuple;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
 @Service
 public class PatientService {
@@ -45,7 +48,7 @@ public class PatientService {
 
     private CollectionEventRepository collectionEventRepository;
 
-    private BiobankEventPublisher eventPublisher;
+    private ApplicationEventPublisher eventPublisher;
 
     private StudyRepository studyRepository;
 
@@ -59,7 +62,7 @@ public class PatientService {
         StudyRepository studyRepository,
         UserService userService,
         Validator validator,
-        BiobankEventPublisher eventPublisher
+        ApplicationEventPublisher eventPublisher
     ) {
         this.patientRepository = patientRepository;
         this.collectionEventRepository = collectionEventRepository;
@@ -77,22 +80,21 @@ public class PatientService {
     }
 
     public Either<AppError, PatientDTO> get(String pnumber) {
-        return getInternal(pnumber)
-            .flatMap(patient -> {
-                return new PatientReadPermission(patient.studyId())
-                    .isAllowed()
-                    .flatMap(allowed -> {
-                        logger.debug("patient study id: {}, allowed: {}", patient.studyId(), allowed);
-                        if (!allowed) {
-                            return Either.left(new PermissionError("patient read"));
-                        }
+        return getInternal(pnumber).flatMap(patient -> {
+            return new PatientReadPermission(patient.studyId())
+                .isAllowed()
+                .flatMap(allowed -> {
+                    logger.debug("patient study id: {}, allowed: {}", patient.studyId(), allowed);
+                    if (!allowed) {
+                        return Either.left(new PermissionError("patient read"));
+                    }
 
-                        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                        eventPublisher.publishPatientRead(auth.getName(), pnumber);
+                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                    eventPublisher.publishEvent(new PatientReadEvent(auth.getName(), pnumber));
 
-                        return Either.right(patient);
-                    });
-            });
+                    return Either.right(patient);
+                });
+        });
     }
 
     public Either<AppError, PatientDTO> add(PatientAddDTO dto) {
@@ -138,7 +140,7 @@ public class PatientService {
                 Patient savedPatient = patientRepository.save(patient);
 
                 Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                eventPublisher.publishPatientCreated(auth.getName(), dto.pnumber());
+                eventPublisher.publishEvent(new PatientCreatedEvent(auth.getName(), dto.pnumber()));
                 return Either.right(PatientDTO.fromPatient(savedPatient));
             });
     }
@@ -199,7 +201,7 @@ public class PatientService {
                         Patient savedPatient = patientRepository.save(patient);
 
                         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                        eventPublisher.publishPatientUpdated(auth.getName(), data.pnumber());
+                        eventPublisher.publishEvent(new PatientUpdatedEvent(auth.getName(), data.pnumber()));
                         return Either.right(PatientDTO.fromPatient(savedPatient));
                     });
             });
@@ -229,7 +231,7 @@ public class PatientService {
                     });
 
                 Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                eventPublisher.publishPatientRead(auth.getName(), pnumber);
+                eventPublisher.publishEvent(new PatientReadEvent(auth.getName(), pnumber));
                 return Either.right(comments.values());
             });
     }
@@ -245,34 +247,33 @@ public class PatientService {
             return Either.left(new ValidationError(String.join(", ", errors)));
         }
 
-        return patientExists(pnumber)
-            .flatMap(patient -> {
-                var permission = new PatientUpdatePermission(patient.studyId());
-                return permission
-                    .isAllowed()
-                    .flatMap(allowed -> {
-                        if (!allowed) {
-                            return Either.left(new PermissionError("study"));
-                        }
-                        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                        return userService.findOneWithMemberships(auth.getName());
-                    })
-                    .flatMap(userDto -> {
-                        User user = userService.getById(userDto.userId());
+        return patientExists(pnumber).flatMap(patient -> {
+            var permission = new PatientUpdatePermission(patient.studyId());
+            return permission
+                .isAllowed()
+                .flatMap(allowed -> {
+                    if (!allowed) {
+                        return Either.left(new PermissionError("study"));
+                    }
+                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                    return userService.findOneWithMemberships(auth.getName());
+                })
+                .flatMap(userDto -> {
+                    User user = userService.getById(userDto.userId());
 
-                        Comment comment = new Comment();
-                        comment.setUser(user);
-                        comment.setCreatedAt(new Date());
-                        comment.setMessage(commentDTO.message().trim());
+                    Comment comment = new Comment();
+                    comment.setUser(user);
+                    comment.setCreatedAt(new Date());
+                    comment.setMessage(commentDTO.message().trim());
 
-                        Patient patientToUpdate = patientRepository.getReferenceById(patient.id());
-                        patientToUpdate.getComments().add(comment);
-                        patientRepository.save(patientToUpdate);
+                    Patient patientToUpdate = patientRepository.getReferenceById(patient.id());
+                    patientToUpdate.getComments().add(comment);
+                    patientRepository.save(patientToUpdate);
 
-                        eventPublisher.publishPatientUpdated(userDto.username(), pnumber);
-                        return Either.right(CommentDTO.fromComment(comment));
-                    });
-            });
+                    eventPublisher.publishEvent(new PatientUpdatedEvent(userDto.username(), pnumber));
+                    return Either.right(CommentDTO.fromComment(comment));
+                });
+        });
     }
 
     /**
@@ -281,16 +282,15 @@ public class PatientService {
      * It does not check for user permissions or update the LOG table.
      */
     Either<AppError, PatientDTO> getInternal(String pnumber) {
-        return patientExists(pnumber)
-            .flatMap(patient -> {
-                var ceSummary = collectionEventRepository
-                    .findSummariesByPatient(pnumber, Tuple.class)
-                    .stream()
-                    .map(row -> CollectionEventSummaryDTO.fromTuple(row))
-                    .toList();
+        return patientExists(pnumber).flatMap(patient -> {
+            var ceSummary = collectionEventRepository
+                .findSummariesByPatient(pnumber, Tuple.class)
+                .stream()
+                .map(row -> CollectionEventSummaryDTO.fromTuple(row))
+                .toList();
 
-                return Either.right(patient.withCollectionEvents(ceSummary));
-            });
+            return Either.right(patient.withCollectionEvents(ceSummary));
+        });
     }
 
     private Either<AppError, PatientDTO> patientExists(String pnumber) {
