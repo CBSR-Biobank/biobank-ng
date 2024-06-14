@@ -1,7 +1,7 @@
 import { useUserStore } from '@app/store';
 import { cn } from '@app/utils';
 
-import { faFileLines, faSquarePlus, faUserDoctor, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faFileLines, faSquarePlus, faTableCells, faUserDoctor, faUsers } from '@fortawesome/free-solid-svg-icons';
 
 import { DrawerMenuItem } from './drawer-menu-item';
 import { MenuItem } from './menu-item';
@@ -30,6 +30,12 @@ const menuItems: MenuItem[] = [
     ],
   },
   {
+    title: 'Study Catalogue',
+    icon: faTableCells,
+    route: '/study-catalogue',
+    submenu: [],
+  },
+  {
     title: 'Logging',
     icon: faFileLines,
     route: '/logging',
@@ -48,7 +54,7 @@ export const DashboardDrawer: React.FC<{ open: boolean }> = ({ open }) => {
   const allowedMenuItems = menuItems;
 
   return (
-    <div className={cn('pt-2 text-white', { 'w-72': open }, { 'w-14': !open })}>
+    <div className={cn('border-r pt-2 text-white transition-all', { 'w-72': open }, { 'w-14': !open })}>
       <ul>
         {allowedMenuItems.map((item, index) => (
           <DrawerMenuItem key={index} item={item} drawerOpen={open} />

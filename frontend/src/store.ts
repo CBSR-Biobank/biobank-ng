@@ -92,3 +92,13 @@ export const usePatientStore = create<PatientState>((set) => ({
   setPatient: (patient) => set((state) => ({ ...state, patient, collectionEvent: undefined })),
   setCollectionEvent: (collectionEvent) => set((state) => ({ ...state, collectionEvent })),
 }));
+
+interface StudyState {
+  catalogueUrl: string | null;
+  setCatalogueUrl: (url: string | null) => void;
+}
+
+export const useStudyStore = create<StudyState>((set) => ({
+  catalogueUrl: null,
+  setCatalogueUrl: (url) => set((state) => ({ ...state, url })),
+}));

@@ -2,7 +2,7 @@ import { cn } from '@app/utils';
 
 import { VariantProps, cva } from 'class-variance-authority';
 
-const variants = cva('mb-8 grid grid-cols-1 gap-4 rounded-md bg-gray-100 p-4 drop-shadow-md', {
+const variants = cva('mb-8 grid grid-cols-1 gap-4 p-4', {
   variants: {
     variant: {
       default: 'border-0',

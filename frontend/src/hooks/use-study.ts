@@ -1,7 +1,7 @@
 import { StudyApi } from '@app/api/study-api';
 import { Status } from '@app/models/status';
 
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export function useStudyNames() {
   const query = useQuery({
@@ -16,6 +16,19 @@ export function useStudyNames() {
     isError: query.isError,
     error: query.error,
   };
+}
+
+export function useCatalogueRequest() {
+  const queryClient = useQueryClient();
+
+  const addPatientMutation = useMutation({
+    mutationFn: (nameShort: string) => StudyApi.catalogue(nameShort),
+    onSuccess: (data, _variables, _context) => {
+      queryClient.setQueryData(['studies', 'catalogue', data], data);
+      queryClient.invalidateQueries({ queryKey: ['studies', 'catalogue'] });
+    },
+  });
+  return addPatientMutation;
 }
 
 export function useStudyAnnotationTypes(nameshort: string) {

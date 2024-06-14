@@ -5,7 +5,6 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from '@app/components/ui/context-menu';
-import { userHasGroups } from '@app/models/user';
 import { useUserStore } from '@app/store';
 import { cn } from '@app/utils';
 
@@ -45,36 +44,41 @@ export const PopupSubMenu: React.FC<{
     return null;
   }
 
-  const allowedSubmenuItems = (menuItem?.submenu ?? []).filter((item) =>
-    userHasGroups(user, item?.requiredGroups ?? [])
-  );
+  // const allowedSubmenuItems = (menuItem?.submenu ?? []).filter((item) =>
+  //   userHasGroups(user, item?.requiredGroups ?? [])
+  // );
+
+  const allowedSubmenuItems = menuItem?.submenu ?? [];
 
   return (
-    <div className={cn('hover:bg-basic-300 relative cursor-pointer rounded-md px-2 py-1')} onClick={handleParentClick}>
+    <div className={cn('relative cursor-pointer rounded-md p-2 hover:bg-gray-300')} onClick={handleParentClick}>
       <ContextMenu onOpenChange={handleOpened}>
         <ContextMenuTrigger className="flex items-center justify-center">
           <FontAwesomeIcon icon={icon} />
         </ContextMenuTrigger>
-        <ContextMenuContent className="absolute -top-4 left-6 z-10 w-64 bg-white">
+        <ContextMenuContent className="absolute -top-4 left-6 z-10 w-64 bg-white text-gray-600">
           <ContextMenuItem
-            className="flex gap-2 font-semibold"
+            className="flex gap-2 font-semibold focus:bg-gray-300"
             onSelect={(event: Event) => handleSelected(event, menuItem)}
           >
             {menuItem.title}
           </ContextMenuItem>
-          <ContextMenuSeparator className="bg-gray-300" />
-          {menuItem.submenu &&
-            allowedSubmenuItems.map((item, index) => (
-              <ContextMenuItem
-                key={index}
-                inset
-                className="flex gap-2"
-                onSelect={(event: Event) => handleSelected(event, item)}
-              >
-                <FontAwesomeIcon icon={item.icon} className="text-basic-500" />
-                {item.title}
-              </ContextMenuItem>
-            ))}
+          {allowedSubmenuItems.length > 0 && (
+            <>
+              <ContextMenuSeparator className="bg-gray-300" />
+              {allowedSubmenuItems.map((item, index) => (
+                <ContextMenuItem
+                  key={index}
+                  inset
+                  className="flex gap-2 focus:bg-gray-300"
+                  onSelect={(event: Event) => handleSelected(event, item)}
+                >
+                  <FontAwesomeIcon icon={item.icon} className="text-basic-500" />
+                  {item.title}
+                </ContextMenuItem>
+              ))}
+            </>
+          )}
         </ContextMenuContent>
       </ContextMenu>
     </div>

@@ -36,7 +36,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping(path = "/api/studies", produces = "application/json")
@@ -93,29 +95,29 @@ public class StudyController {
     }
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    @PostMapping("/catalogue/{nameshort}")
+    @PostMapping("/catalogues/{nameshort}")
     public ResponseEntity<String> catlogue(@PathVariable String nameshort) {
         var task = studyService.catalogueCreate(nameshort);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         eventPublisher.publishEvent(new StudyCatalogueRequestEvent(auth.getName(), nameshort));
-        return ResponseEntity.ok()
-            .location(URI.create("/api/studies/catalogue/%s/%s".formatted(nameshort, task.id())))
+        return ResponseEntity
+            .created(URI.create("/api/studies/catalogue/%s/%s".formatted(nameshort, task.id())))
             .build();
     }
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    @GetMapping("/catalogue/{nameshort}/{id}")
+    @GetMapping("/catalogues/{nameshort}/{id}")
     public CatalogueTaskDTO get(@PathVariable String nameshort, @PathVariable UUID id) {
         return studyService.catalogueTaskStatus(nameshort, id);
     }
 
-    @DeleteMapping("/catalogue/{nameshort}/{id}")
+    @DeleteMapping("/catalogues/{nameshort}/{id}")
     public void cancel(@PathVariable String nameshort, @PathVariable UUID id) {
         studyService.catalogueTaskDelete(id);
     }
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    @GetMapping("/catalogues/{name}")
+    @GetMapping("/catalogues/download/{name}")
     public ResponseEntity<?> downloadCatalogue(@PathVariable(value = "name") String fileName) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         eventPublisher.publishEvent(new StudyCatalogueDownloadEvent(auth.getName(), fileName));

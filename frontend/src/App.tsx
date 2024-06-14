@@ -106,6 +106,29 @@ const router = createBrowserRouter([
         ],
       },
       {
+        path: 'study-catalogue',
+        async lazy() {
+          let { CataloguePage } = await import('@app/pages/studies/catalogue-page');
+          return { Component: CataloguePage };
+        },
+        children: [
+          {
+            index: true,
+            async lazy() {
+              let { CatalogueRequest } = await import('@app/components/studies/catalogue-request');
+              return { Component: CatalogueRequest };
+            },
+          },
+          {
+            path: 'wait',
+            async lazy() {
+              let { CatalogueWait } = await import('@app/components/studies/catalogue-wait');
+              return { Component: CatalogueWait };
+            },
+          },
+        ],
+      },
+      {
         path: 'profile',
         async lazy() {
           let { UserProfile } = await import('@app/pages/user/user-profile');

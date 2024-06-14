@@ -20,6 +20,16 @@ export class StudyApi {
     return names;
   }
 
+  static async catalogue(nameShort: string) {
+    const response = await httpClient({
+      method: 'POST',
+      path: ['studies', 'catalogue', nameShort],
+      body: undefined,
+      query: undefined,
+    });
+    return response.headers.get('Location');
+  }
+
   static async annotationTypes(nameshort: string, status?: Status) {
     const response = await httpClient({
       method: 'GET',

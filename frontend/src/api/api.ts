@@ -131,6 +131,13 @@ type AliquotsGet = {
   body: undefined;
 };
 
+type StudyCatalogue = {
+  method: 'POST';
+  path: ['studies', 'catalogue', string];
+  query: undefined;
+  body: undefined;
+};
+
 type StudyNames = {
   method: 'GET';
   path: ['studies', 'names'];
@@ -171,6 +178,7 @@ export type Endpoint =
   | CollectionEventAddComment
   | SourceSpecimenCreate
   | AliquotsGet
+  | StudyCatalogue
   | StudyNames
   | StudyAnnotationTypes
   | SourceSpecimenTypes;
