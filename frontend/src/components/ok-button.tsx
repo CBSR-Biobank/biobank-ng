@@ -1,12 +1,12 @@
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
 
-import { Button } from './ui/button';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { BbButton } from './bb-button';
 
 export const OkButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
-  ({ className, ...props }, ref) => (
-    <Button ref={ref} variant="default" icon={faCheck} {...props} className={className}>
+  ({ className, ...props }, _ref) => (
+    <BbButton intent="primary" leadingIcon={faCheck} {...props} className={className}>
       OK
-    </Button>
+    </BbButton>
   )
 );
