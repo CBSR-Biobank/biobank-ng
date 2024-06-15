@@ -10,7 +10,7 @@
 
 services:
     db:
-        image: mariadb:11.0.3-jammy
+        image: mariadb:11.2.4-jammy
         command: --default-authentication-plugin=mariadb_native_password --lower-case-table-names=1
         volumes:
             - ../database/lib:/var/lib/mysql

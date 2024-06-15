@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.applicationevents.UserLoggedInEvent;
 import edu.ualberta.med.biobank.services.UserService;
+import edu.ualberta.med.biobank.util.LoggingUtils;
 
 @Service
 public class BiobankUserDetailsService implements UserDetailsService {
@@ -35,6 +36,7 @@ public class BiobankUserDetailsService implements UserDetailsService {
         var userInfoMaybe = userService.findByLogin(username);
 
         if (userInfoMaybe.isLeft()) {
+            logger.debug("User not found for this username: {}", username);
             throw new UsernameNotFoundException("User not found for this username: " + username);
         }
 

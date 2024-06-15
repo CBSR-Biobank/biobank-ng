@@ -1,11 +1,5 @@
 package edu.ualberta.med.biobank.services;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.domain.PermissionEnum;
 import edu.ualberta.med.biobank.domain.User;
 import edu.ualberta.med.biobank.dtos.DomainDTO;
@@ -21,6 +15,12 @@ import io.jbock.util.Either;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
@@ -87,6 +87,7 @@ public class UserService {
 
                 var membershipId = row.get("MEMBERSHIP_ID", Integer.class);
                 if (membershipId == null) {
+                    logger.error("membership is null");
                     throw new RuntimeException("membership is null");
                 }
                 users.get(userId).memberships().computeIfAbsent(membershipId, id -> MembershipDTO.fromTuple(row));

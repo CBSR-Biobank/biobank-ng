@@ -49,19 +49,13 @@ public interface UserRepository extends JpaRepository<User, Integer> {
         """;
 
     @Query(
-        value = BASE_QRY +
-        """
-        where p.login = :login
-        """,
+        value = BASE_QRY + "where p.login = :login",
         nativeQuery = true
     )
     <T> Collection<T> findByLogin(String login, Class<T> type);
 
     @Query(
-        value = BASE_QRY +
-        """
-        where uak.api_key = :apiKey
-        """,
+        value = BASE_QRY + "where uak.api_key = :apiKey",
         nativeQuery = true
     )
     <T> Collection<T> findByApiKey(String apiKey, Class<T> type);
