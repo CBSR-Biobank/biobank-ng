@@ -19,6 +19,8 @@ public class V1_1__Indices extends BaseJavaMigration {
 
             // specimen table
             update.execute("ALTER TABLE specimen ADD INDEX specimen_created_at_ndx (created_at)");
+
+            update.execute("ALTER TABLE specimen_position ADD INDEX spos_container_specimen_index (container_id,specimen_id)");
         }
     }
 }
