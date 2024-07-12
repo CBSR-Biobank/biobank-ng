@@ -5,15 +5,18 @@ import { LabelledInput } from '../forms/labelled-input';
 import { MutatorProps } from './mutator';
 import { MutatorFooter } from './mutator-footer';
 
-const requiredSchema = z.object({
-  value: z.string().trim().email(),
-});
+export type MutatorRegexProps = MutatorProps<string> & {
+  regex: RegExp;
+};
 
-const optionalSchema = z.object({
-  value: z.union([z.literal(''), z.string().trim().email()]),
-});
+export function MutatorRegex({ label, value, required, regex, onClose }: MutatorRegexProps) {
+  const valueSchema = z.string().regex(regex, { message: 'Invalid value' });
+  const requiredSchema = z.object({ value: valueSchema });
 
-export const MutatorEmail: React.FC<MutatorProps<string>> = ({ label, value, required, onClose }) => {
+  const optionalSchema = z.object({
+    value: z.union([z.literal(''), valueSchema]),
+  });
+
   const schema = required ? requiredSchema : optionalSchema;
 
   const {
@@ -42,10 +45,10 @@ export const MutatorEmail: React.FC<MutatorProps<string>> = ({ label, value, req
     <>
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 gap-6">
-          <LabelledInput type="email" label={label} errorMessage={errors?.value?.message} {...register('value')} />
+          <LabelledInput type="url" label={label} errorMessage={errors?.value?.message} {...register('value')} />
         </div>
       </form>
       <MutatorFooter isValueValid={isValid} onOk={handleOk} />
     </>
   );
-};
+}

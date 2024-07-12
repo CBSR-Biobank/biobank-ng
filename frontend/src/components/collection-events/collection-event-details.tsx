@@ -72,7 +72,7 @@ export const CollectionEventDetails: React.FC<{ patient: Patient; vnumber: numbe
     );
   };
 
-  const handleStatusUpdated = (value?: Status) => {
+  const handleStatusUpdated = (value?: Status | null) => {
     if (!value) {
       return; // do nothing
     }
@@ -84,7 +84,7 @@ export const CollectionEventDetails: React.FC<{ patient: Patient; vnumber: numbe
     });
   };
 
-  const handleAnnotationChange = (annotation: Annotation, value?: string) => {
+  const handleAnnotationChange = (annotation: Annotation, value?: string | null) => {
     const annotations = collectionEvent.annotations.filter((a) => a.name !== annotation.name);
     annotations.push({ ...annotation, value: value ?? '' });
     updateMutation.mutate({

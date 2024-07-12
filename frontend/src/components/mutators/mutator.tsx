@@ -5,8 +5,8 @@ export interface PropertyOption<T> {
 
 export type MutatorProps<T> = {
   label: string;
-  required: boolean;
-  value?: T;
-  onClose: (value?: T) => void;
+  required?: boolean;
+  value?: T | null;
+  onClose: (value?: T | null) => void;
   propertyOptions?: PropertyOption<T>[];
 };

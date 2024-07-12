@@ -1,13 +1,9 @@
-import { DialogClose, DialogFooter } from '@app/components/ui/dialog';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
-import { CancelButton } from '../cancel-button';
 import { LabelledInput } from '../forms/labelled-input';
-import { OkButton } from '../ok-button';
 import { MutatorProps } from './mutator';
+import { MutatorFooter } from './mutator-footer';
 
 const requiredSchema = z.object({
   value: z.string().trim().url(),
@@ -28,7 +24,7 @@ export const MutatorUrl: React.FC<MutatorProps<string>> = ({ label, value, requi
     mode: 'all',
     reValidateMode: 'onChange',
     resolver: zodResolver(schema),
-    defaultValues: { value },
+    defaultValues: { value: value ?? '' },
   });
 
   const handleSubmit = (event: React.SyntheticEvent) => {
@@ -49,15 +45,7 @@ export const MutatorUrl: React.FC<MutatorProps<string>> = ({ label, value, requi
           <LabelledInput type="url" label={label} errorMessage={errors?.value?.message} {...register('value')} />
         </div>
       </form>
-
-      <DialogFooter className="grid-cols-1 gap-3 lg:grid-cols-2">
-        <DialogClose asChild>
-          <CancelButton />
-        </DialogClose>
-        <DialogClose asChild>
-          <OkButton onClick={handleOk} disabled={!isValid} />
-        </DialogClose>
-      </DialogFooter>
+      <MutatorFooter isValueValid={isValid} onOk={handleOk} />
     </>
   );
 };

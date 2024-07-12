@@ -7,7 +7,7 @@ import { CollectionEvent } from '@app/models/collection-event';
 
 export const CollectionEventAnnotations: React.FC<{
   collectionEvent: CollectionEvent;
-  onClick: (annotation: Annotation, value?: string) => void;
+  onClick: (annotation: Annotation, value?: string | null) => void;
 }> = ({ collectionEvent, onClick }) => {
   const { annotationTypes, isLoading, isError, error } = useStudyAnnotationTypes(collectionEvent.studyNameShort);
 

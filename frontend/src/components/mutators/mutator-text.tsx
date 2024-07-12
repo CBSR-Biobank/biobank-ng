@@ -1,14 +1,10 @@
-import { DialogClose, DialogFooter } from '@app/components/ui/dialog';
 import { cn } from '@app/utils';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
-import { CancelButton } from '../cancel-button';
 import { LabelledInput } from '../forms/labelled-input';
-import { OkButton } from '../ok-button';
 import { MutatorProps } from './mutator';
+import { MutatorFooter } from './mutator-footer';
 
 export type MutatorTextareaProps = MutatorProps<string> & {
   multiline?: boolean;
@@ -40,7 +36,14 @@ function makeSchema(required: boolean, minlength?: number, maxlength?: number) {
   });
 }
 
-export const MutatorText: React.FC<MutatorTextareaProps> = ({ label, value, required, onClose, multiline, maxlen }) => {
+export const MutatorText: React.FC<MutatorTextareaProps> = ({
+  label,
+  value,
+  required = false,
+  onClose,
+  multiline,
+  maxlen,
+}) => {
   const schema = makeSchema(required, 1, maxlen);
 
   const {
@@ -51,7 +54,7 @@ export const MutatorText: React.FC<MutatorTextareaProps> = ({ label, value, requ
     mode: 'all',
     reValidateMode: 'onChange',
     resolver: zodResolver(schema),
-    defaultValues: { value },
+    defaultValues: { value: value ?? '' },
   });
 
   const handleSubmit = (event: React.SyntheticEvent) => {
@@ -83,14 +86,7 @@ export const MutatorText: React.FC<MutatorTextareaProps> = ({ label, value, requ
           )}
         </div>
       </form>
-      <DialogFooter className="grid-cols-1 gap-3 lg:grid-cols-2">
-        <DialogClose asChild>
-          <CancelButton />
-        </DialogClose>
-        <DialogClose asChild>
-          <OkButton onClick={handleOk} disabled={!isValid} />
-        </DialogClose>
-      </DialogFooter>
+      <MutatorFooter isValueValid={isValid} onOk={handleOk} />
     </>
   );
 };

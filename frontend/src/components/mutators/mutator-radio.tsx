@@ -1,13 +1,9 @@
-import { DialogClose, DialogFooter } from '@app/components/ui/dialog';
 import { cn } from '@app/utils';
-
 import { useState } from 'react';
-
-import { CancelButton } from '../cancel-button';
-import { OkButton } from '../ok-button';
 import { Label } from '../ui/label';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { MutatorProps, PropertyOption } from './mutator';
+import { MutatorFooter } from './mutator-footer';
 
 export function MutatorRadio<T>({ label, value, onClose, propertyOptions }: MutatorProps<T>) {
   const selectedOption = propertyOptions?.find((option) => option.id === value);
@@ -40,14 +36,7 @@ export function MutatorRadio<T>({ label, value, onClose, propertyOptions }: Muta
           </div>
         ))}
       </RadioGroup>
-      <DialogFooter className="grid-cols-1 gap-3 lg:grid-cols-2">
-        <DialogClose asChild>
-          <CancelButton />
-        </DialogClose>
-        <DialogClose asChild>
-          <OkButton onClick={handleOk} />
-        </DialogClose>
-      </DialogFooter>
+      <MutatorFooter isValueValid={true} onOk={handleOk} />
     </>
   );
 }

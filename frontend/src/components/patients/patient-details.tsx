@@ -75,7 +75,7 @@ export function PatientDetails() {
     });
   };
 
-  const handlePnumberUpdated = (value?: string) => {
+  const handlePnumberUpdated = (value?: string | null) => {
     if (!value) {
       throw new Error('new pnumber value is invalid');
     }
@@ -85,7 +85,7 @@ export function PatientDetails() {
     handleUpdate({ pnumber: value, studyNameShort: patient.studyNameShort });
   };
 
-  const handleStudyUpdated = (value?: string) => {
+  const handleStudyUpdated = (value?: string | null) => {
     if (!value) {
       throw new Error('new study name short value is invalid');
     }

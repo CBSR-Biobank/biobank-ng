@@ -1,14 +1,11 @@
-import { DialogClose, DialogFooter } from '@app/components/ui/dialog';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { CancelButton } from '../cancel-button';
 import { LabelledInput } from '../forms/labelled-input';
-import { OkButton } from '../ok-button';
 import { MutatorProps } from './mutator';
+import { MutatorFooter } from './mutator-footer';
 
 export type MutatorDateProps = MutatorProps<Date> & {
   minDate?: Date;
@@ -47,15 +44,7 @@ export const MutatorDate = ({ label, value, onClose }: MutatorDateProps) => {
         {...register('value')}
         pattern="\d{4}-\d{2}-\d{2}"
       />
-
-      <DialogFooter className="grid-cols-1 gap-3 lg:grid-cols-2">
-        <DialogClose asChild>
-          <CancelButton />
-        </DialogClose>
-        <DialogClose asChild>
-          <OkButton onClick={handleOk} disabled={!isValid} />
-        </DialogClose>
-      </DialogFooter>
+      <MutatorFooter isValueValid={isValid} onOk={handleOk} />
     </>
   );
 };

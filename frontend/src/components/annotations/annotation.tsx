@@ -25,6 +25,10 @@ const AnnotationMutator: React.FC<{
     throw new Error('invalid annotation type');
   }
 
+  const handleUpdate = (value?: unknown) => {
+    onUpdate(annotation, value ? `${value}` : undefined);
+  };
+
   switch (annotation.type) {
     case 'number':
       return (
@@ -32,18 +36,13 @@ const AnnotationMutator: React.FC<{
           label={annotation.name}
           value={annotation.value ? parseFloat(annotation.value) : undefined}
           required
-          onClose={(value?: number) => onUpdate(annotation, value ? `${value}` : undefined)}
+          onClose={handleUpdate}
         />
       );
 
     case 'text':
       return (
-        <MutatorText
-          label={annotation.name}
-          value={annotation.value ?? undefined}
-          required
-          onClose={(value?: string) => onUpdate(annotation, value)}
-        />
+        <MutatorText label={annotation.name} value={annotation.value ?? undefined} required onClose={handleUpdate} />
       );
 
     case 'date_time':
@@ -52,7 +51,7 @@ const AnnotationMutator: React.FC<{
           label={annotation.name}
           value={annotationValueAsDate(annotation)}
           required
-          onClose={(value?: Date) => onUpdate(annotation, value ? `${value}` : undefined)}
+          onClose={handleUpdate}
         />
       );
 
@@ -67,7 +66,7 @@ const AnnotationMutator: React.FC<{
         .map((v) => ({ id: v, label: v }))
         .filter((v) => !annotation.value?.includes(v.id));
 
-      const handleClose = (value?: string) => {
+      const handleClose = (value?: string | null) => {
         if (annotation.type === 'select_multiple') {
           if (!value) {
             return;
@@ -103,7 +102,14 @@ const AnnotationMutator: React.FC<{
       }
 
       return (
-        <MutatorSelect label={annotation.name} value={value} required propertyOptions={options} onClose={handleClose} />
+        <MutatorSelect
+          label={annotation.name}
+          value={value}
+          required
+          propertyOptions={options}
+          onClose={handleClose}
+          allowNone={false}
+        />
       );
     }
   }
@@ -164,7 +170,7 @@ export const Annotations: React.FC<{
   mutatorTitle: string;
   annotations: Annotation[];
   annotationTypes: AnnotationType[];
-  onUpdate: (annotation: Annotation, value?: string) => void;
+  onUpdate: (annotation: Annotation, value?: string | null) => void;
 }> = ({ mutatorTitle, annotations, annotationTypes, onUpdate }) => {
   const typeLookup = Object.fromEntries(annotationTypes.map((at) => [at.label, at]));
 
