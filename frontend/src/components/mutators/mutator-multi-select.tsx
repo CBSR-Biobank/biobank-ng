@@ -3,6 +3,7 @@ import { Button } from '@app/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@app/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@app/components/ui/popover';
 import { cn } from '@app/utils';
+import { CommandList } from 'cmdk';
 import { Check, ChevronsUpDown, X } from 'lucide-react';
 import { useState } from 'react';
 
@@ -63,25 +64,29 @@ export function MutatorMultiSelect({ options, selected, onChange, className, ...
       <PopoverContent className="w-full p-0">
         <Command className={className}>
           <CommandInput placeholder="Search ..." />
-          <CommandEmpty>No item found.</CommandEmpty>
-          <CommandGroup className="max-h-64 overflow-auto">
-            {options.map((option) => (
-              <CommandItem
-                key={option.value}
-                onSelect={() => {
-                  onChange(
-                    selected.includes(option.value)
-                      ? selected.filter((item) => item !== option.value)
-                      : [...selected, option.value]
-                  );
-                  setOpen(true);
-                }}
-              >
-                <Check className={cn('mr-2 h-4 w-4', selected.includes(option.value) ? 'opacity-100' : 'opacity-0')} />
-                {option.label}
-              </CommandItem>
-            ))}
-          </CommandGroup>
+          <CommandList>
+            <CommandEmpty>No item found.</CommandEmpty>
+            <CommandGroup className="max-h-64 overflow-auto">
+              {options.map((option) => (
+                <CommandItem
+                  key={option.value}
+                  onSelect={() => {
+                    onChange(
+                      selected.includes(option.value)
+                        ? selected.filter((item) => item !== option.value)
+                        : [...selected, option.value]
+                    );
+                    setOpen(true);
+                  }}
+                >
+                  <Check
+                    className={cn('mr-2 h-4 w-4', selected.includes(option.value) ? 'opacity-100' : 'opacity-0')}
+                  />
+                  {option.label}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
         </Command>
       </PopoverContent>
     </Popover>

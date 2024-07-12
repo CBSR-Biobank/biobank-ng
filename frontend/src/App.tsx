@@ -1,8 +1,6 @@
 import { Login } from '@app/components/login';
 import { HomePage } from '@app/pages/homepage';
-
 import { Link, RouterProvider, createBrowserRouter, useRouteError } from 'react-router-dom';
-
 import { ShowError } from './components/show-error';
 import { BasicPage } from './pages/basic-page';
 

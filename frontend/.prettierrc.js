@@ -7,11 +7,7 @@ const config = {
   printWidth: 120,
   tailwindConfig: './tailwind.config.js',
   tailwindFunctions: ['cn', 'clsx'],
-  plugins: ['@trivago/prettier-plugin-sort-imports', 'prettier-plugin-organize-imports', 'prettier-plugin-tailwindcss'],
-  importOrder: ['^@app/(.*)$', '<THIRD_PARTY_MODULES>', '^[./]'],
-  importOrderSeparation: true,
-  importOrderSortSpecifiers: true,
-  importOrderCaseInsensitive: false,
+  plugins: ['prettier-plugin-organize-imports', 'prettier-plugin-tailwindcss'],
 };
 
 export default config;

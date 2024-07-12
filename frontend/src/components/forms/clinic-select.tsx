@@ -5,6 +5,7 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 import { useState } from 'react';
 import { Control, FieldPathByValue, FieldValues, useController } from 'react-hook-form';
 
+import { CommandList } from 'cmdk';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { ScrollArea } from '../ui/scroll-area';
@@ -48,29 +49,31 @@ export function ClinicSelect<T extends FieldValues, U extends FieldPathByValue<T
           <ScrollArea className="w-full p-2 text-gray-700 md:h-[450px]">
             <Command>
               <CommandInput placeholder="Search..." className="m-1" />
-              <CommandEmpty className="bg-warning-600 text-basic-100 ml-5 mt-5 rounded-md px-3 py-2">
-                That clinic does not exist
-              </CommandEmpty>
-              <CommandGroup>
-                {clinics.map((option) => (
-                  <CommandItem
-                    key={option.id}
-                    value={option.nameShort}
-                    onSelect={() => {
-                      setPopoverOpen(false);
-                      field.onChange(option.nameShort);
-                    }}
-                  >
-                    <Check
-                      className={cn('mr-2 h-4 w-4', field.value === option.nameShort ? 'opacity-100' : 'opacity-0')}
-                    />
-                    <div className="flex flex-col items-start">
-                      <p>{option.nameShort}</p>
-                      <p className="text-sm text-muted-foreground md:max-w-[40rem]">{option.name}</p>
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+              <CommandList>
+                <CommandEmpty className="bg-warning-600 text-basic-100 ml-5 mt-5 rounded-md px-3 py-2">
+                  That clinic does not exist
+                </CommandEmpty>
+                <CommandGroup>
+                  {clinics.map((option) => (
+                    <CommandItem
+                      key={option.id}
+                      value={option.nameShort}
+                      onSelect={() => {
+                        setPopoverOpen(false);
+                        field.onChange(option.nameShort);
+                      }}
+                    >
+                      <Check
+                        className={cn('mr-2 h-4 w-4', field.value === option.nameShort ? 'opacity-100' : 'opacity-0')}
+                      />
+                      <div className="flex flex-col items-start">
+                        <p>{option.nameShort}</p>
+                        <p className="text-sm text-muted-foreground md:max-w-[40rem]">{option.name}</p>
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
             </Command>
           </ScrollArea>
         </PopoverContent>

@@ -1,16 +1,14 @@
 import { ApiError, login } from '@app/api/api';
 import { AdminPage } from '@app/pages/admin-page';
 import { useUserStore } from '@app/store';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-
+import { BbButton } from './bb-button';
 import { LabelledInput } from './forms/labelled-input';
 import { Alert } from './ui/alert';
-import { Button } from './ui/button';
 
 const schema = z.object({
   username: z.string().min(1, { message: 'A username is required' }),
@@ -75,9 +73,9 @@ export function Login() {
             </div>
           )}
           <div className="w-full pt-6">
-            <Button type="submit" disabled={!isValid} size="full">
-              OK
-            </Button>
+            <BbButton type="submit" disabled={!isValid}>
+              Login
+            </BbButton>
           </div>
         </div>
       </form>
