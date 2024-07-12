@@ -35,12 +35,17 @@ import edu.ualberta.med.biobank.services.catalogue.CatalogueCreateOp;
 import edu.ualberta.med.biobank.util.LoggingUtils;
 import io.jbock.util.Either;
 import jakarta.persistence.Tuple;
+import org.springframework.beans.factory.annotation.Value;
+import java.io.File;
 
 @Service
 public class StudyService {
 
     @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(StudyService.class);
+
+    @Value("${biobank.catalogue.folder}")
+    private String catalogueFolder;
 
     private StudyRepository studyRepository;
 
@@ -205,7 +210,16 @@ public class StudyService {
         if (task == null) {
             throw new AppErrorException(new BadRequest("invalid task id"));
         }
-        return CatalogueTaskDTO.fromTask(task, nameShort);
+        var result = CatalogueTaskDTO.fromTask(task, nameShort);
+        if (task.isCompleted()) {
+            var pathname = "%s/%s_%s.xlsx".formatted(catalogueFolder, nameShort, id);
+            File path = new File(pathname);
+            if (!path.exists()) {
+                var cancelledTask = task.toCancelled();
+                return CatalogueTaskDTO.fromTask(cancelledTask, nameShort);
+            }
+        }
+        return result;
     }
 
     public void catalogueTaskDelete(UUID id) {

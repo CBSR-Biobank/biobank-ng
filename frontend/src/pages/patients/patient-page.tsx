@@ -2,10 +2,8 @@ import { PatientBreadcrumbs } from '@app/components/breadcrumbs/patients-breadcr
 import { CircularProgress } from '@app/components/circular-progress';
 import { ShowError } from '@app/components/show-error';
 import { usePatient } from '@app/hooks/use-patient';
-
 import { useEffect } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-
 import { AdminPage } from '../admin-page';
 
 const PatientPageInternal: React.FC<{ pnumber: string }> = ({ pnumber }) => {

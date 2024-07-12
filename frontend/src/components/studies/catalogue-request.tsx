@@ -36,9 +36,11 @@ export const CatalogueRequest: React.FC = () => {
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = (values) => {
     catalogueMutation.mutate(values.studyNameShort, {
-      onSuccess: (url: string | null) => {
+      onSuccess: (url: string) => {
         setCatalogueUrl(url);
-        navigate(`/study-catalogue/wait`);
+        const path = url.split('/');
+        const catId = path[path?.length - 1];
+        navigate(`/study-catalogue/${values.studyNameShort}/${catId}`);
         reset();
       },
       onError: () => {
@@ -57,13 +59,17 @@ export const CatalogueRequest: React.FC = () => {
 
   return (
     <>
-      <p>Select the study you want a specimen catalogue for:</p>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 gap-6">
-          <StudySelect control={control} name="studyNameShort" studies={studyNames} />
+          <StudySelect
+            label="Select the study you want a specimen catalogue for:"
+            control={control}
+            name="studyNameShort"
+            studies={studyNames}
+          />
 
           <div className="flex gap-4">
-            <BbButton disabled={!isValid} type="submit" leadingIcon={faPaperPlane}>
+            <BbButton disabled={!isValid} size="xl" type="submit" leadingIcon={faPaperPlane}>
               Submit
             </BbButton>
           </div>

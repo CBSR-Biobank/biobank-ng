@@ -105,22 +105,20 @@ const router = createBrowserRouter([
       },
       {
         path: 'study-catalogue',
-        async lazy() {
-          let { CataloguePage } = await import('@app/pages/studies/catalogue-page');
-          return { Component: CataloguePage };
-        },
         children: [
           {
             index: true,
             async lazy() {
-              let { CatalogueRequest } = await import('@app/components/studies/catalogue-request');
-              return { Component: CatalogueRequest };
+              let { CataloguePage } = await import('@app/pages/studies/catalogue-page');
+              return { Component: CataloguePage };
             },
           },
           {
-            path: 'wait',
+            path: ':studyName/:catId',
             async lazy() {
-              let { CatalogueWait } = await import('@app/components/studies/catalogue-wait');
+              let { CatalogueWaitComplete: CatalogueWait } = await import(
+                '@app/components/studies/catalogue-wait-complete'
+              );
               return { Component: CatalogueWait };
             },
           },

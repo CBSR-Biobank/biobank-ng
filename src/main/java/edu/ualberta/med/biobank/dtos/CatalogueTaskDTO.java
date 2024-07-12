@@ -8,7 +8,7 @@ public record CatalogueTaskDTO(UUID id, int progress, String state, String nameS
     public static CatalogueTaskDTO fromTask(Task task, String nameShort) {
         Optional<String> fileUrl = Optional.empty();
         if (task.isCompleted()) {
-            fileUrl = Optional.of("/api/studies/catalogues/%s_%s.xlsx".formatted(nameShort, task.id()));
+            fileUrl = Optional.of("/api/studies/catalogues/download/%s_%s.xlsx".formatted(nameShort, task.id()));
         }
         return new CatalogueTaskDTO(task.id(), task.progress(), task.stateName(), nameShort, fileUrl);
     }

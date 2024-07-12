@@ -5,6 +5,7 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { faPencil } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { VariantProps, cva } from 'class-variance-authority';
+import { BbButton } from '../bb-button';
 
 const mutatorVariants = cva('', {
   variants: {
@@ -36,9 +37,12 @@ export const MutatorDialog: React.FC<
         <Tooltip>
           <TooltipTrigger asChild>
             <DialogTrigger asChild>
-              <button className="bg-basic-300 text-secondary-300 hover:bg-basic-400 flex cursor-pointer items-center rounded-r-lg p-3">
+              <BbButton
+                intent="mutator"
+                className="bg-basic-300 text-secondary-300 hover:bg-basic-400 flex cursor-pointer items-center rounded-r-lg p-3"
+              >
                 <FontAwesomeIcon icon={icon} />
-              </button>
+              </BbButton>
             </DialogTrigger>
           </TooltipTrigger>
           <TooltipContent className="text-xs">{tooltip}</TooltipContent>

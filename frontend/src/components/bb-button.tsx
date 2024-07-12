@@ -13,8 +13,9 @@ const buttonVariants = cva('font-semibold shadow-sm cursor-pointer', {
       primary:
         'bg-sky-500 text-white hover:bg-sky-600 active:bg-sky-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:bg-blue-300',
       secondary:
-        'bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 active:bg-gray-100 disabled:bg-gray-200 disabled:text-white',
+        'bg-slate-200 text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 active:bg-gray-100 disabled:bg-gray-200 disabled:text-white',
       soft: 'bg-gray-100 text-slate-700 hover:bg-gray-300 active:bg-gray-300 border-2 border-gray-400 disabled:bg-gray-300 disabled:text-white',
+      mutator: 'bg-gray-300/50 text-sky-500 border-r hover:bg-gray-300 p-0',
     },
     size: {
       xs: 'text-xs',
@@ -34,6 +35,7 @@ const buttonVariants = cva('font-semibold shadow-sm cursor-pointer', {
     },
   },
   compoundVariants: [
+    { intent: 'mutator', className: 'rounded-none' },
     { size: ['xs', 'sm'], rounded: 'normal', className: 'rounded' },
     { size: ['md', 'lg', 'xl'], rounded: 'normal', className: 'rounded-md' },
     {

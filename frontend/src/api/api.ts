@@ -133,7 +133,14 @@ type AliquotsGet = {
 
 type StudyCatalogue = {
   method: 'POST';
-  path: ['studies', 'catalogue', string];
+  path: ['studies', 'catalogues', string];
+  query: undefined;
+  body: undefined;
+};
+
+type StudyCatalogueStatus = {
+  method: 'GET';
+  path: ['studies', 'catalogues', string, string];
   query: undefined;
   body: undefined;
 };
@@ -179,13 +186,22 @@ export type Endpoint =
   | SourceSpecimenCreate
   | AliquotsGet
   | StudyCatalogue
+  | StudyCatalogueStatus
   | StudyNames
   | StudyAnnotationTypes
   | SourceSpecimenTypes;
 
 export type ApiError = {
   status: number;
-  error: any;
+  error: {
+    details: string;
+    timestamp?: string;
+    message?: string;
+    instance?: string;
+    status?: number;
+    title?: string;
+    type?: string;
+  };
 };
 
 export async function httpClient(endpoint: Endpoint) {
@@ -224,7 +240,7 @@ export async function login(username: string, password: string) {
     }
     const err: ApiError = {
       status: response.status,
-      error: response.status === 401 ? 'unauthrorized' : 'unknown',
+      error: { details: response.status === 401 ? 'unauthorized' : 'unknown' },
     };
     console.error(err);
     throw err;
@@ -247,7 +263,7 @@ export async function fetchAuthenticated() {
   });
 
   if (!response.ok) {
-    const err: ApiError = { status: response.status, error: 'Unable to authenticate' };
+    const err: ApiError = { status: response.status, error: { details: 'Unable to authenticate' } };
     throw err;
   }
 
@@ -271,6 +287,16 @@ export async function fetchApiFileUpload(route: string, file: File) {
   return handleServerResponse(response);
 }
 
+export async function fetchApiFileDownload(url: string) {
+  const response = await fetch(url, {
+    headers: {
+      Authorization: 'Bearer ' + useUserStore.getState().userToken,
+      credentials: 'include',
+    },
+  });
+  return response;
+}
+
 async function handleServerResponse(response: Response) {
   if (!response.ok) {
     if (response.status === 401) {
@@ -280,7 +306,7 @@ async function handleServerResponse(response: Response) {
     let err: ApiError;
     let body = await response.text();
     if (body === '') {
-      err = { status: response.status, error: undefined };
+      err = { status: response.status, error: { details: 'unknown error' } };
     } else {
       const json = body === '' ? {} : JSON.parse(body);
       err = { status: response.status, error: json };

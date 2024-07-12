@@ -1,12 +1,11 @@
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
-
-import { Button } from './ui/button';
+import { BbButton } from './bb-button';
 
 export const BackButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
-  ({ className, ...props }, ref) => (
-    <Button ref={ref} variant="default" {...props} icon={faChevronLeft}>
+  ({ className, ...props }, _ref) => (
+    <BbButton intent="secondary" {...props} size="xl" leadingIcon={faChevronLeft}>
       Back
-    </Button>
+    </BbButton>
   )
 );

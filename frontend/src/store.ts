@@ -100,5 +100,5 @@ interface StudyState {
 
 export const useStudyStore = create<StudyState>((set) => ({
   catalogueUrl: null,
-  setCatalogueUrl: (url) => set((state) => ({ ...state, url })),
+  setCatalogueUrl: (catalogueUrl) => set((state) => ({ ...state, catalogueUrl })),
 }));

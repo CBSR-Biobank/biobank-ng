@@ -108,7 +108,8 @@ public class StudyController {
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @GetMapping("/catalogues/{nameshort}/{id}")
     public CatalogueTaskDTO get(@PathVariable String nameshort, @PathVariable UUID id) {
-        return studyService.catalogueTaskStatus(nameshort, id);
+        var result = studyService.catalogueTaskStatus(nameshort, id);
+        return result;
     }
 
     @DeleteMapping("/catalogues/{nameshort}/{id}")
