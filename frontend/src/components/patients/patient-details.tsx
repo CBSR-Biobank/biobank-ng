@@ -174,7 +174,7 @@ export function PatientDetails() {
         <CollectionEventTable collectionEvents={patient.collectionEvents} />
       </div>
       <div className="flex flex-col gap-3 pt-8 md:w-max md:flex-row">
-        <BackButton onClick={backClicked} className="md:w-min" />
+        <BackButton onClick={backClicked} />
         <VisitAddDialog disallow={takenVisitNumbers(patient)} onSubmit={handleVisitAdd} />
         <CommentAddDialog onSubmit={handleCommentAdd} />
       </div>
