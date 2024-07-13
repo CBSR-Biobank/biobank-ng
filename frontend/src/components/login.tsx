@@ -73,7 +73,7 @@ export function Login() {
             </div>
           )}
           <div className="w-full pt-6">
-            <BbButton type="submit" disabled={!isValid}>
+            <BbButton type="submit" disabled={!isValid} size="xl">
               Login
             </BbButton>
           </div>

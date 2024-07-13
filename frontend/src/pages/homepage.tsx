@@ -23,7 +23,7 @@ export function HomePage() {
               </CardHeader>
               <CardFooter>
                 <div className="w-full">
-                  <IconButton intent="soft" icon={faPlus} hiddenLabel="add / view patient visit" />
+                  <IconButton variant="soft" icon={faPlus} hiddenLabel="add / view patient visit" />
                 </div>
               </CardFooter>
             </Card>
@@ -36,7 +36,7 @@ export function HomePage() {
               </CardHeader>
               <CardFooter>
                 <div className="w-full">
-                  <IconButton intent="soft" icon={faPlus} hiddenLabel="add patient" />
+                  <IconButton variant="soft" icon={faPlus} hiddenLabel="add patient" />
                 </div>
               </CardFooter>
             </Card>

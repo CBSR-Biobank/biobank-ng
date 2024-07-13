@@ -8,18 +8,19 @@ import {
   DialogTrigger,
 } from '@app/components/ui/dialog';
 
-import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { PropsWithChildren } from 'react';
 
+import { BbButton } from './bb-button';
 import { CancelButton } from './cancel-button';
-import { Button } from './ui/button';
+import { DeleteButton } from './delete-button';
 
 export const EntityDeleteDialog: React.FC<
   PropsWithChildren<{
     title?: string;
     buttonLabel?: string;
-    buttonIcon?: IconProp;
+    buttonIcon?: IconDefinition;
     onClose: (result: boolean) => void;
   }>
 > = ({ title = 'Confirm Deletion', buttonLabel, buttonIcon, onClose, children }) => {
@@ -30,9 +31,9 @@ export const EntityDeleteDialog: React.FC<
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="destructive" icon={buttonIcon ?? faTrash}>
+        <BbButton variant="destructive" trailingIcon={buttonIcon ?? faTrash}>
           {buttonLabel ?? 'Add'}
-        </Button>
+        </BbButton>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
@@ -44,9 +45,7 @@ export const EntityDeleteDialog: React.FC<
             <CancelButton type="button" />
           </DialogClose>
           <DialogClose asChild>
-            <Button type="button" variant="destructive" icon={faTrash} onClick={handleDelete}>
-              Delete
-            </Button>
+            <DeleteButton type="button" onClick={handleDelete} />
           </DialogClose>
         </DialogFooter>
       </DialogContent>

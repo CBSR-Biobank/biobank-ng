@@ -1,5 +1,4 @@
 import { OkButton } from '@app/components/ok-button';
-import { Button } from '@app/components/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -12,14 +11,15 @@ import {
 
 import { faTrash, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { BbButton } from '../bb-button';
 
 export const VisitDeleteNotAllowed: React.FC = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="destructive" icon={faTrash}>
+        <BbButton variant="destructive" trailingIcon={faTrash}>
           Delete Visit
-        </Button>
+        </BbButton>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>

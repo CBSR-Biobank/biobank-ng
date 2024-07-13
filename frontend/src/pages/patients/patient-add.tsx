@@ -2,7 +2,6 @@ import { PatientBreadcrumbs } from '@app/components/breadcrumbs/patients-breadcr
 import { CircularProgress } from '@app/components/circular-progress';
 import { LabelledInput } from '@app/components/forms/labelled-input';
 import { StudySelect } from '@app/components/forms/study-select';
-import { Button } from '@app/components/ui/button';
 import { usePatientAdd } from '@app/hooks/use-patient';
 import { useStudyNames } from '@app/hooks/use-study';
 import { Patient } from '@app/models/patient';
@@ -15,6 +14,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 
+import { BbButton } from '@app/components/bb-button';
 import { AdminPage } from '../admin-page';
 
 const schema = z.object({
@@ -84,9 +84,9 @@ export function PatientAddPage() {
             <StudySelect control={control} name="studyNameShort" studies={studyNamesQry.studyNames} />
 
             <div className="flex gap-4">
-              <Button disabled={!isValid} type="submit" icon={faPaperPlane}>
+              <BbButton disabled={!isValid} type="submit" trailingIcon={faPaperPlane} size="xl">
                 Submit
-              </Button>
+              </BbButton>
             </div>
           </div>
         </form>

@@ -1,12 +1,12 @@
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@app/components/ui/dialog';
 
-import { faCircleXmark, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 
 import { CancelButton } from '../cancel-button';
 import { Chip } from '../chip';
-import { Button } from '../ui/button';
+import { DeleteButton } from '../delete-button';
 
 export const AnnotationValueDeleteDialog: React.FC<{
   value: string;
@@ -40,9 +40,7 @@ export const AnnotationValueDeleteDialog: React.FC<{
             <CancelButton type="button" />
           </DialogClose>
           <DialogClose asChild>
-            <Button type="button" variant="destructive" icon={faTrash} onClick={handleDelete}>
-              Delete
-            </Button>
+            <DeleteButton type="button" onClick={handleDelete} />
           </DialogClose>
         </DialogFooter>
       </DialogContent>

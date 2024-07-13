@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, useParams } from 'react-router-dom';
 
 import { BackButton } from '../back-button';
-import { Button } from '../ui/button';
+import { BbButton } from '../bb-button';
 
 export const PatientNotExist: React.FC = () => {
   const { pnumber } = useParams();
@@ -28,9 +28,9 @@ export const PatientNotExist: React.FC = () => {
             <BackButton />
           </Link>
           <Link to={`/patients/add?pnumber=${pnumber}`}>
-            <Button variant="secondary" icon={faPlusCircle}>
+            <BbButton variant="secondary" trailingIcon={faPlusCircle}>
               Add Patient
-            </Button>
+            </BbButton>
           </Link>
         </div>
       </div>

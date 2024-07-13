@@ -1,5 +1,4 @@
 import { PatientBreadcrumbs } from '@app/components/breadcrumbs/patients-breadcrubms';
-import { Button } from '@app/components/ui/button';
 import { Input } from '@app/components/ui/input';
 import { usePatientStore } from '@app/store';
 
@@ -7,6 +6,7 @@ import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { BbButton } from '@app/components/bb-button';
 import { AdminPage } from '../admin-page';
 
 export function PatientSelect() {
@@ -48,9 +48,14 @@ export function PatientSelect() {
             onChange={handleInputChange}
             onKeyUp={handleInputKeyUp}
           />
-          <Button type="submit" icon={faPaperPlane} disabled={input.trim() === ''} className="md:w-min">
+          <BbButton
+            type="submit"
+            trailingIcon={faPaperPlane}
+            disabled={input.trim() === ''}
+            className="min-w-max md:w-min"
+          >
             Submit
-          </Button>
+          </BbButton>
         </form>
       </AdminPage>
     </>

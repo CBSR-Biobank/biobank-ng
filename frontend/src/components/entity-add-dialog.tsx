@@ -9,19 +9,19 @@ import {
   DialogTrigger,
 } from '@app/components/ui/dialog';
 
-import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
+import { BbButton } from './bb-button';
 import { CancelButton } from './cancel-button';
 import { OkButton } from './ok-button';
-import { Button } from './ui/button';
 
 export const EntityAddDialog: React.FC<
   React.PropsWithChildren<{
     title: string;
     message?: string;
     buttonLabel?: string;
-    buttonIcon?: IconProp;
+    buttonIcon?: IconDefinition;
     okButtonEnabled: GLboolean;
     onOk: () => void;
     onCancel: () => void;
@@ -38,9 +38,9 @@ export const EntityAddDialog: React.FC<
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="secondary" icon={buttonIcon ?? faPlus}>
+        <BbButton variant="secondary" trailingIcon={buttonIcon ?? faPlus}>
           {buttonLabel ?? 'Add'}
-        </Button>
+        </BbButton>
       </DialogTrigger>
       <DialogContent onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader>

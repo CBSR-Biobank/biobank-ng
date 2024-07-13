@@ -69,7 +69,7 @@ export const DashboardLayout: React.FC<{ children?: ReactNode }> = ({ children }
       >
         <div className="flex items-center gap-4 px-2">
           <IconButton
-            intent="soft"
+            variant="soft"
             className={cn(logoClasses)}
             icon={faBars}
             onClick={toggleDrawer}
