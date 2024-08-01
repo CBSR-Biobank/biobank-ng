@@ -20,7 +20,7 @@ type FormInputs = z.infer<typeof schema>;
 export function Login() {
   const navigate = useNavigate();
   const { loggedIn, user } = useUserStore();
-  const [loginError, setLoginError] = useState(false);
+  const [loginError, setLoginError] = useState<number | undefined>(undefined);
 
   const {
     register,
@@ -43,15 +43,29 @@ export function Login() {
       }
     } catch (e) {
       const apiError = e as ApiError;
-      if (apiError.status === 401) {
-        setLoginError(true);
-      }
+      setLoginError(apiError.status);
     }
   };
 
   if (loggedIn && user !== undefined) {
     return <Navigate to="/" />;
   }
+
+  const LoginError = () => {
+    if (!loginError) {
+      throw new Error('login error is invalid');
+    }
+
+    const message = loginError >= 500 ? 'backend error' : 'invalid username or password';
+
+    return (
+      <div className="flex items-center justify-center">
+        <Alert variant="destructive" className="border-2 border-red-600 bg-red-200 p-2 text-red-600">
+          {message}
+        </Alert>
+      </div>
+    );
+  };
 
   return (
     <AdminPage className="grid h-screen content-center justify-items-center gap-8">
@@ -65,13 +79,7 @@ export function Login() {
             errorMessage={errors?.password?.message}
             {...register('password')}
           />
-          {loginError && (
-            <div className="flex items-center justify-center">
-              <Alert variant="destructive" className="border-2 border-red-600 bg-red-200 p-2 text-red-600">
-                {'invalid username or password'}
-              </Alert>
-            </div>
-          )}
+          {loginError && <LoginError />}
           <div className="w-full pt-6">
             <BbButton type="submit" disabled={!isValid} size="xl">
               Login

@@ -7,161 +7,161 @@ import { useUserStore } from '@app/store';
 
 type Auth = {
   method: 'GET';
-  path: ['auth'];
+  path: readonly ['auth'];
   query: undefined;
   body: undefined;
 };
 
 type ClinicNames = {
   method: 'GET';
-  path: ['clinics', 'names'];
+  path: readonly ['clinics', 'names'];
   query: { status?: Status | undefined };
   body: undefined;
 };
 
 type Logging = {
   method: 'GET';
-  path: ['logging'];
+  path: readonly ['logging'];
   query: undefined;
   body: undefined;
 };
 
 type LoggingLatest = {
   method: 'GET';
-  path: ['logging', 'latest'];
+  path: readonly ['logging', 'latest'];
   query: undefined;
   body: undefined;
 };
 
 type PatientCreate = {
   method: 'POST';
-  path: ['patients'];
+  path: readonly ['patients'];
   query: undefined;
   body: string;
 };
 
 type PatientUpdate = {
   method: 'PUT';
-  path: ['patients', string];
+  path: readonly ['patients', string];
   query: undefined;
   body: string;
 };
 
 type PatientComments = {
   method: 'GET';
-  path: ['patients', string, 'comments'];
+  path: readonly ['patients', string, 'comments'];
   query: undefined;
   body: undefined;
 };
 
 type PatientGet = {
   method: 'GET';
-  path: ['patients', string];
+  path: readonly ['patients', string];
   query: undefined;
   body: undefined;
 };
 
 type PatientAddComment = {
   method: 'POST';
-  path: ['patients', string, 'comments'];
+  path: readonly ['patients', string, 'comments'];
   query: undefined;
   body: string;
 };
 
 type CollectionEventsGet = {
   method: 'GET';
-  path: ['patients', string, 'collection-events'];
+  path: readonly ['patients', string, 'collection-events'];
   query: undefined;
   body: undefined;
 };
 
 type CollectionEventGet = {
   method: 'GET';
-  path: ['patients', string, 'collection-events', number];
+  path: readonly ['patients', string, 'collection-events', number];
   query: undefined;
   body: undefined;
 };
 
 type CollectionEventCreate = {
   method: 'POST';
-  path: ['patients', string, 'collection-events'];
+  path: readonly ['patients', string, 'collection-events'];
   query: undefined;
   body: string;
 };
 
 type CollectionEventUpdate = {
   method: 'PUT';
-  path: ['patients', string, 'collection-events', number];
+  path: readonly ['patients', string, 'collection-events', number];
   query: undefined;
   body: string;
 };
 
 type CollectionEventDelete = {
   method: 'DELETE';
-  path: ['patients', string, 'collection-events', number];
+  path: readonly ['patients', string, 'collection-events', number];
   query: undefined;
   body: undefined;
 };
 
 type CollectionEventListComments = {
   method: 'GET';
-  path: ['patients', string, 'collection-events', number, 'comments'];
+  path: readonly ['patients', string, 'collection-events', number, 'comments'];
   query: undefined;
   body: undefined;
 };
 
 type CollectionEventAddComment = {
   method: 'POST';
-  path: ['patients', string, 'collection-events', number, 'comments'];
+  path: readonly ['patients', string, 'collection-events', number, 'comments'];
   query: undefined;
   body: string;
 };
 
 type SourceSpecimenCreate = {
   method: 'POST';
-  path: ['specimens'];
+  path: readonly ['specimens'];
   query: undefined;
   body: string;
 };
 
 type AliquotsGet = {
   method: 'GET';
-  path: ['specimens', string, 'aliquots'];
+  path: readonly ['specimens', string, 'aliquots'];
   query: undefined;
   body: undefined;
 };
 
 type StudyCatalogue = {
   method: 'POST';
-  path: ['studies', 'catalogues', string];
+  path: readonly ['studies', 'catalogues', string];
   query: undefined;
   body: undefined;
 };
 
 type StudyCatalogueStatus = {
   method: 'GET';
-  path: ['studies', 'catalogues', string, string];
+  path: readonly ['studies', 'catalogues', string, string];
   query: undefined;
   body: undefined;
 };
 
 type StudyNames = {
   method: 'GET';
-  path: ['studies', 'names'];
+  path: readonly ['studies', 'names'];
   query: { status?: Status | undefined };
   body: undefined;
 };
 
 type StudyAnnotationTypes = {
   method: 'GET';
-  path: ['studies', string, 'annotation-types'];
+  path: readonly ['studies', string, 'annotation-types'];
   query: { status?: Status | undefined };
   body: undefined;
 };
 
 type SourceSpecimenTypes = {
   method: 'GET';
-  path: ['studies', string, 'source-specimen-types'];
+  path: readonly ['studies', string, 'source-specimen-types'];
   query: undefined;
   body: undefined;
 };

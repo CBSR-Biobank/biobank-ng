@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
 const schema = z.object({
-  studyNameShort: z.string().min(1, { message: 'a study name is required' }),
+  studyNameShort: z.string(),
 });
 
 export const CatalogueRequest: React.FC = () => {
@@ -29,25 +29,7 @@ export const CatalogueRequest: React.FC = () => {
     mode: 'all',
     reValidateMode: 'onChange',
     resolver: zodResolver(schema),
-    defaultValues: {
-      studyNameShort: '',
-    },
   });
-
-  const onSubmit: SubmitHandler<z.infer<typeof schema>> = (values) => {
-    catalogueMutation.mutate(values.studyNameShort, {
-      onSuccess: (url: string) => {
-        setCatalogueUrl(url);
-        const path = url.split('/');
-        const catId = path[path?.length - 1];
-        navigate(`/study-catalogue/${values.studyNameShort}/${catId}`);
-        reset();
-      },
-      onError: () => {
-        reset();
-      },
-    });
-  };
 
   if (isError && error) {
     return <ShowError error={error} />;
@@ -56,6 +38,25 @@ export const CatalogueRequest: React.FC = () => {
   if (isLoading || !studyNames) {
     return <CircularProgress />;
   }
+
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = (values) => {
+    const selectedStudy = studyNames.find((sn) => sn.nameShort === values.studyNameShort);
+    if (!selectedStudy) {
+      throw new Error('invalid study selected');
+    }
+    catalogueMutation.mutate(selectedStudy.nameShort, {
+      onSuccess: (url: string) => {
+        setCatalogueUrl(url);
+        const path = url.split('/');
+        const catId = path[path?.length - 1];
+        navigate(`/study-catalogue/${selectedStudy.nameShort}/${catId}`);
+        reset();
+      },
+      onError: () => {
+        reset();
+      },
+    });
+  };
 
   return (
     <>

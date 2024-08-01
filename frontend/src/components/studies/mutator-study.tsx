@@ -33,7 +33,7 @@ export function MutatorStudy({ value, required, onClose }: MutatorProps<string>)
     mode: 'all',
     reValidateMode: 'onChange',
     defaultValues: {
-      studyNameShort: value ?? '',
+      studyNameShort: value ?? undefined,
     },
   });
 
@@ -43,7 +43,7 @@ export function MutatorStudy({ value, required, onClose }: MutatorProps<string>)
 
   const handleOk = () => {
     const value = getValues().studyNameShort;
-    onClose(value ?? null);
+    onClose(value === '' ? null : value);
   };
 
   if (studyNamesQuery.isLoading || !studyNamesQuery.studyNames) {

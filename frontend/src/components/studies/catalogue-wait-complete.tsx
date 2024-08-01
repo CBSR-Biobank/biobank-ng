@@ -52,7 +52,7 @@ export const CatalogueWaitComplete: React.FC = () => {
           clearInterval(interval);
           reject(err);
         }
-      }, 500);
+      }, 1000);
     });
   };
 
