@@ -7,7 +7,7 @@
   "singleQuote": true,
   "printWidth": 120,
   "plugins": [
-    "/home/nelson/.nvm/versions/node/v20.11.0/lib/node_modules/prettier-plugin-java/dist/index.js",
-    "/home/nelson/.nvm/versions/node/v20.11.0/lib/node_modules/prettier-plugin-sql/lib/index.cjs"
+    "/home/nelson/.nvm/versions/node/v20.15.1/lib/node_modules/prettier-plugin-java/dist/index.js",
+    "/home/nelson/.nvm/versions/node/v20.15.1/lib/node_modules/prettier-plugin-sql/lib/index.cjs"
   ]
 }

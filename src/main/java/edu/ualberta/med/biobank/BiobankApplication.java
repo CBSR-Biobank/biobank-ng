@@ -15,8 +15,10 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import jakarta.servlet.ServletContext;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableAsync
+@EnableScheduling
 @SpringBootApplication
 @EnableConfigurationProperties(RsaKeyProperties.class)
 public class BiobankApplication {
