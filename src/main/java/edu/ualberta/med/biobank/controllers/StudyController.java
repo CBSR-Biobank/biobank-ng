@@ -1,20 +1,10 @@
 package edu.ualberta.med.biobank.controllers;
 
-import edu.ualberta.med.biobank.applicationevents.StudyCatalogueDownloadEvent;
-import edu.ualberta.med.biobank.applicationevents.StudyCatalogueRequestEvent;
-import edu.ualberta.med.biobank.dtos.AnnotationTypeDTO;
-import edu.ualberta.med.biobank.dtos.CatalogueTaskDTO;
-import edu.ualberta.med.biobank.dtos.SourceSpecimenTypeDTO;
-import edu.ualberta.med.biobank.dtos.StudyDTO;
-import edu.ualberta.med.biobank.dtos.StudyNameDTO;
-import edu.ualberta.med.biobank.errors.EntityNotFound;
-import edu.ualberta.med.biobank.exception.AppErrorException;
-import edu.ualberta.med.biobank.services.StudyService;
-import edu.ualberta.med.biobank.services.TaskService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,6 +16,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -36,9 +27,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.HttpStatus;
+import edu.ualberta.med.biobank.applicationevents.StudyCatalogueDownloadEvent;
+import edu.ualberta.med.biobank.applicationevents.StudyCatalogueRequestEvent;
+import edu.ualberta.med.biobank.dtos.AnnotationTypeDTO;
+import edu.ualberta.med.biobank.dtos.CatalogueTaskDTO;
+import edu.ualberta.med.biobank.dtos.SourceSpecimenTypeDTO;
+import edu.ualberta.med.biobank.dtos.StudyDTO;
+import edu.ualberta.med.biobank.dtos.StudyNameDTO;
+import edu.ualberta.med.biobank.errors.EntityNotFound;
+import edu.ualberta.med.biobank.exception.AppErrorException;
+import edu.ualberta.med.biobank.services.StudyService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(path = "/api/studies", produces = "application/json")
@@ -96,13 +98,13 @@ public class StudyController {
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @PostMapping("/catalogues/{nameshort}")
-    public ResponseEntity<String> catlogue(@PathVariable String nameshort) {
+    public ResponseEntity<String> catlogue(@PathVariable String nameshort, HttpServletRequest request) {
         var task = studyService.catalogueCreate(nameshort);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         eventPublisher.publishEvent(new StudyCatalogueRequestEvent(auth.getName(), nameshort));
-        return ResponseEntity
-            .created(URI.create("/api/studies/catalogue/%s/%s".formatted(nameshort, task.id())))
-            .build();
+
+        var path = "%s/%s".formatted(request.getRequestURI(), task.id());
+        return ResponseEntity.created(URI.create(path)).build();
     }
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })

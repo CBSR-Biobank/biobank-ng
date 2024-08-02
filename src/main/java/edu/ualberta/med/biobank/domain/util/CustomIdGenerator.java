@@ -42,8 +42,6 @@ public class CustomIdGenerator implements IdentifierGenerator {
                 obj.getClass().getSimpleName()
         );
 
-        // logger.info(">>>>>>>>>>>>> generate: {}", sql);
-
         var query = session.createQuery(sql, Integer.class);
         query.setFlushMode(FlushModeType.COMMIT);
         Integer id = query.getSingleResultOrNull();

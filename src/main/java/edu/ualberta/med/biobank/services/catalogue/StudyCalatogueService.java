@@ -56,7 +56,6 @@ class StudyCatalogueService {
 
         try {
             var filename = "%s/%s_%s.xlsx".formatted(catalogueFolder, op.studyNameShort(), op.task().id());
-            logger.info(">>>> writing to %s".formatted(filename));
             createCatalogueFolderIfNotExist();
             var writer = new StudyCatalogueWriter(specimens.values());
             writer.write(filename);

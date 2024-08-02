@@ -20,9 +20,10 @@ export class StudyApi {
   }
 
   static async catalogue(nameShort: string) {
+    const encoded = encodeURI(nameShort);
     const response = await httpClient({
       method: 'POST',
-      path: ['studies', 'catalogues', nameShort],
+      path: ['studies', 'catalogues', encoded],
       body: undefined,
       query: undefined,
     });
@@ -34,9 +35,10 @@ export class StudyApi {
   }
 
   static async catalogueStatus(nameShort: string, id: string) {
+    const encoded = encodeURI(nameShort);
     const response = await httpClient({
       method: 'GET',
-      path: ['studies', 'catalogues', nameShort, id],
+      path: ['studies', 'catalogues', encoded, id],
       body: undefined,
       query: undefined,
     });
@@ -44,10 +46,11 @@ export class StudyApi {
     return catalougeStatusSchema.parse(json);
   }
 
-  static async annotationTypes(nameshort: string, status?: Status) {
+  static async annotationTypes(nameShort: string, status?: Status) {
+    const encoded = encodeURI(nameShort);
     const response = await httpClient({
       method: 'GET',
-      path: ['studies', nameshort, 'annotation-types'],
+      path: ['studies', encoded, 'annotation-types'],
       body: undefined,
       query: { status },
     });
@@ -56,10 +59,11 @@ export class StudyApi {
     return types;
   }
 
-  static async sourceSpecimenTypes(nameshort: string) {
+  static async sourceSpecimenTypes(nameShort: string) {
+    const encoded = encodeURI(nameShort);
     const response = await httpClient({
       method: 'GET',
-      path: ['studies', nameshort, 'source-specimen-types'],
+      path: ['studies', encoded, 'source-specimen-types'],
       body: undefined,
       query: undefined,
     });
