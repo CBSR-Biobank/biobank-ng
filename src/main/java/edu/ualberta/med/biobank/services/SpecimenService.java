@@ -6,12 +6,13 @@ import edu.ualberta.med.biobank.domain.Clinic;
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.domain.OriginInfo;
 import edu.ualberta.med.biobank.domain.Specimen;
+import edu.ualberta.med.biobank.domain.SpecimenPull;
+import edu.ualberta.med.biobank.domain.SpecimenRequest;
 import edu.ualberta.med.biobank.domain.SpecimenType;
 import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.dtos.AliquotSpecimenDTO;
 import edu.ualberta.med.biobank.dtos.ClinicDTO;
 import edu.ualberta.med.biobank.dtos.CollectionEventDTO;
-import edu.ualberta.med.biobank.dtos.PatientDTO;
 import edu.ualberta.med.biobank.dtos.SourceSpecimenAddDTO;
 import edu.ualberta.med.biobank.dtos.SourceSpecimenDTO;
 import edu.ualberta.med.biobank.dtos.SpecimenDTO;
@@ -25,6 +26,7 @@ import edu.ualberta.med.biobank.permission.patients.CollectionEventUpdatePermiss
 import edu.ualberta.med.biobank.permission.patients.SpecimenReadPermission;
 import edu.ualberta.med.biobank.repositories.ClinicRepository;
 import edu.ualberta.med.biobank.repositories.CollectionEventRepository;
+import edu.ualberta.med.biobank.repositories.CustomSpecimenRepository;
 import edu.ualberta.med.biobank.repositories.OriginInfoRepository;
 import edu.ualberta.med.biobank.repositories.SpecimenRepository;
 import edu.ualberta.med.biobank.repositories.SpecimenTypeRepository;
@@ -34,13 +36,12 @@ import io.jbock.util.Either;
 import jakarta.persistence.Tuple;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,25 +56,27 @@ public class SpecimenService {
     @SuppressWarnings("unused")
     final Logger logger = LoggerFactory.getLogger(SpecimenService.class);
 
-    private SpecimenRepository specimenRepository;
+    private final SpecimenRepository specimenRepository;
 
-    private CollectionEventService collectionEventService;
+    private final CollectionEventService collectionEventService;
 
-    private CollectionEventRepository collectionEventRepository;
+    private final CollectionEventRepository collectionEventRepository;
 
-    private ClinicService clinicService;
+    private final ClinicService clinicService;
 
-    private ClinicRepository clinicRepository;
+    private final ClinicRepository clinicRepository;
 
-    private SpecimenTypeService specimenTypeService;
+    private final SpecimenTypeService specimenTypeService;
 
-    private SpecimenTypeRepository specimenTypeRepository;
+    private final SpecimenTypeRepository specimenTypeRepository;
 
-    private OriginInfoRepository originInfoRepository;
+    private final OriginInfoRepository originInfoRepository;
 
-    private ApplicationEventPublisher eventPublisher;
+    private final CustomSpecimenRepository customSpecimenRepository;
 
-    private Validator validator;
+    private final ApplicationEventPublisher eventPublisher;
+
+    private final Validator validator;
 
     public SpecimenService(
         SpecimenRepository specimenRepository,
@@ -84,6 +87,7 @@ public class SpecimenService {
         SpecimenTypeService specimenTypeService,
         SpecimenTypeRepository specimenTypeRepository,
         OriginInfoRepository originInfoRepository,
+        CustomSpecimenRepository customSpecimenRepository,
         ApplicationEventPublisher eventPublisher,
         Validator validator
     ) {
@@ -95,6 +99,7 @@ public class SpecimenService {
         this.specimenTypeService = specimenTypeService;
         this.specimenTypeRepository = specimenTypeRepository;
         this.originInfoRepository = originInfoRepository;
+        this.customSpecimenRepository = customSpecimenRepository;
         this.validator = validator;
         this.eventPublisher = eventPublisher;
     }
@@ -160,6 +165,34 @@ public class SpecimenService {
         });
     }
 
+    public List<SpecimenPull> specimenRequest(List<SpecimenRequest> requests) {
+        var results = new ArrayList<SpecimenPull>();
+        for (SpecimenRequest request : requests) {
+            var pullChoices = customSpecimenRepository.pullChoices(
+                request.pnumber(),
+                request.dateDrawn(),
+                request.specimenType()
+            );
+
+            for (int j = 0; j < request.count(); j++) {
+                if (j < pullChoices.size()) {
+                    results.add(pullChoices.get(j));
+                }
+            }
+
+            if (pullChoices.size() < request.count()) {
+                results.add(new SpecimenPull(
+                    request.pnumber(),
+                    "",
+                    request.dateDrawn(),
+                    request.specimenType(),
+                    "NOT_FOUND(%s)".formatted(request.count() - pullChoices.size()),
+                    Status.NONE));
+            }
+        }
+        return results;
+    }
+
     public Either<AppError, SourceSpecimenDTO> add(SourceSpecimenAddDTO dto) {
         return validateSpecimen(dto).flatMap(info -> {
             var permission = new CollectionEventUpdatePermission(info.visit().studyId(), info.clinic().id());
@@ -194,9 +227,7 @@ public class SpecimenService {
                     specimenRepository.save(specimen);
 
                     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                    eventPublisher.publishEvent(
-                        new VisitUpdatedEvent(auth.getName(), dto.pnumber(), dto.vnumber())
-                    );
+                    eventPublisher.publishEvent(new VisitUpdatedEvent(auth.getName(), dto.pnumber(), dto.vnumber()));
                     return Either.right(SourceSpecimenDTO.fromSpecimen(specimen));
                 });
         });

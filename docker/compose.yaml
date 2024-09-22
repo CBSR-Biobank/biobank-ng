@@ -19,8 +19,6 @@ services:
             - ../database/db_initial.sql.gz:/db_initial.sql.gz
             - ../database/_init.sh:/docker-entrypoint-initdb.d/_init.sh
         environment:
-            - MARIADB_CONTAINER_USER=${uid}
-            - MARIADB_CONTAINER_GROUP=${gid}
             - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
             - MARIADB_USER=${DB_USER}
             - MARIADB_PASSWORD=${DB_PASSWORD}

@@ -8,12 +8,12 @@ public abstract class AppError implements Serializable {
 
     final private String message;
 
-    public String getMessage() {
-        return message;
-    }
-
     AppError(String message) {
         this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
 }
