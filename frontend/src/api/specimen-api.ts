@@ -2,6 +2,7 @@ import { SourceSpecimenAdd, aliquotSchema, sourceSpecimenSchema } from '@app/mod
 
 import { z } from 'zod';
 
+import { specimenPullSchema } from '@app/models/specimen-pull';
 import { httpClient } from './api';
 
 export class SpecimenApi {
@@ -29,8 +30,10 @@ export class SpecimenApi {
   }
 
   static async specimenRequestUpload(file: File) {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const data = new FormData();
     data.append('file', file);
+    data.append('timezone', timeZone);
 
     const response = await httpClient(
       {
@@ -42,6 +45,6 @@ export class SpecimenApi {
       null
     );
     const result = await response.json();
-    return result;
+    return z.array(specimenPullSchema).parse(result);
   }
 }

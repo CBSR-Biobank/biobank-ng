@@ -4,26 +4,18 @@ import { CircularProgress } from '@app/components/circular-progress';
 import { StatusChip } from '@app/components/status-chip';
 import { DataTable } from '@app/components/table/data-table';
 import { DataTableColumnHeader } from '@app/components/table/table-column-header';
-import { RowAction } from '@app/components/table/table-row-actions';
 import { Alert, AlertTitle } from '@app/components/ui/alert';
+import { SpecimenPull } from '@app/models/specimen-pull';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
+import { format } from 'date-fns';
 import { useMemo, useRef, useState } from 'react';
 import { AdminPage } from '../admin-page';
 
 const MAX_FILE_SIZE = 500000;
 
-type SpecimenPull = {
-  pnumber: string;
-  inventoryId: string;
-  dateDrawn: string;
-  specimenType: string;
-  location: string;
-  status: string;
-};
-
-function getColumns(actions: RowAction<SpecimenPull>[]): ColumnDef<SpecimenPull, any>[] {
+function getColumns(): ColumnDef<SpecimenPull, any>[] {
   const columnHelper = createColumnHelper<SpecimenPull>();
   return [
     columnHelper.accessor('pnumber', {
@@ -36,7 +28,7 @@ function getColumns(actions: RowAction<SpecimenPull>[]): ColumnDef<SpecimenPull,
     }),
     columnHelper.accessor('dateDrawn', {
       header: () => 'Date Drawn',
-      cell: ({ row }) => row.getValue('dateDrawn'),
+      cell: ({ row }) => format(row.getValue('dateDrawn'), 'yyyy-MM-dd'),
     }),
     columnHelper.accessor('specimenType', {
       header: () => 'Type',
@@ -46,9 +38,9 @@ function getColumns(actions: RowAction<SpecimenPull>[]): ColumnDef<SpecimenPull,
       header: () => 'Location',
       cell: ({ row }) => row.getValue('location'),
     }),
-    columnHelper.accessor('status', {
+    columnHelper.accessor('activityStatus', {
       header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
-      cell: ({ row }) => <StatusChip status={row.original.status} variant="table" size="xs" />,
+      cell: ({ row }) => <StatusChip status={row.original.activityStatus} variant="table" size="xs" />,
     }),
   ];
 }
@@ -61,19 +53,7 @@ export const RequestPage: React.FC = () => {
   const [resultsReady, setResultsReady] = useState(false);
   const [results, setResults] = useState<SpecimenPull[]>([]);
 
-  const columns = useMemo(
-    () =>
-      getColumns([
-        {
-          label: 'Update',
-          onSelect: (specimenPull: SpecimenPull) => {
-            // TODO: do something here?
-            console.log(specimenPull);
-          },
-        },
-      ]),
-    []
-  );
+  const columns = useMemo(() => getColumns(), []);
 
   const handleBrowseClick = () => {
     if (!hiddenFileInput?.current) {

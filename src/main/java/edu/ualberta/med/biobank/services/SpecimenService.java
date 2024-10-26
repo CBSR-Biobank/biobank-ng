@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.dtos.CollectionEventDTO;
 import edu.ualberta.med.biobank.dtos.SourceSpecimenAddDTO;
 import edu.ualberta.med.biobank.dtos.SourceSpecimenDTO;
 import edu.ualberta.med.biobank.dtos.SpecimenDTO;
+import edu.ualberta.med.biobank.dtos.SpecimenPullDTO;
 import edu.ualberta.med.biobank.dtos.SpecimenTypeDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.BadRequest;
@@ -36,6 +37,10 @@ import io.jbock.util.Either;
 import jakarta.persistence.Tuple;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -165,8 +170,8 @@ public class SpecimenService {
         });
     }
 
-    public List<SpecimenPull> specimenRequest(List<SpecimenRequest> requests) {
-        var results = new ArrayList<SpecimenPull>();
+    public List<SpecimenPullDTO> specimenRequest(List<SpecimenRequest> requests) {
+        var results = new ArrayList<SpecimenPullDTO>();
         for (SpecimenRequest request : requests) {
             var pullChoices = customSpecimenRepository.pullChoices(
                 request.pnumber(),
@@ -176,20 +181,24 @@ public class SpecimenService {
 
             for (int j = 0; j < request.count(); j++) {
                 if (j < pullChoices.size()) {
-                    results.add(pullChoices.get(j));
+                    var dto = SpecimenPullDTO.fromSpecimenPull(pullChoices.get(j));
+                    results.add(dto);
                 }
             }
 
             if (pullChoices.size() < request.count()) {
-                results.add(new SpecimenPull(
+                results.add(new SpecimenPullDTO(
                     request.pnumber(),
                     "",
                     request.dateDrawn(),
                     request.specimenType(),
                     "NOT_FOUND(%s)".formatted(request.count() - pullChoices.size()),
-                    Status.NONE));
+                    Status.NONE.toString()));
             }
         }
+
+
+
         return results;
     }
 
