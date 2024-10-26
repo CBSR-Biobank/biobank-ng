@@ -1,12 +1,12 @@
 package edu.ualberta.med.biobank.repositories;
 
+import edu.ualberta.med.biobank.domain.SpecimenPull;
+import edu.ualberta.med.biobank.domain.Status;
 import java.util.Date;
 import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import edu.ualberta.med.biobank.domain.SpecimenPull;
-import edu.ualberta.med.biobank.domain.Status;
 
 @Repository
 public class CustomSpecimenRepository {
@@ -29,13 +29,13 @@ public class CustomSpecimenRepository {
            inner join specimen_type styp on styp.id = s.specimen_type_id
            inner join specimen_position sp on sp.specimen_id = s.id
            inner join container ct on ct.id = sp.container_id
-        where ct.label not like 'ss%'
+        where ct.label not like "ss%"
            and p.pnumber = ?
            and abs(datediff(stop.created_at, ?)) <= 1
            and styp.name_short = ?
            and s.activity_status_id != 2
-         order by s.activity_status_id, rand()
-         """;
+        order by s.activity_status_id, rand()
+        """;
 
     RowMapper<SpecimenPull> pullChoiceRowMapper = (rs, rowNum) -> {
         return new SpecimenPull(
