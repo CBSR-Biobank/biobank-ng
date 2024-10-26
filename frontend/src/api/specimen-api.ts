@@ -41,6 +41,7 @@ export class SpecimenApi {
       },
       null
     );
-    return response;
+    const result = await response.json();
+    return result;
   }
 }

@@ -1,12 +1,57 @@
 import { SpecimenApi } from '@app/api/specimen-api';
 import { BbButton } from '@app/components/bb-button';
-import { cn } from '@app/utils';
-import { faCircleExclamation, faGear } from '@fortawesome/free-solid-svg-icons';
+import { CircularProgress } from '@app/components/circular-progress';
+import { StatusChip } from '@app/components/status-chip';
+import { DataTable } from '@app/components/table/data-table';
+import { DataTableColumnHeader } from '@app/components/table/table-column-header';
+import { RowAction } from '@app/components/table/table-row-actions';
+import { Alert, AlertTitle } from '@app/components/ui/alert';
+import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useRef, useState } from 'react';
+import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
+import { useMemo, useRef, useState } from 'react';
 import { AdminPage } from '../admin-page';
 
 const MAX_FILE_SIZE = 500000;
+
+type SpecimenPull = {
+  pnumber: string;
+  inventoryId: string;
+  dateDrawn: string;
+  specimenType: string;
+  location: string;
+  status: string;
+};
+
+function getColumns(actions: RowAction<SpecimenPull>[]): ColumnDef<SpecimenPull, any>[] {
+  const columnHelper = createColumnHelper<SpecimenPull>();
+  return [
+    columnHelper.accessor('pnumber', {
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Patient" />,
+      cell: ({ row }) => row.getValue('pnumber'),
+    }),
+    columnHelper.accessor('inventoryId', {
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Inventory Id" />,
+      cell: ({ row }) => row.getValue('inventoryId'),
+    }),
+    columnHelper.accessor('dateDrawn', {
+      header: () => 'Date Drawn',
+      cell: ({ row }) => row.getValue('dateDrawn'),
+    }),
+    columnHelper.accessor('specimenType', {
+      header: () => 'Type',
+      cell: ({ row }) => row.getValue('specimenType'),
+    }),
+    columnHelper.accessor('location', {
+      header: () => 'Location',
+      cell: ({ row }) => row.getValue('location'),
+    }),
+    columnHelper.accessor('status', {
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+      cell: ({ row }) => <StatusChip status={row.original.status} variant="table" size="xs" />,
+    }),
+  ];
+}
 
 export const RequestPage: React.FC = () => {
   const hiddenFileInput = useRef<HTMLInputElement>(null);
@@ -14,12 +59,31 @@ export const RequestPage: React.FC = () => {
   const [fileSizeError, setFileSizeError] = useState(false);
   const [csvUploading, setCsvUploading] = useState(false);
   const [resultsReady, setResultsReady] = useState(false);
+  const [results, setResults] = useState<SpecimenPull[]>([]);
 
-  const handleButtonClick = () => {
+  const columns = useMemo(
+    () =>
+      getColumns([
+        {
+          label: 'Update',
+          onSelect: (specimenPull: SpecimenPull) => {
+            // TODO: do something here?
+            console.log(specimenPull);
+          },
+        },
+      ]),
+    []
+  );
+
+  const handleBrowseClick = () => {
     if (!hiddenFileInput?.current) {
       return;
     }
     setFileSizeError(false);
+    setCsvUploading(false);
+    setResultsReady(false);
+    setResults([]);
+    setSelectedFile(null);
     hiddenFileInput.current.click();
   };
 
@@ -36,13 +100,17 @@ export const RequestPage: React.FC = () => {
 
   const handleCsvUpload = () => {
     setCsvUploading(true);
+    setResultsReady(false);
+    setResults([]);
+
     if (!selectedFile) {
       throw new Error('file is invalid');
     }
     SpecimenApi.specimenRequestUpload(selectedFile)
-      .then(() => {
+      .then((result) => {
         setCsvUploading(false);
         setResultsReady(true);
+        setResults(result);
       })
       .catch((e) => {
         setCsvUploading(false);
@@ -63,7 +131,7 @@ export const RequestPage: React.FC = () => {
             <p className="text-primary-400 flex-1 rounded-md border-2 p-2 shadow-md">
               {selectedFile ? selectedFile.name : 'None'}
             </p>
-            <BbButton size="lg" onClick={handleButtonClick} type="button" disabled={csvUploading}>
+            <BbButton size="lg" onClick={handleBrowseClick} type="button" disabled={csvUploading}>
               Browse
             </BbButton>
           </div>
@@ -85,12 +153,14 @@ export const RequestPage: React.FC = () => {
 
         {selectedFile && csvUploading && (
           <div className="flex items-center justify-start">
-            Processing file...
-            <FontAwesomeIcon icon={faGear} className={cn('bg-primary-300 h-6 w-6 animate-spin')} size="3x" />
+            <Alert variant="info">
+              <AlertTitle>Processing request...</AlertTitle>
+              <CircularProgress />
+            </Alert>
           </div>
         )}
 
-        {selectedFile && resultsReady && <div>show results here</div>}
+        {selectedFile && resultsReady && <DataTable data={results} columns={columns} totalItems={results.length} />}
       </div>
     </AdminPage>
   );
