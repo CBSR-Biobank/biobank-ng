@@ -194,6 +194,7 @@
           <compilerArgs>
             <arg>-Xlint:all</arg>
           </compilerArgs>
+          <proc>none</proc>
         </configuration>
       </plugin>
 

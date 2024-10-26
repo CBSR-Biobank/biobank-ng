@@ -27,4 +27,20 @@ export class SpecimenApi {
     const result = await response.json();
     return sourceSpecimenSchema.parse(result);
   }
+
+  static async specimenRequestUpload(file: File) {
+    const data = new FormData();
+    data.append('file', file);
+
+    const response = await httpClient(
+      {
+        method: 'POST',
+        path: ['specimens', 'request'],
+        body: data,
+        query: undefined,
+      },
+      null
+    );
+    return response;
+  }
 }

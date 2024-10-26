@@ -131,6 +131,13 @@ type AliquotsGet = {
   body: undefined;
 };
 
+type SpecimenRequestPost = {
+  method: 'POST';
+  path: readonly ['specimens', 'request'];
+  query: undefined;
+  body: FormData;
+};
+
 type StudyCatalogue = {
   method: 'POST';
   path: readonly ['studies', 'catalogues', string];
@@ -185,6 +192,7 @@ export type Endpoint =
   | CollectionEventAddComment
   | SourceSpecimenCreate
   | AliquotsGet
+  | SpecimenRequestPost
   | StudyCatalogue
   | StudyCatalogueStatus
   | StudyNames
@@ -204,15 +212,26 @@ export type ApiError = {
   };
 };
 
-export async function httpClient(endpoint: Endpoint) {
+export async function httpClient(endpoint: Endpoint, contentType: string | null = 'application/json') {
   const method = endpoint.method;
   const path = endpoint.path.join('/');
-  const body = endpoint.body ?? null;
-  const headers = {
+  let headers: HeadersInit = {
     Authorization: 'Bearer ' + useUserStore.getState().userToken,
     credentials: 'include',
-    'Content-Type': 'application/json',
   };
+
+  if (contentType) {
+    headers['Content-Type'] = contentType;
+  }
+
+  let body: any = undefined;
+  if (endpoint.body) {
+    if (contentType === 'application/json') {
+      body = JSON.stringify(endpoint.body);
+    } else {
+      body = endpoint.body;
+    }
+  }
 
   let url = `/api/${path}`;
   if (endpoint.query !== undefined) {

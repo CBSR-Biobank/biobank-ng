@@ -104,6 +104,18 @@ const router = createBrowserRouter([
         ],
       },
       {
+        path: 'specimen-request',
+        children: [
+          {
+            index: true,
+            async lazy() {
+              let { RequestPage } = await import('@app/pages/specimens/request-page');
+              return { Component: RequestPage };
+            },
+          },
+        ],
+      },
+      {
         path: 'study-catalogue',
         children: [
           {
