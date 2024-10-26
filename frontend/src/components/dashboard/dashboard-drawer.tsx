@@ -1,7 +1,14 @@
 import { useUserStore } from '@app/store';
 import { cn } from '@app/utils';
 
-import { faFileLines, faSquarePlus, faTableCells, faUserDoctor, faUsers } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArrowDown,
+  faFileLines,
+  faSquarePlus,
+  faTableCells,
+  faUserDoctor,
+  faUsers,
+} from '@fortawesome/free-solid-svg-icons';
 
 import { DrawerMenuItem } from './drawer-menu-item';
 import { MenuItem } from './menu-item';
@@ -33,6 +40,12 @@ const menuItems: MenuItem[] = [
     title: 'Study Catalogue',
     icon: faTableCells,
     route: '/study-catalogue',
+    submenu: [],
+  },
+  {
+    title: 'Specimen Request',
+    icon: faArrowDown,
+    route: '/specimen-request',
     submenu: [],
   },
   {

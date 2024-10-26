@@ -11,7 +11,7 @@ import { BackButton } from '../back-button';
 import { BbButton } from '../bb-button';
 import { CircularProgress } from '../circular-progress';
 import { ShowError } from '../show-error';
-import { Alert, AlertTitle } from '../ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 
 const Wrapper: React.FC<{ studyName?: string; children: ReactNode }> = ({ studyName, children }) => {
   return (
@@ -125,8 +125,10 @@ export const CatalogueWaitComplete: React.FC = () => {
   if (isLoading) {
     return (
       <Wrapper studyName={studyName}>
-        <p>Waiting for catalogue...</p>
-        <CircularProgress />
+        <Alert variant="info">
+          <AlertTitle>Waiting for catalogue...</AlertTitle>
+          <CircularProgress />
+        </Alert>
       </Wrapper>
     );
   }
@@ -150,7 +152,8 @@ export const CatalogueWaitComplete: React.FC = () => {
       <div className="flex flex-col gap-3 pt-8">
         <Alert variant="info">
           <FontAwesomeIcon icon={faCircleInfo} />
-          <AlertTitle>Catalouge is ready to download</AlertTitle>
+          <AlertTitle>Catalouge file is ready</AlertTitle>
+          <AlertDescription>Press the download button to save the file</AlertDescription>
         </Alert>
         <div className="flex flex-row gap-3 pt-8 md:w-max md:flex-row">
           <BbButton size="xl" onClick={downloadFile}>

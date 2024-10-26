@@ -23,18 +23,20 @@ public class CustomSpecimenRepository {
            styp.name_short specimen_type,
            s.activity_status_id status_id
         from specimen s
-           inner join collection_event ce on ce.id = s.collection_event_id
-           inner join patient p on p.id = ce.patient_id
-           inner join specimen stop on stop.id = s.top_specimen_id
-           inner join specimen_type styp on styp.id = s.specimen_type_id
-           inner join specimen_position sp on sp.specimen_id = s.id
-           inner join container ct on ct.id = sp.container_id
-        where ct.label not like "ss%"
+           left join collection_event ce on ce.id = s.collection_event_id
+           left join patient p on p.id = ce.patient_id
+           left join specimen stop on stop.id = s.top_specimen_id
+           left join specimen_type styp on styp.id = s.specimen_type_id
+           left join specimen_position sp on sp.specimen_id = s.id
+           left join container ct on ct.id = sp.container_id
+        where ct.label not like "SS%"
            and p.pnumber = ?
            and abs(datediff(stop.created_at, ?)) <= 1
            and styp.name_short = ?
            and s.activity_status_id != 2
-        order by s.activity_status_id, rand()
+        order by
+           s.activity_status_id,
+           rand()
         """;
 
     RowMapper<SpecimenPull> pullChoiceRowMapper = (rs, rowNum) -> {

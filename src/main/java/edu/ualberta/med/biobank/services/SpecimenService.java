@@ -1,12 +1,23 @@
 package edu.ualberta.med.biobank.services;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.applicationevents.SpecimenReadEvent;
 import edu.ualberta.med.biobank.applicationevents.VisitUpdatedEvent;
 import edu.ualberta.med.biobank.domain.Clinic;
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.domain.OriginInfo;
 import edu.ualberta.med.biobank.domain.Specimen;
-import edu.ualberta.med.biobank.domain.SpecimenPull;
 import edu.ualberta.med.biobank.domain.SpecimenRequest;
 import edu.ualberta.med.biobank.domain.SpecimenType;
 import edu.ualberta.med.biobank.domain.Status;
@@ -16,6 +27,7 @@ import edu.ualberta.med.biobank.dtos.CollectionEventDTO;
 import edu.ualberta.med.biobank.dtos.SourceSpecimenAddDTO;
 import edu.ualberta.med.biobank.dtos.SourceSpecimenDTO;
 import edu.ualberta.med.biobank.dtos.SpecimenDTO;
+import edu.ualberta.med.biobank.dtos.SpecimenPullDTO;
 import edu.ualberta.med.biobank.dtos.SpecimenTypeDTO;
 import edu.ualberta.med.biobank.errors.AppError;
 import edu.ualberta.med.biobank.errors.BadRequest;
@@ -36,19 +48,6 @@ import io.jbock.util.Either;
 import jakarta.persistence.Tuple;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 
 @Service
 public class SpecimenService {
@@ -165,8 +164,8 @@ public class SpecimenService {
         });
     }
 
-    public List<SpecimenPull> specimenRequest(List<SpecimenRequest> requests) {
-        var results = new ArrayList<SpecimenPull>();
+    public List<SpecimenPullDTO> specimenRequest(List<SpecimenRequest> requests) {
+        var results = new ArrayList<SpecimenPullDTO>();
         for (SpecimenRequest request : requests) {
             var pullChoices = customSpecimenRepository.pullChoices(
                 request.pnumber(),
@@ -174,22 +173,28 @@ public class SpecimenService {
                 request.specimenType()
             );
 
+            //logger.info("------------->  %s".formatted(LoggingUtils.prettyPrintJson(pullChoices)));
+
             for (int j = 0; j < request.count(); j++) {
                 if (j < pullChoices.size()) {
-                    results.add(pullChoices.get(j));
+                    var dto = SpecimenPullDTO.fromSpecimenPull(pullChoices.get(j));
+                    results.add(dto);
                 }
             }
 
             if (pullChoices.size() < request.count()) {
-                results.add(new SpecimenPull(
+                results.add(new SpecimenPullDTO(
                     request.pnumber(),
                     "",
                     request.dateDrawn(),
                     request.specimenType(),
                     "NOT_FOUND(%s)".formatted(request.count() - pullChoices.size()),
-                    Status.NONE));
+                    Status.NONE.toString()));
             }
         }
+
+
+
         return results;
     }
 
