@@ -2,7 +2,7 @@
 
 server {
     listen 8443 ssl; # managed by Certbot
-    server_name biobank-new.cbsr.ualberta.ca;
+    server_name biobank.cbsr.ualberta.ca;
     root /opt/biobank-spring-boot/frontend/dist;
     index index.html;
     error_log  /var/log/nginx/biobank-dashboard-error.log;
@@ -25,21 +25,27 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_pass http://localhost:9000\$request_uri;
     }
+    location /client/ {
+        root /var/www;
+        autoindex on;                      # Enable directory listing
+        autoindex_exact_size off;          # Show file sizes in human-readable format
+        allow all;
+    }
 
-    ssl_certificate /etc/letsencrypt/live/biobank-new.cbsr.ualberta.ca/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/biobank-new.cbsr.ualberta.ca/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/biobank.cbsr.ualberta.ca/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/biobank.cbsr.ualberta.ca/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
 }
 
 server {
-    if ($host = biobank-new.cbsr.ualberta.ca) {
+    if ($host = biobank.cbsr.ualberta.ca) {
         return 301 https://$host:8443$request_uri;
     } # managed by Certbot
 
 
     listen 80;
-    server_name biobank-new.cbsr.ualberta.ca;
+    server_name biobank.cbsr.ualberta.ca;
     return 404; # managed by Certbot
 }
