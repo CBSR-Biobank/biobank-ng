@@ -1,12 +1,23 @@
 package edu.ualberta.med.biobank.services;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.applicationevents.SpecimenReadEvent;
 import edu.ualberta.med.biobank.applicationevents.VisitUpdatedEvent;
 import edu.ualberta.med.biobank.domain.Clinic;
 import edu.ualberta.med.biobank.domain.CollectionEvent;
 import edu.ualberta.med.biobank.domain.OriginInfo;
 import edu.ualberta.med.biobank.domain.Specimen;
-import edu.ualberta.med.biobank.domain.SpecimenPull;
 import edu.ualberta.med.biobank.domain.SpecimenRequest;
 import edu.ualberta.med.biobank.domain.SpecimenType;
 import edu.ualberta.med.biobank.domain.Status;
@@ -37,23 +48,6 @@ import io.jbock.util.Either;
 import jakarta.persistence.Tuple;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 
 @Service
 public class SpecimenService {
@@ -178,6 +172,8 @@ public class SpecimenService {
                 request.dateDrawn(),
                 request.specimenType()
             );
+
+            //logger.info("------------->  %s".formatted(LoggingUtils.prettyPrintJson(pullChoices)));
 
             for (int j = 0; j < request.count(); j++) {
                 if (j < pullChoices.size()) {

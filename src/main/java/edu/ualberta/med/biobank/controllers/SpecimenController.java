@@ -32,7 +32,6 @@ import edu.ualberta.med.biobank.dtos.SpecimenPullDTO;
 import edu.ualberta.med.biobank.errors.BadRequest;
 import edu.ualberta.med.biobank.exception.AppErrorException;
 import edu.ualberta.med.biobank.services.SpecimenService;
-import edu.ualberta.med.biobank.util.DateUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -72,8 +71,7 @@ public class SpecimenController {
             throw new AppErrorException(new BadRequest("the file is empty"));
         }
 
-        //ZoneId zoneId = ZoneId.of(timezone);
-        ZoneId zoneId = ZoneId.of("America/Edmonton");
+        ZoneId zoneId = ZoneId.of(timezone);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
         var requested = new ArrayList<SpecimenRequest>();
@@ -84,14 +82,10 @@ public class SpecimenController {
             for (CSVRecord record : records) {
                 LocalDateTime localDateTime = LocalDateTime.parse(record.get(1) + "T00:00:00", formatter);
                 ZonedDateTime userTime = localDateTime.atZone(zoneId);
-                ZonedDateTime utcTime = userTime.withZoneSameInstant(ZoneId.of("UTC"));
-
-                logger.info("-------------> usertime: %s (%s), utctime: %s".formatted(userTime, Date.from(userTime.toInstant()), utcTime));
 
                 requested.add(new SpecimenRequest(
                     record.get(0),
                     Date.from(userTime.toInstant()),
-                    // Date.from(utcTime.toInstant()),
                     record.get(2),
                     Integer.parseInt(record.get(3))
                 ));
