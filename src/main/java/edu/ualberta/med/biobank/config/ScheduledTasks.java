@@ -30,7 +30,7 @@ public class ScheduledTasks {
     @Scheduled(cron = "0 0 3 * * ?")
     public void runAt3AM() {
         logger.info("Task performed at {}", LocalDateTime.now());
-        var result = removeCatalogueFiles();
+        var result = removeStaleFiles();
         if (result.isLeft()) {
             logger.error("task error: %s".formatted(LoggingUtils.prettyPrintJson(result.getLeft().get())));
         }
@@ -45,7 +45,7 @@ public class ScheduledTasks {
     //     }
     // }
 
-    private Either<AppError, Boolean> removeCatalogueFiles() {
+    private Either<AppError, Boolean> removeStaleFiles() {
         Instant currentTime = Instant.now();
         File directory = new File(catalogueFolder);
 
