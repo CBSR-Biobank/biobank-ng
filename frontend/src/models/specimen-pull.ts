@@ -5,7 +5,7 @@ export const specimenPullSchema = z.object({
   pnumber: z.string(),
   inventoryId: z.string(),
   dateDrawn: z.string().pipe(z.coerce.date()),
-  specimeType: z.string().optional(),
+  specimenType: z.string(),
   location: z.string(),
   activityStatus: z.nativeEnum(Status),
 });

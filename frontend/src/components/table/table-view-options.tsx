@@ -21,7 +21,7 @@ export function TableViewOptions<TData>({ table }: DataTableViewOptionsProps<TDa
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="ml-auto hidden h-8 lg:flex">
-          <FontAwesomeIcon icon={faGear} className={cn('bg-primary-300 animate-spin')} />
+          <FontAwesomeIcon icon={faGear} className={cn('bg-primary-300')} />
           View
         </Button>
       </DropdownMenuTrigger>

@@ -21,21 +21,22 @@ function getColumns(): ColumnDef<SpecimenPull, any>[] {
     columnHelper.accessor('pnumber', {
       header: ({ column }) => <DataTableColumnHeader column={column} title="Patient" />,
       cell: ({ row }) => row.getValue('pnumber'),
+      sortingFn: 'alphanumeric',
     }),
     columnHelper.accessor('inventoryId', {
       header: ({ column }) => <DataTableColumnHeader column={column} title="Inventory Id" />,
       cell: ({ row }) => row.getValue('inventoryId'),
     }),
     columnHelper.accessor('dateDrawn', {
-      header: () => 'Date Drawn',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Date Drawn" />,
       cell: ({ row }) => format(row.getValue('dateDrawn'), 'yyyy-MM-dd'),
     }),
     columnHelper.accessor('specimenType', {
-      header: () => 'Type',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
       cell: ({ row }) => row.getValue('specimenType'),
     }),
     columnHelper.accessor('location', {
-      header: () => 'Location',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Location" />,
       cell: ({ row }) => row.getValue('location'),
     }),
     columnHelper.accessor('activityStatus', {
@@ -98,6 +99,40 @@ export const RequestPage: React.FC = () => {
       });
   };
 
+  const handleCsvDownload = () => {
+    const fileName = prompt('Enter file name (the .csv extension will be added automatically)', 'data');
+    if (!fileName) return; // If the user cancels, exit the function
+
+    const csvRows = [];
+    csvRows.push('pnumber,inventoryId,dateDrawn,specimenType,location,activityStatus');
+
+    results.forEach((pull) => {
+      const values = [
+        pull.pnumber,
+        pull.inventoryId,
+        format(pull.dateDrawn, 'yyy-MM-dd'),
+        pull.specimenType,
+        pull.location,
+        pull.activityStatus,
+      ];
+      csvRows.push(values.join(','));
+    });
+
+    // Convert rows to a CSV blob
+    const csvString = csvRows.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv' });
+
+    // Create a download link and trigger download
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${fileName}.csv`;
+    a.click();
+
+    // Clean up
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <AdminPage>
       <AdminPage.Title hasBorder>
@@ -125,9 +160,12 @@ export const RequestPage: React.FC = () => {
           </div>
         )}
 
-        <div className="flex">
+        <div className="flex gap-1">
           <BbButton size="xl" onClick={handleCsvUpload} disabled={!selectedFile || csvUploading}>
             Generate
+          </BbButton>
+          <BbButton variant="secondary" size="xl" onClick={handleCsvDownload} disabled={!resultsReady}>
+            Download CSV
           </BbButton>
         </div>
 
