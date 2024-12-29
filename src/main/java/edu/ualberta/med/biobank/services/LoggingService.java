@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.applicationevents.PatientCreatedEvent;
 import edu.ualberta.med.biobank.applicationevents.PatientReadEvent;
 import edu.ualberta.med.biobank.applicationevents.PatientUpdatedEvent;
+import edu.ualberta.med.biobank.applicationevents.SpecimenPullRequestEvent;
 import edu.ualberta.med.biobank.applicationevents.SpecimenReadEvent;
 import edu.ualberta.med.biobank.applicationevents.StudyCatalogueDownloadEvent;
 import edu.ualberta.med.biobank.applicationevents.StudyCatalogueRequestEvent;
@@ -185,6 +186,16 @@ public class LoggingService {
             .username(event.getUsername())
             .type("StudyCatalogue")
             .details("filename: %s".formatted(event.getFilename()))
+            .build();
+        loggingRepository.save(logEvent);
+    }
+
+    @EventListener
+    void handleSpecimenPullRequestEvent(SpecimenPullRequestEvent event) {
+        Log logEvent = new Log.LogBuilder()
+            .action("S3 - Specimen Request by CSV file")
+            .username(event.getUsername())
+            .type("report")
             .build();
         loggingRepository.save(logEvent);
     }

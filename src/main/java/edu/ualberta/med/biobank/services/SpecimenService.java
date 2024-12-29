@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import edu.ualberta.med.biobank.applicationevents.SpecimenPullRequestEvent;
 import edu.ualberta.med.biobank.applicationevents.SpecimenReadEvent;
 import edu.ualberta.med.biobank.applicationevents.VisitUpdatedEvent;
 import edu.ualberta.med.biobank.domain.Clinic;
@@ -173,8 +174,6 @@ public class SpecimenService {
                 request.specimenType()
             );
 
-            //logger.info("------------->  %s".formatted(LoggingUtils.prettyPrintJson(pullChoices)));
-
             for (int j = 0; j < request.count(); j++) {
                 if (j < pullChoices.size()) {
                     var dto = SpecimenPullDTO.fromSpecimenPull(pullChoices.get(j));
@@ -193,7 +192,8 @@ public class SpecimenService {
             }
         }
 
-
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        eventPublisher.publishEvent(new SpecimenPullRequestEvent(auth.getName()));
 
         return results;
     }
