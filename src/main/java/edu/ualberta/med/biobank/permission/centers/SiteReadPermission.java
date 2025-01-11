@@ -26,8 +26,6 @@ public class SiteReadPermission implements Permission {
         var userService = applicationContext.getBean(UserService.class);
         return userService
             .findOneWithMemberships(auth.getName())
-            .flatMap(user -> {
-                return Either.right(user.hasPermission(PermissionEnum.SITE_READ, null, siteId));
-            });
+            .flatMap(user -> Either.right(user.hasPermission(PermissionEnum.SITE_READ, null, siteId)));
     }
 }

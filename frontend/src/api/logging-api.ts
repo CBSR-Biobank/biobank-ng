@@ -1,19 +1,30 @@
-import { loggingSchema } from '@app/models/logging';
-
-import { z } from 'zod';
-
+import { appLoggingSchema } from '@app/models/app-logging';
+import { pagedQueryBuild } from '@app/models/paged-query';
+import { paginatedResponseSchema } from '@app/models/paginated-response';
+import { SortingState } from '@tanstack/react-table';
 import { httpClient } from './api';
 
 export class LoggingApi {
-  static async getLatest() {
+  static async paginate({
+    page,
+    size,
+    searchTerm,
+    sorting,
+  }: {
+    page?: number;
+    size?: number;
+    searchTerm?: string;
+    sorting?: SortingState;
+  }) {
+    let query = pagedQueryBuild({ page: page ?? 0, size: size, search: searchTerm, sorting });
+
     const response = await await httpClient({
       method: 'GET',
-      path: ['logging', 'latest'],
+      path: ['logging'],
       body: undefined,
-      query: undefined,
+      query,
     });
     const result = await response.json();
-    const logs = z.array(loggingSchema).parse(result);
-    return logs;
+    return paginatedResponseSchema(appLoggingSchema).parse(result);
   }
 }

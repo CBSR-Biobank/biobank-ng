@@ -1,3 +1,4 @@
+import { PagedQuery } from '@app/models/paged-query';
 import { Status } from '@app/models/status';
 import { userSchema } from '@app/models/user';
 import { useUserStore } from '@app/store';
@@ -22,14 +23,7 @@ type ClinicNames = {
 type Logging = {
   method: 'GET';
   path: readonly ['logging'];
-  query: undefined;
-  body: undefined;
-};
-
-type LoggingLatest = {
-  method: 'GET';
-  path: readonly ['logging', 'latest'];
-  query: undefined;
+  query: PagedQuery;
   body: undefined;
 };
 
@@ -177,7 +171,6 @@ export type Endpoint =
   | Auth
   | ClinicNames
   | Logging
-  | LoggingLatest
   | PatientCreate
   | PatientUpdate
   | PatientComments
@@ -235,8 +228,18 @@ export async function httpClient(endpoint: Endpoint, contentType: string | null 
 
   let url = `/api/${path}`;
   if (endpoint.query !== undefined) {
-    const queryString = new URLSearchParams(endpoint.query).toString();
-    if (queryString.length > 0) {
+    const queryString = new URLSearchParams();
+    Object.entries(endpoint.query).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((v) => {
+          queryString.append(`${key}`, v);
+        });
+        return;
+      }
+      queryString.append(key, `${value}`);
+    });
+
+    if (queryString.toString().length > 0) {
       url += `?${queryString}`;
     }
   }

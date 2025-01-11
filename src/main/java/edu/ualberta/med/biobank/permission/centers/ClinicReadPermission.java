@@ -26,8 +26,6 @@ public class ClinicReadPermission implements Permission {
         var userService = applicationContext.getBean(UserService.class);
         return userService
             .findOneWithMemberships(auth.getName())
-            .flatMap(user -> {
-                return Either.right(user.hasPermission(PermissionEnum.CLINIC_READ, null, ClinicId));
-            });
+            .flatMap(user -> Either.right(user.hasPermission(PermissionEnum.CLINIC_READ, null, ClinicId)));
     }
 }

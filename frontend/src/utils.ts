@@ -2,6 +2,18 @@ import { clsx, type ClassValue } from 'clsx';
 import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
+import { z } from 'zod';
+
+export const isoDateTimeOrNullSchema = z.union([
+  z
+    .string()
+    .refine((val) => !isNaN(Date.parse(val)), {
+      message: 'Invalid ISO date-time format',
+    })
+    .transform((val) => new Date(val)),
+  z.null(),
+  z.null(),
+]);
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

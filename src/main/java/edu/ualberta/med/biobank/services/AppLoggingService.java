@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.services;
 
-import java.util.Collection;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -23,36 +21,34 @@ import edu.ualberta.med.biobank.applicationevents.VisitDeletedEvent;
 import edu.ualberta.med.biobank.applicationevents.VisitReadEvent;
 import edu.ualberta.med.biobank.applicationevents.VisitUpdatedEvent;
 import edu.ualberta.med.biobank.domain.Log;
-import edu.ualberta.med.biobank.dtos.LoggingDTO;
-import edu.ualberta.med.biobank.repositories.LoggingRepository;
-import jakarta.persistence.Tuple;
+import edu.ualberta.med.biobank.dtos.AppLogEntryDTO;
+import edu.ualberta.med.biobank.repositories.AppLoggingRepository;
+import edu.ualberta.med.biobank.repositories.CustomAppLoggingRepository;
 
 @Service
-public class LoggingService {
+public class AppLoggingService {
 
     @SuppressWarnings("unused")
-    final Logger logger = LoggerFactory.getLogger(LoggingService.class);
+    final Logger logger = LoggerFactory.getLogger(AppLoggingService.class);
 
-    private LoggingRepository loggingRepository;
+    private AppLoggingRepository loggingRepository;
 
-    public LoggingService(LoggingRepository loggingRepository) {
+    private CustomAppLoggingRepository customLoggingRepository;
+
+    public AppLoggingService(AppLoggingRepository loggingRepository, CustomAppLoggingRepository customAppLoggingRepository) {
         this.loggingRepository = loggingRepository;
+        this.customLoggingRepository = customAppLoggingRepository;
     }
 
-    public Page<LoggingDTO> loggingPagination(Integer pageNumber, Integer pageSize, String sort) {
+    public Page<AppLogEntryDTO> paginated(Integer pageNumber, Integer pageSize, String sort) {
         Pageable pageable = null;
         if (sort != null) {
-            pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, sort);
+            pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.DESC, sort);
         } else {
-            pageable = PageRequest.of(pageNumber, pageSize);
+            pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.DESC, "createdAt");
         }
-        Page<Tuple> data = loggingRepository.findAllWithPagination(pageable);
-        return data.map(d -> LoggingDTO.fromTuple(d));
-    }
-
-    public List<LoggingDTO> loggingLatest() {
-        Collection<Tuple> data = loggingRepository.getLastest();
-        return data.stream().map(d -> LoggingDTO.fromTuple(d)).toList();
+        var result = customLoggingRepository.paginated(pageable);
+        return result;
     }
 
     @EventListener

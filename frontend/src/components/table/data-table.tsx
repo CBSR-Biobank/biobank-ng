@@ -16,42 +16,18 @@ export function sortingToStringArray(sorting: SortingState) {
 export function DataTable<TData>({
   data,
   columns,
-  // page,
-  // pageSize,
   totalItems,
-  // sorting,
-  // onSortingChange,
 }: {
   data: TData[];
   columns: ColumnDef<TData, any>[];
-  page?: number;
-  pageSize?: number;
   totalItems: number;
-  sorting?: SortingState;
-  onSortingChange?: (sorting: SortingState) => void;
 }) {
   const table = useReactTable({
-    // debugTable: true,
     columns,
     data,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    // onSortingChange: (updater) => {
-    //   if (!sorting || !onSortingChange) {
-    //     return;
-    //   }
-    //   const newSortingValue = updater instanceof Function ? updater(sorting) : updater;
-    //   onSortingChange(newSortingValue);
-    // },
-    //manualSorting: sorting !== undefined,
     rowCount: totalItems,
-    // state: {
-    //   pagination: {
-    //     pageIndex: page ?? 1,
-    //     pageSize: pageSize ?? Infinity,
-    //   },
-    //   sorting,
-    // },
   });
 
   return (
@@ -62,7 +38,7 @@ export function DataTable<TData>({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
+                <TableHead key={header.id} className="text-xs">
                   {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                 </TableHead>
               ))}
@@ -74,7 +50,7 @@ export function DataTable<TData>({
             table.getRowModel().rows.map((row) => (
               <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="p-3">
+                  <TableCell key={cell.id} className="text-nowrap p-2 align-top text-xs">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
@@ -82,7 +58,7 @@ export function DataTable<TData>({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
+              <TableCell colSpan={columns.length} className="h-24">
                 No results.
               </TableCell>
             </TableRow>

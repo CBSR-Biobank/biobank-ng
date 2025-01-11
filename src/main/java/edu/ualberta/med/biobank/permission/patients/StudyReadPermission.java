@@ -26,8 +26,6 @@ public class StudyReadPermission implements Permission {
         var userService = applicationContext.getBean(UserService.class);
         return userService
             .findOneWithMemberships(auth.getName())
-            .flatMap(user -> {
-                return Either.right(user.hasPermission(PermissionEnum.STUDY_READ, null, studyId));
-            });
+            .flatMap(user -> Either.right(user.hasPermission(PermissionEnum.STUDY_READ, null, studyId)));
     }
 }

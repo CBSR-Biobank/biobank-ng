@@ -7,7 +7,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@app/components/ui/dropdown-menu';
-import { cn } from '@app/utils';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Table } from '@tanstack/react-table';
@@ -20,9 +19,9 @@ export function TableViewOptions<TData>({ table }: DataTableViewOptionsProps<TDa
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="ml-auto hidden h-8 lg:flex">
-          <FontAwesomeIcon icon={faGear} className={cn('bg-primary-300')} />
+        <Button variant="outline" size="sm" className="ml-auto flex h-8 gap-2">
           View
+          <FontAwesomeIcon icon={faGear} className="bg-primary-300" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[150px]">

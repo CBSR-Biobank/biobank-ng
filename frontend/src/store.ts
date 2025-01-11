@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-
+import { SortingState } from '@tanstack/react-table';
+import { create, StateCreator } from 'zustand';
 import { CollectionEvent } from './models/collection-event';
 import { Patient } from './models/patient';
 import { User } from './models/user';
@@ -10,6 +10,17 @@ const DRAWER_MENU_OPEN_KEY = 'biobank-drawer-menus-open';
 
 const LOGGED_IN_TOKEN_KEY = 'biobank-logged-in-token';
 
+interface PaginationSlice {
+  page: number;
+  pageSize?: number;
+  searchTerm?: string;
+  sorting: SortingState;
+  setPage: (page: number) => void;
+  setPageSize: (size: number) => void;
+  setSearchTerm: (searchTerm: string) => void;
+  setSorting: (sorting: SortingState) => void;
+}
+
 function getDrawerOpen(): boolean {
   return localStorage.getItem(DRAWER_OPEN_KEY) === 'true';
 }
@@ -17,6 +28,17 @@ function getDrawerOpen(): boolean {
 function getDrawerMenuOpen(title: string): boolean {
   return (localStorage.getItem(DRAWER_MENU_OPEN_KEY) ?? '').includes(title);
 }
+
+const createPaginationSlice: StateCreator<PaginationSlice, [], [], PaginationSlice> = (set) => ({
+  page: 1,
+  pageSize: undefined,
+  searchTerm: undefined,
+  sorting: [],
+  setPage: (page: number) => set((_state) => ({ page })),
+  setPageSize: (pageSize: number) => set((_state) => ({ pageSize })),
+  setSearchTerm: (searchTerm: string) => set((_state) => ({ searchTerm })),
+  setSorting: (sorting: SortingState) => set((_state) => ({ sorting })),
+});
 
 interface UserState {
   checkingAuth: boolean;
@@ -101,4 +123,12 @@ interface StudyState {
 export const useStudyStore = create<StudyState>((set) => ({
   catalogueUrl: null,
   setCatalogueUrl: (catalogueUrl) => set((state) => ({ ...state, catalogueUrl })),
+}));
+
+interface AppLoggingsState extends PaginationSlice {}
+
+export const useAppLoggingsStore = create<AppLoggingsState>((...a) => ({
+  ...createPaginationSlice(...a),
+  pageSize: 20,
+  sorting: [{ id: 'createdAt', desc: true }],
 }));

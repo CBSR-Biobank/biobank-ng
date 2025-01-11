@@ -9,39 +9,32 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import edu.ualberta.med.biobank.dtos.LoggingDTO;
-import edu.ualberta.med.biobank.services.LoggingService;
+import edu.ualberta.med.biobank.dtos.AppLogEntryDTO;
+import edu.ualberta.med.biobank.services.AppLoggingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/api/logging")
-public class LoggingController {
+public class AppLoggingController {
 
     Logger logger = LoggerFactory.getLogger(StudyController.class);
 
-    private final LoggingService loggingService;
+    private final AppLoggingService loggingService;
 
-    LoggingController(LoggingService loggingService) {
+    AppLoggingController(AppLoggingService loggingService) {
         this.loggingService = loggingService;
 
     }
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @GetMapping( name = "")
-    public Page<LoggingDTO> allPaginated(
+    public Page<AppLogEntryDTO> allPaginated(
             @RequestParam Optional<Integer> page,
             @RequestParam Optional<Integer> size) {
         int thePage = page.orElse(0);
         int theSize = size.orElse(10);
-        Page<LoggingDTO> data = loggingService.loggingPagination(thePage, theSize, null);
-        return data;
-    }
-
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    @GetMapping("/latest")
-    public List<LoggingDTO> latest() {
-        var data = loggingService.loggingLatest();
+        Page<AppLogEntryDTO> data = loggingService.paginated(thePage, theSize, null);
         return data;
     }
 

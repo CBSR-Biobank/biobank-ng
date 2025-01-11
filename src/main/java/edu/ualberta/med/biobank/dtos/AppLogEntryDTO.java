@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.dtos;
 import java.util.Date;
 import jakarta.persistence.Tuple;
 
-public record LoggingDTO(
+public record AppLogEntryDTO(
     Integer id,
     Date   createdAt,
     String username,
@@ -15,8 +15,8 @@ public record LoggingDTO(
     String details,
     String type
 ) {
-    public static LoggingDTO fromTuple(Tuple data) {
-        return new LoggingDTO(
+    public static AppLogEntryDTO fromTuple(Tuple data) {
+        return new AppLogEntryDTO(
             data.get("id", Number.class).intValue(),
             data.get("createdAt", Date.class),
             data.get("username", String.class),
