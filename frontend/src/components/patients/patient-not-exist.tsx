@@ -1,11 +1,11 @@
-import { Alert, AlertDescription } from '@app/components/ui/alert';
+import { AlertDescription } from '@app/components/ui/alert';
 import { AdminPage } from '@app/pages/admin-page';
 
 import { faPlusCircle, faWarning } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, useParams } from 'react-router-dom';
 
 import { BackButton } from '../back-button';
+import { BbAlert } from '../bb-alert';
 import { BbButton } from '../bb-button';
 
 export const PatientNotExist: React.FC = () => {
@@ -17,12 +17,11 @@ export const PatientNotExist: React.FC = () => {
         <p className="text-4xl font-semibold text-sky-600">Patient Does Not Exist</p>
       </AdminPage.Title>
       <div className="grid grid-cols-1 gap-8">
-        <Alert variant="warning">
-          <FontAwesomeIcon icon={faWarning} />
+        <BbAlert variant="warning" icon={faWarning}>
           <AlertDescription>
             The patient with number <b>{pnumber}</b> is not on record
           </AlertDescription>
-        </Alert>
+        </BbAlert>
         <div className="flex gap-4">
           <Link to="/patients">
             <BackButton />

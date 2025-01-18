@@ -4,14 +4,14 @@ import { CatalogueState } from '@app/models/catalogue-state';
 import { CatalogueStatus } from '@app/models/catalogue-status';
 import { AdminPage } from '@app/pages/admin-page';
 import { faCircleInfo, faWarning } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ReactNode, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BackButton } from '../back-button';
+import { BbAlert } from '../bb-alert';
 import { BbButton } from '../bb-button';
 import { CircularProgress } from '../circular-progress';
 import { ShowError } from '../show-error';
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { AlertDescription, AlertTitle } from '../ui/alert';
 
 const Wrapper: React.FC<{ studyName?: string; children: ReactNode }> = ({ studyName, children }) => {
   return (
@@ -109,10 +109,7 @@ export const CatalogueWaitComplete: React.FC = () => {
     if (error.error.details === 'invalid task id') {
       return (
         <Wrapper studyName={studyName}>
-          <Alert variant="warning">
-            <FontAwesomeIcon icon={faWarning} />
-            <AlertTitle>This catalogue is no longer available</AlertTitle>
-          </Alert>
+          <BbAlert variant="warning" icon={faWarning} title="This catalogue is no longer available" />
           <div className="flex flex-col gap-3 pt-8 md:w-max md:flex-row">
             <BackButton onClick={backClicked} />
           </div>
@@ -125,10 +122,9 @@ export const CatalogueWaitComplete: React.FC = () => {
   if (isLoading) {
     return (
       <Wrapper studyName={studyName}>
-        <Alert variant="info">
-          <AlertTitle>Waiting for catalogue...</AlertTitle>
+        <BbAlert variant="info" title="Waiting for catalogue...">
           <CircularProgress />
-        </Alert>
+        </BbAlert>
       </Wrapper>
     );
   }
@@ -136,10 +132,7 @@ export const CatalogueWaitComplete: React.FC = () => {
   if (data?.state === CatalogueState.CANCELLED) {
     return (
       <Wrapper studyName={studyName}>
-        <Alert variant="warning">
-          <FontAwesomeIcon icon={faWarning} />
-          <AlertTitle>This catalogue is no longer available</AlertTitle>
-        </Alert>
+        <BbAlert variant="warning" icon={faWarning} title="This catalogue is no longer available" />
         <div className="flex flex-col gap-3 pt-8 md:w-max md:flex-row">
           <BackButton onClick={backClicked} />
         </div>
@@ -150,11 +143,10 @@ export const CatalogueWaitComplete: React.FC = () => {
   return (
     <Wrapper studyName={studyName}>
       <div className="flex flex-col gap-3 pt-8">
-        <Alert variant="info">
-          <FontAwesomeIcon icon={faCircleInfo} />
+        <BbAlert variant="info" icon={faCircleInfo}>
           <AlertTitle>Catalouge file is ready</AlertTitle>
           <AlertDescription>Press the download button to save the file</AlertDescription>
-        </Alert>
+        </BbAlert>
         <div className="flex flex-row gap-3 pt-8 md:w-max md:flex-row">
           <BbButton size="xl" onClick={downloadFile}>
             Download File

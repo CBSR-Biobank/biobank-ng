@@ -1,10 +1,10 @@
 import { SpecimenApi } from '@app/api/specimen-api';
+import { BbAlert } from '@app/components/bb-alert';
 import { BbButton } from '@app/components/bb-button';
 import { CircularProgress } from '@app/components/circular-progress';
 import { StatusChip } from '@app/components/status-chip';
 import { DataTable } from '@app/components/table/data-table';
 import { DataTableColumnHeader } from '@app/components/table/table-column-header';
-import { Alert, AlertTitle } from '@app/components/ui/alert';
 import { SpecimenPull } from '@app/models/specimen-pull';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -171,10 +171,9 @@ export const RequestPage: React.FC = () => {
 
         {selectedFile && csvUploading && (
           <div className="flex items-center justify-start">
-            <Alert variant="info">
-              <AlertTitle>Processing request...</AlertTitle>
+            <BbAlert variant="info" title="Processing request...">
               <CircularProgress />
-            </Alert>
+            </BbAlert>
           </div>
         )}
 
