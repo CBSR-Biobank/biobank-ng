@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import edu.ualberta.med.biobank.applicationevents.StudyCatalogueDownloadEvent;
 import edu.ualberta.med.biobank.applicationevents.StudyCatalogueRequestEvent;
+import edu.ualberta.med.biobank.dtos.AliquotDTO;
 import edu.ualberta.med.biobank.dtos.AnnotationTypeDTO;
 import edu.ualberta.med.biobank.dtos.CatalogueTaskDTO;
 import edu.ualberta.med.biobank.dtos.SourceSpecimenTypeDTO;
@@ -94,6 +95,12 @@ public class StudyController {
     @GetMapping("/{nameshort}/source-specimen-types")
     public List<SourceSpecimenTypeDTO> sourceSpecimens(@PathVariable String nameshort) {
         return studyService.sourceSpecimens(nameshort).orElseThrow(err -> new AppErrorException(err));
+    }
+
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @GetMapping("/catalogues/{nameshort}")
+    public List<AliquotDTO> catlogueJson(@PathVariable String nameshort, HttpServletRequest request) {
+        return studyService.catalogue(nameshort).orElseThrow(err -> new AppErrorException(err));
     }
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })

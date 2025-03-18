@@ -1,23 +1,10 @@
 package edu.ualberta.med.biobank.services;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.event.EventListener;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 import edu.ualberta.med.biobank.domain.Operation;
 import edu.ualberta.med.biobank.domain.Status;
 import edu.ualberta.med.biobank.domain.Study;
 import edu.ualberta.med.biobank.domain.Task;
+import edu.ualberta.med.biobank.dtos.AliquotDTO;
 import edu.ualberta.med.biobank.dtos.AnnotationTypeDTO;
 import edu.ualberta.med.biobank.dtos.CatalogueTaskDTO;
 import edu.ualberta.med.biobank.dtos.SourceSpecimenTypeDTO;
@@ -30,13 +17,31 @@ import edu.ualberta.med.biobank.errors.Forbidden;
 import edu.ualberta.med.biobank.errors.PermissionError;
 import edu.ualberta.med.biobank.exception.AppErrorException;
 import edu.ualberta.med.biobank.permission.patients.StudyReadPermission;
+import edu.ualberta.med.biobank.repositories.SpecimenRepository;
 import edu.ualberta.med.biobank.repositories.StudyRepository;
 import edu.ualberta.med.biobank.services.catalogue.CatalogueCreateOp;
 import edu.ualberta.med.biobank.util.LoggingUtils;
 import io.jbock.util.Either;
 import jakarta.persistence.Tuple;
-import org.springframework.beans.factory.annotation.Value;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
 @Service
 public class StudyService {
@@ -49,14 +54,22 @@ public class StudyService {
 
     private StudyRepository studyRepository;
 
+    private SpecimenRepository specimenRepository;
+
     private final TaskService taskService;
 
     UserService userService;
 
-    public StudyService(StudyRepository studyRepository, TaskService taskService, UserService userService) {
+    public StudyService(
+        StudyRepository studyRepository,
+        TaskService taskService,
+        UserService userService,
+        SpecimenRepository specimenRepository
+    ) {
         this.studyRepository = studyRepository;
         this.taskService = taskService;
         this.userService = userService;
+        this.specimenRepository = specimenRepository;
     }
 
     public void save(Study study) {
@@ -188,6 +201,28 @@ public class StudyService {
                 Collection<Tuple> sourceSpecimenTypes = studyRepository.listSourceSpecimens(nameshort, Tuple.class);
                 var dtos = sourceSpecimenTypes.stream().map(s -> SourceSpecimenTypeDTO.fromTuple(s)).toList();
                 return Either.right(dtos);
+            });
+    }
+
+    public Either<AppError, List<AliquotDTO>> catalogue(String nameShort) {
+        var found = studyRepository.findByNameShort(nameShort, Tuple.class).stream().findFirst();
+        if (found.isEmpty()) {
+            return Either.left(new EntityNotFound("study"));
+        }
+
+        var study = StudyDTO.fromTuple(found.get());
+        return new StudyReadPermission(study.id())
+            .isAllowed()
+            .flatMap(allowed -> {
+                Map<String, AliquotDTO> specimenDTOs = new LinkedHashMap<>();
+                specimenRepository
+                    .findByStudy(nameShort, Tuple.class)
+                    .stream()
+                    .forEach(row -> {
+                        var inventoryId = row.get("inventory_Id", String.class);
+                        specimenDTOs.computeIfAbsent(inventoryId, id -> AliquotDTO.fromTuple(row));
+                    });
+                return Either.right(new ArrayList<>(specimenDTOs.values()));
             });
     }
 
